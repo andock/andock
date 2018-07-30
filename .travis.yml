@@ -1,0 +1,23 @@
+sudo: required
+dist: trusty
+language: php
+php:
+  - "7.1"
+services:
+- docker
+env:
+  global:
+  - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
+  - ENCRYPTION_LABEL: fe3d37fe6546
+
+before_install:
+
+- ./init_ssh.sh
+- ./bin/andock.sh _install-andock
+- cd tests
+- git clone https://github.com/andock/demo-project.git
+script:
+- set -e
+- bats server.bats
+- bats build.bats
+- bats fin.bats

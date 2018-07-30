@@ -1,0 +1,19 @@
+site_name: andock documentation
+theme: readthedocs
+repo_url: https://github.com/andock/andock
+site_url: https://docs.andock
+markdown_extensions:
+  - markdown.extensions.admonition
+pages:
+  - Home: index.md
+  - Getting started:
+    - Concept: getting-started/the-software.md
+    - System requirements: getting-started/system-requirements.md
+    - 5 minutes setup: getting-started/docksal.md
+    - Automate on your ci: getting-started/ci.md
+  - Configuration:
+    - Overview: configuration/overview.md
+    - Build configuration: configuration/build.md
+    - Fin configuration: configuration/fin.md
+    - Hook configurations:
+      - Drupal: configuration/example-drupal-hooks.md
