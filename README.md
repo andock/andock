@@ -1,27 +1,71 @@
-# andock - docksal and ansible powered hosting.
+# andock cli - docksal and ansible powered hosting.
 
-## Key features
-* Easy to use command line tool.
-* Use ansible to remote control docksal.
-* Easy configuration.
-* One environment per branch.
-* Extendable with init, update, tests ansible hooks.
-* drush support including drush sql-sync without extra ssh container.
-* Easy to integrate in your CI environment.
+The <b>andock cli</b> is a command line interface to andock.    
 
-## For what can you use andock?
-* Host your project including environments support for every branch.
-* Host your project on acquia, platform.sh etc. Use andock for unlimited development environment.
-* Use andock to host review environments for qa suites. 
 
-## How can I use andock
-* As docksal addon
-* As a docker image inside your CI
-* As a standalone command line tool.
 
-## Commands:
-![alt text](docs/commands.png "Logo Title Text 1")
+## Installation
+Docksal addon:
+```
+    fin addon install andock
+    fin addon install andock
+```
+Standalone: 
+```
+    curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock | sh
+```
 
+## Updates
+Update with this command:
+```
+    andock self-update
+```
+
+## Usage
+As docksal addon:
+```
+    fin andock help
+```
+Standalone: 
+```
+    andock help
+```
+# Commands:
+```bash
+  andock command reference   0.0.1
+
+  connect                    Connect andock to andock server
+  (.) ssh-add <ssh-key>      Add private SSH key <ssh-key> variable to the agent store.
+
+  Server management:         
+  server:install [root_user, default=root] [andock_pass, default=keygen]  Install andock server.
+  server:update [root_user, default=root]  Update andock server.
+  server:ssh-add [root_user, default=root]  Add public ssh key to andock server.
+
+  Project configuration:     
+  generate:config            Generate andock project configuration.
+
+  Project build management:  
+  build                      Build project and push it to target branch.
+
+  Control remote docksal:    
+  fin init                   Clone git repository and init tasks.
+  fin up                     Start services.
+  fin update                 Pull changes and run update tasks.
+  fin test                   Run UI tests.
+  fin stop                   Stop services.
+  fin rm                     Remove environment.
+
+  fin-run <command> <path>   Run any fin command.
+
+  Drush:                     
+  drush:generate-alias       Generate drush alias.
+
+  version (v, -v)            Print andock version. [v, -v] - prints short version
+  alias                      Print andock alias.
+
+  self-update                Update andock
+```
 
 # Getting started?
 

@@ -4,26 +4,26 @@
 [System requirements](/system-requirements.md)
 #### Install addon
 ```
-fin addon install acp
+fin addon install andock
 ```
-#### Enable acp in your project
+#### Enable andock in your project
 ```
-fin acp enable
+fin andock enable
 ```
-#### Setup the acp server
+#### Setup the andock server
 The easiest way to test andock is to create a cloud box on aws or digital ocean etc. with ubuntu 16.04 or 18.04.
 
 After that run:
 
 ```
-fin acp connect
-fin acp server:install
-fin acp server:ssh-add "ssh-rsa AAAAB3NzaC1yc2EA ..."
+fin andock connect
+fin andock server:install
+fin andock server:ssh-add "ssh-rsa AAAAB3NzaC1yc2EA ..."
 ```
 
 #### Generate project configuration
 ```
-fin acp config:generate
+fin andock config:generate
 ```
 This will create some required config files and templates for init, build, test and update hooks. 
 #### Build project (optional)
@@ -31,17 +31,17 @@ This will create some required config files and templates for init, build, test 
 [See](./build.md)
 #### Initialize remote environment
 ```
-fin acp fin init
+fin andock fin init
 ```
 
 #### Update remote environment  
 ```
-fin acp fin update
+fin andock fin update
 ```
 
 #### Run tests
 ```
-fin acp fin test
+fin andock fin test
 ```
 
 ### Congratulations, the installation is finished!

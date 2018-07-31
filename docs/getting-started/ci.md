@@ -1,6 +1,5 @@
 # CI configuration
 
-
 TBD.
 
 ## Installation travis (standalone).

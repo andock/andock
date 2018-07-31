@@ -6,8 +6,9 @@ markdown_extensions:
   - markdown.extensions.admonition
 pages:
   - Home: index.md
+  - Big Picture:
+    - Introduction: big-picture/introduction.md
   - Getting started:
-    - Concept: getting-started/the-software.md
     - System requirements: getting-started/system-requirements.md
     - 5 minutes setup: getting-started/docksal.md
     - Automate on your ci: getting-started/ci.md
