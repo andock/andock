@@ -3,8 +3,8 @@
 ANSIBLE_VERSION="2.4.4"
 ANDOCK_VERSION=0.0.1
 
-REQUIREMENTS_ANDOCK_BUILD='0.0.7'
-REQUIREMENTS_ANDOCK_FIN='0.0.5'
+REQUIREMENTS_ANDOCK_BUILD='0.0.8'
+REQUIREMENTS_ANDOCK_FIN='0.0.6'
 REQUIREMENTS_ANDOCK_SERVER='0.0.1'
 REQUIREMENTS_SSH_KEYS='0.3'
 
@@ -203,7 +203,7 @@ generate_playbooks()
 - hosts: andock-docksal-server
   gather_facts: true
   roles:
-    - { role: key-tec.fin, git_repository_path: \"{{ git_target_repository_path }}\" }
+    - { role: key-tec.fin }
 " > "${ANDOCK_PLAYBOOK}/fin.yml"
 
 
@@ -337,8 +337,8 @@ show_help ()
     printh "Control remote docksal:" "" "yellow"
     printh "fin init"  "Clone git repository and init tasks."
     printh "fin up"  "Start services."
-    printh "fin update"  "Pull changes from repository and run update tasks."
-    printh "fin test"  "Run tests."
+    printh "fin update"  "Pull changes and run update tasks."
+    printh "fin test"  "Run UI tests."
     printh "fin stop" "Stop services."
     printh "fin rm" "Remove environment."
     echo
@@ -593,20 +593,13 @@ run_fin ()
             exit 1
         ;;
     esac
-    echo $branch_name
+
     # Run the playbook.
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
 
     # Handling playbook results.
     if [[ $? == 0 ]]; then
         echo-green "fin ${tag} was finished successfully."
-        local domains
-        domains=$(echo $config_base_domains | tr " " "\n")
-        for domain in $domains
-        do
-            local url="http://${branch_name}.${domain}"
-            echo-green  "See [$url]"
-        done
     else
         echo-error $DEFAULT_ERROR_MESSAGE
         exit 1;
