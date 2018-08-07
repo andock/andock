@@ -8,3 +8,8 @@ The following configuration files are added to a project by running `fin acp gen
 | `hooks/init_tasks.yml`     | Build hook fired while `fin acp fin init` |
 | `hooks/update_tasks.yml`   | Build hook fired while `fin acp fin update`|
 | `hooks/test_tasks.yml`     | Build hook fired while `fin acp fin test`|
+
+## The main configuration file `andock.yml`:
+
+```
+```
