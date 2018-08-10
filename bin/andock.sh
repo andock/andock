@@ -4,7 +4,7 @@ ANSIBLE_VERSION="2.4.4"
 ANDOCK_VERSION=0.0.1
 
 REQUIREMENTS_ANDOCK_BUILD='0.0.8'
-REQUIREMENTS_ANDOCK_FIN='0.0.6'
+REQUIREMENTS_ANDOCK_FIN='0.0.7'
 REQUIREMENTS_ANDOCK_SERVER='0.0.1'
 REQUIREMENTS_SSH_KEYS='0.3'
 
@@ -382,7 +382,7 @@ get_git_origin_url ()
 # Returns the default project name
 get_default_project_name ()
 {
-    if [ "${ANDOCK_PROJECT_NAME}" != "" ]; then
+    if [ "${ANDOCK_PROJECT_NAME}" = "" ]; then
         echo "$(basename ${PWD})"
     else
         echo "${ANDOCK_PROJECT_NAME}"
@@ -654,14 +654,32 @@ generate_config ()
         exit
     fi
 
-    local base_domains && base_domains=$(_ask "Please enter project base domain. [Like: dev.project.com. Url is: branch.dev.project.com]")
-
+    local virtual_host_pattern && virtual_host_pattern=$(_ask "Please enter your virtual host pattern. [{{ branch }}.${project_name}.com]")
+    if [ "$virtual_host_pattern" = "" ]; then
+        virtual_host_pattern="{{ branch }}.${project_name}.com"
+    fi
     mkdir -p ".andock"
     mkdir -p ".andock/hooks"
 
-    echo "project_name: \"${project_name}\"
-base_domains: \"${base_domains}\"
+    echo "# andock.yml (version: ${ANDOCK_VERSION})
+
+## The name of this project, which must be unique within a andock server.
+project_name: \"${project_name}\"
+
+## The virtual host configuration pattern.
+virtual_hosts:
+  default: \"${virtual_host_pattern}\"
+
+## The git checkout repository.
 git_repository_path: ${git_repository_path}
+
+## Mounts describe writeable persistent filesystem mounts in the application.
+## Mounts are linked via volumnes: into the docker environment.
+# mounts:
+#   - { name: 'files', src: 'files', path: 'docroot/files' }
+
+## ansible build hooks.
+## The hooks that will be triggered when the environment is builded/initialized/updated.
 hook_build_tasks: \"{{project_path}}/.andock/hooks/build_tasks.yml\"
 hook_init_tasks: \"{{project_path}}/.andock/hooks/init_tasks.yml\"
 hook_update_tasks: \"{{project_path}}/.andock/hooks/update_tasks.yml\"
@@ -682,11 +700,7 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
     generate_config_empty_hook "test"
 
     if [[ $? == 0 ]]; then
-        if [ "$build" = 1 ]; then
-            echo-green "Configuration was generated. Configure your hooks and start with ${yellow}andock build${NC}"
-        else
-            echo-green "Configuration was generated. Configure your hooks and start with ${yellow}andock fin init${NC}"
-        fi
+        echo-green "Configuration was generated. Configure your hooks and start with ${yellow}andock build${NC}"
     else
         echo-error ${DEFAULT_ERROR_MESSAGE}
     fi
