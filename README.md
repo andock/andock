@@ -1,4 +1,4 @@
-![alt text](docs/images/logo.png "andock")
+![alt text](docs/images/logo_circle.png "andock")
 
 
 # andock cli - docksal and ansible powered hosting.
