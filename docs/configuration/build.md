@@ -16,7 +16,6 @@ Run `andock build` to start the build.
   command: "npm run compile"
   args:
     chdir: "{{ checkout_path }}/docroot/themes/custom/theme"
-
 ```
 ### .gitignore
 To commit builded artifacts the folders must be removed from .gitignore.
@@ -36,5 +35,7 @@ docroot/profiles/contrib
 vendor
 #### END REMOVE ANDOCK ###
 ```
-## No build needed?
-> Build the project on your own CI or there is no need to build the project? You can define your git repository as artifact repository. Add your git repository to `git_artifact_repository_path`. 
+## 
+
+!!! tip "No build needed?"
+    Build the project on your own CI or there is no need to build the project? You can define your git repository as artifact repository. Add your git repository to `git_artifact_repository_path`. 

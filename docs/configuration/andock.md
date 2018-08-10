@@ -50,6 +50,6 @@ virtual_hosts:
   default: "www.domain.com"
 ```
 
-## Own template generation files.
-> To overwrite the generation templates you can define your own template files.
+!!! tip Own template generation files?
+    To overwrite the generation templates you can define your own template files.
 Simple add `docksal_local_yml_path` or `docksal_local_env_path` to your `andock.yml`
