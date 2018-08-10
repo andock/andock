@@ -14,8 +14,8 @@ To use andock you must install docksal on your server. This can easily done with
 If you are new to andock and want to give it a try: 
 [5 minutes setup](../getting-started/docksal.md)
 
-If you want to get an overview about the configuration structure see:
-[5 minutes setup](configuration-structure.md) 
+Configure your project:
+[Configure your project](../configuration/andock.md) 
  
 
 ## "build &amp; fin"
@@ -30,7 +30,7 @@ Here a short overview of the two main phases.
 ### Fin lifecycle.
 With andock fin you can create/start/stop/update/remove docksal environment  
 * Checks out the builded artifact 
-* Generates docksal-local configuration files.
+* Generates `docksal-local.yml` configuration files.
 * create/start/stop/update/remove docksal environment
 
 [See configuration](../configuration/fin.md)

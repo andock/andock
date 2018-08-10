@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.4.4"
-ANDOCK_VERSION=0.0.1
+ANDOCK_VERSION=0.0.2
 
 REQUIREMENTS_ANDOCK_BUILD='0.0.8'
 REQUIREMENTS_ANDOCK_FIN='0.0.7'
@@ -673,8 +673,8 @@ virtual_hosts:
 ## The git checkout repository.
 git_repository_path: ${git_repository_path}
 
-## Mounts describe writeable persistent filesystem mounts in the application.
-## Mounts are linked via volumnes: into the docker environment.
+## Mounts describe writeable persistent volumnes in the docker container.
+## Mounts are linked via volumnes: into the docker container.
 # mounts:
 #   - { name: 'files', src: 'files', path: 'docroot/files' }
 
