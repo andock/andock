@@ -1,6 +1,5 @@
-<div style="text-align:center">
 ![alt text](docs/images/logo.png "andock")
-</div>
+
 
 # andock cli - docksal and ansible powered hosting.
 
@@ -8,7 +7,7 @@ The <b>andock cli</b> is a command line interface to andock.
 
 ## New to andock?
 * [See documentation](https://andock.readthedocs.io/en/latest/)
-* [5 minutes setup](https://andock.readthedocs.io/en/latest/getting-started/docksal.md)
+* [5 minutes setup](https://andock.readthedocs.io/en/latest/getting-started/docksal/)
 
 ## Installation
 Docksal addon:
