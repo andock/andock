@@ -2,7 +2,7 @@
 
 # andock cli - docksal and ansible powered hosting.
 
-The <b>andock cli</b> is a command line interface to andock.    
+The `andock cli` is a command line interface to andock.    
 
 ## New to andock?
 * [See documentation](https://andock.readthedocs.io/en/latest/)
