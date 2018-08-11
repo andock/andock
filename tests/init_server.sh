@@ -23,7 +23,7 @@ fi
 
 # Create new droplet.
 echo "Create new droplet with image id: ${slug}"
-doctl_id=$(doctl compute droplet create andock-travis --size 1gb --image ${slug} --region fra1 --ssh-keys 4b:df:d0:74:35:11:97:a7:93:87:a7:4a:b1:66:9b:a3 --wait --no-header --format ID)
+doctl_id=$(doctl compute droplet create andock-travis --size 1gb --image ${slug} --region fra1 --ssh-keys b6:3c:4d:07:15:8c:7c:43:43:71:e3:61:a3:2d:f1:db,4b:df:d0:74:35:11:97:a7:93:87:a7:4a:b1:66:9b:a3 --wait --no-header --format ID)
 echo "Droplet was created successfully. ID: ${doctl_id}"
 # Assign floating ip.
 echo "Assign floating ip."
