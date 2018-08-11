@@ -1,4 +1,4 @@
-![alt text](images/logo_circle.png "andock")
+![alt text](images/logo_circle.svg "andock")
 # andock - docksal and ansible powered hosting.
 
 ## What is andock?
