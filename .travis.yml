@@ -8,7 +8,6 @@ services:
 env:
   matrix:
   - do_image_slug=ubuntu-18-04-x64
-  - do_image_slug=ubuntu-16-04-x64
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
@@ -16,15 +15,15 @@ env:
 before_install:
 - ./init_ssh.sh
 - ./bin/andock.sh _install-andock
-- git clone https://github.com/andock/demo-project.git
 - curl -sL https://github.com/digitalocean/doctl/releases/download/v1.7.2/doctl-1.7.2-linux-amd64.tar.gz | tar -xzv
 - sudo mv doctl /usr/local/bin
 - doctl auth init -t $do_token
 - cd tests
+- git clone https://github.com/andock/demo-project.git
 
 script:
 - set -e
-- ./init_server.sh $do_image_slug
+- ./init_server.sh $do_image_slug $name
 - bats server.bats
 - bats build.bats
 - bats fin.bats
