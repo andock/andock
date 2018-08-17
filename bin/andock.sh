@@ -5,7 +5,7 @@ ANDOCK_VERSION=0.0.2
 
 REQUIREMENTS_ANDOCK_BUILD='0.0.8'
 REQUIREMENTS_ANDOCK_FIN='0.0.7'
-REQUIREMENTS_ANDOCK_SERVER='0.0.2'
+REQUIREMENTS_ANDOCK_SERVER='0.0.3'
 REQUIREMENTS_SSH_KEYS='0.3'
 
 DEFAULT_CONNECTION_NAME="default"
@@ -838,7 +838,7 @@ run_server_install ()
 
     ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
     ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "${ANDOCK_PLAYBOOK}/server_install.yml"
-    run_server_ssh_add "$connection"
+    #run_server_ssh_add "$connection"
     ansible andock-docksal-server -e "ansible_ssh_user=andock" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "andock-server install" -b -e "ansible_sudo_pass=${andock_pw}" -vvv
     if [ "$tag" == "install" ]; then
         echo-green "andock password is: ${andock_pw}"
