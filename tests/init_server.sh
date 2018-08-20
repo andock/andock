@@ -18,7 +18,6 @@ doctl_ip=$(doctl compute droplet list "andock-travis-${slug}" --no-header --form
 # Assign floating ip.
 
 echo "${doctl_ip} dev.andock.ci" | sudo tee --append /etc/hosts
-sudo echo "dev.andock.ci ${doctl_ip}" >> /etc/hosts
 sudo cat /etc/hosts
 echo "JUUUPPI!. Sleep for 2 minutes to be sure everything is up."
 sleep 120
