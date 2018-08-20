@@ -13,10 +13,10 @@ fi
 
 # Check if a droplet exists and if found delete it.
 echo "Search for old droplet with name andock-travis-${slug}"
-old_doctl_id=$(doctl compute droplet list 'andock-travis-${slug}' --no-header --format=ID)
+old_doctl_id=$(doctl compute droplet list "andock-travis-${slug}" --no-header --format=ID)
 if [ "${old_doctl_id}" != "" ]; then
     echo "Old droplet found."
     echo "Delete droplet with id: ${old_doctl_id}..."
-    doctl compute droplet delete andock-travis -f
+    doctl compute droplet delete ${old_doctl_id} -f
     echo "Deleting done."
 fi

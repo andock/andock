@@ -27,3 +27,6 @@ script:
 - bats server.bats
 - bats build.bats
 - bats fin.bats
+
+after_install:
+- ./remove_server.sh $do_image_slug $name
