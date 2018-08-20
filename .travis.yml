@@ -20,7 +20,7 @@ before_install:
 - ./tests/remove_server.sh $do_image_slug $name
 - ./tests/init_server.sh $do_image_slug $name
 - ./init_ssh.sh
-- ssh -q root@dev.andock.ci exit
+- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -q root@dev.andock.ci exit
 - ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git

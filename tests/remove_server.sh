@@ -7,7 +7,7 @@ set -e
 slug=$1
 
 # Set default to "ubuntu-18-04-x64"
-if [ "${slug}" == "" ]; then
+if [ "${slug}" = "" ]; then
     slug="ubuntu-18-04-x64"
 fi
 
