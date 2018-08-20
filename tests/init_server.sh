@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Script creates a new test droplet and
 # assigns an floating ip to the droplet
 
@@ -31,5 +31,5 @@ doctl compute floating-ip-action assign 138.68.112.178 ${doctl_id}
 
 # There seems to be no way to wait till the ip is assigned
 # @TODO: Find better way.
-echo "YUUUPP! BAAAM!. Sleep for 3 minutes to be sure everything is up."
-sleep 180
+echo "YUUUPP! BAAAM!. Sleep for 5 minutes to be sure everything is up."
+sleep 360
