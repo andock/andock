@@ -13,17 +13,17 @@ env:
   - ENCRYPTION_LABEL: fe3d37fe6546
 
 before_install:
-- ./init_ssh.sh
-- ./bin/andock.sh _install-andock
+- set -e
 - curl -sL https://github.com/digitalocean/doctl/releases/download/v1.7.2/doctl-1.7.2-linux-amd64.tar.gz | tar -xzv
 - sudo mv doctl /usr/local/bin
 - doctl auth init -t $do_token
+- ./init_server.sh $do_image_slug $name
+- ./init_ssh.sh
+- ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git
 
 script:
-- set -e
-- ./init_server.sh $do_image_slug $name
 - bats server.bats
 - bats build.bats
 - bats fin.bats
