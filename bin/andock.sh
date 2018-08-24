@@ -5,7 +5,7 @@ ANDOCK_VERSION=0.0.2
 
 REQUIREMENTS_ANDOCK_BUILD='0.0.8'
 REQUIREMENTS_ANDOCK_FIN='0.0.7'
-REQUIREMENTS_ANDOCK_SERVER='0.0.6'
+REQUIREMENTS_ANDOCK_SERVER='0.0.14'
 REQUIREMENTS_SSH_KEYS='0.3'
 
 DEFAULT_CONNECTION_NAME="default"
@@ -816,13 +816,23 @@ run_server_install ()
     shift
     local tag=$1
     shift
+
     set -e
+    local andock_pw_option
+    local andock_pw
 
     if [ "$1" = "" ]; then
-        local andock_pw
-        andock_pw=$(openssl rand -base64 32)
+        if [ "$tag" = "install" ]; then
+            andock_pw=$(openssl rand -base64 32)
+            local andock_pw_enc && andock_pw_enc=$(mkpasswd --method=sha-512 ${andock_pw})
+            andock_pw_option="ansible_sudo_pass=\"${andock_pw}\""
+        else
+            andock_pw_option=""
+        fi
     else
-        local andock_pw=$1
+        andock_pw=${1}
+        local andock_pw_enc && andock_pw_enc=$(mkpasswd --method=sha-512 ${andock_pw})
+        andock_pw_option="ansible_sudo_pass=\"${andock_pw}\""
         shift
     fi
 
@@ -833,16 +843,13 @@ run_server_install ()
         shift
     fi
 
-    local andock_pw_enc
-    andock_pw_enc=$(mkpasswd --method=sha-512 $andock_pw)
-
-    ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
-    ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "${ANDOCK_PLAYBOOK}/server_install.yml"
-
-    if [ "$tag" == "install" ]; then
+    if [ "$tag" = "install" ]; then
+        ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
+        ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock password is: ${andock_pw}"
         echo-green "andock server was installed successfully."
     else
+        ansible-playbook -e ${andock_pw_option} -e "ansible_ssh_user=andock" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock server was updated successfully."
     fi
 }
