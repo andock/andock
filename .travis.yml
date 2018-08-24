@@ -26,6 +26,9 @@ before_install:
 - git clone https://github.com/andock/demo-project.git
 
 script:
+- cd demo-project
+- ../../bin/andock.sh server:install "andock" "root"
+- cd ..
 - bats server.bats
 - bats build.bats
 - bats fin.bats

@@ -845,7 +845,7 @@ run_server_install ()
 
     if [ "$tag" = "install" ]; then
         ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
-        ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" -vvvv "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock password is: ${andock_pw}"
         echo-green "andock server was installed successfully."
     else
