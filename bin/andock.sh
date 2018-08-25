@@ -27,6 +27,8 @@ export ANSIBLE_ROLES_PATH="${ANDOCK_HOME}/roles"
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 
+export ANSIBLE_SSH_PIPELINING=True
+
 config_git_target_repository_path=""
 config_base_domains=""
 config_project_name=""
@@ -219,6 +221,8 @@ generate_playbooks()
 
     echo "---
 - hosts: andock-docksal-server
+  vars: pipelining = True
+
   roles:
     - { role: key-tec.server }
 " > "${ANDOCK_PLAYBOOK}/server_install.yml"
