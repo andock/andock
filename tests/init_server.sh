@@ -27,6 +27,10 @@ else
     echo "
 ${doctl_ip} dev.andock.ci" | sudo tee --append /etc/hosts
     sudo cat /etc/hosts
+
+    echo "
+${doctl_ip} master.demo-project.dev.andock.ci" | sudo tee --append /etc/hosts
+    sudo cat /etc/hosts
 fi
 
 

@@ -7,17 +7,36 @@ setup() {
 }
 
 @test "fin:init" {
-  ../../bin/andock.sh fin init -e "branch=master"
+  run ../../bin/andock.sh fin init -e "branch=master"
+  [ $status = 0 ]
 }
 
-@test "fin:update" {
+@test "fin init: Testing page status" {
+    curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"
+    [ $status = 0 ]
+    [ "$output" = "HTTP/1.1 200 OK" ]
+}
+
+@test "fin init: Testing page content" {
+    curl -sL http://${VIRTUAL_HOST} | grep "Hello Andock"
+    [ $status = 0 ]
+    [ "$output" = "Hello Andock" ]
+}
+
+@test "fin update" {
   ../../bin/andock.sh fin update -e "branch=master"
 }
 
-@test "fin:test" {
+@test "fin test" {
   ../../bin/andock.sh fin test -e "branch=master"
 }
 
-@test "fin:rm" {
+@test "fin rm" {
   ../../bin/andock.sh fin rm -e "branch=master"
+}
+
+@test "fin rm: Testing page status" {
+    curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"
+    [ $status = 0 ]
+    [ "$output" = "HTTP/1.1 200 OK" ]
 }
