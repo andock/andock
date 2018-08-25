@@ -221,8 +221,6 @@ generate_playbooks()
 
     echo "---
 - hosts: andock-docksal-server
-  vars: pipelining = True
-
   roles:
     - { role: key-tec.server }
 " > "${ANDOCK_PLAYBOOK}/server_install.yml"
