@@ -17,8 +17,8 @@ before_install:
 - curl -sL https://github.com/digitalocean/doctl/releases/download/v1.7.2/doctl-1.7.2-linux-amd64.tar.gz | tar -xzv
 - sudo mv doctl /usr/local/bin
 - doctl auth init -t $do_token
-- ./tests/remove_server.sh $do_image_slug $name
-- ./tests/init_server.sh $do_image_slug $name
+- ./tests/remove_server.sh $do_image_slug
+- ./tests/init_server.sh $do_image_slug
 - ./init_ssh.sh
 - ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -q root@dev.andock.ci exit
 - ./bin/andock.sh _install-andock
@@ -26,11 +26,10 @@ before_install:
 - git clone https://github.com/andock/demo-project.git
 
 script:
-- cd demo-project
-- ../../bin/andock.sh server:install "andock" "root"
-- ../../bin/andock.sh build
-- ../../bin/andock.sh fin init
-- ../../bin/andock.sh fin update
+- set -e
+- bats server.bats
+- bats build.bats
+- bats fin.bats
 
 after_script:
-- ./remove_server.sh $do_image_slug $name
+- ./remove_server.sh $do_image_slug
