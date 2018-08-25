@@ -12,12 +12,12 @@ setup() {
 }
 
 @test "fin init: Testing page status" {
-    curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"
+    run curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"
     [ "$output" = "HTTP/1.1 200 OK" ]
 }
 
 @test "fin init: Testing page content" {
-    curl -sL http://master.demo-project.dev.andock.ci | grep "Hello Andock"
+    run curl -sL http://master.demo-project.dev.andock.ci | grep "Hello Andock"
     [ "$output" = "Hello Andock" ]
 }
 
@@ -34,6 +34,6 @@ setup() {
 }
 
 @test "fin rm: Testing page status" {
-    curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"
+    run curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"
     [ "$output" = "" ]
 }
