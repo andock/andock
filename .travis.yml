@@ -8,7 +8,7 @@ services:
 env:
   matrix:
   - image='ubuntu-18-04-x64' type='lxd'
-  - image='ubuntu-18-04-x64' type='digital-ocean'
+  - image='ubuntu-18-04-x64' type='digitalocean'
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546

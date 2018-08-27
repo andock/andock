@@ -12,7 +12,7 @@ fi
 set -e
 echo "Launch container"
 # Create container.
-sudo lxc launch ubuntu-daily:18.04 andock -c security.nesting=true
+sudo lxc launch ubuntu-daily:18.04 andock -c security.privileged=true -c security.nesting=true
 
 echo "done. Sleep to be sure everything is up"
 sleep 10
