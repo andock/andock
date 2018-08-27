@@ -334,7 +334,8 @@ show_help ()
     printh "generate:config" "Generate andock project configuration."
     echo
     printh "Project build management:" "" "yellow"
-    printh "build" "Build project and push it to target branch."
+    printh "build" "Build project and push it to artifact repository."
+    printh "deploy" "Build and deploy."
     echo
     printh "Control remote docksal:" "" "yellow"
     printh "fin init"  "Clone git repository and init tasks."
@@ -587,7 +588,7 @@ run_fin ()
 
     # Validate tag name. Show help if needed.
     case $tag in
-        init|up|update|test|stop|rm|exec)
+        init|up|update|test|stop|rm|exec|"init,update")
             echo-green "Start fin ${tag}..."
         ;;
         *)
@@ -917,9 +918,14 @@ case "$command" in
   connect)
 	run_connect "$@"
   ;;
-   build)
+  build)
 	run_build "$connection" "$@"
   ;;
+  deploy)
+    run_build "$connection" "$@"
+	run_fin "$connection" "init,update" "$@"
+  ;;
+
   fin)
 	run_fin "$connection" "$@"
   ;;

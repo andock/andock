@@ -7,20 +7,14 @@ services:
 - docker
 env:
   matrix:
-  - do_image_slug=ubuntu-18-04-x64
+  - image='ubuntu-18-04-x64' type='digital-ocean'
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
 
 before_install:
 - set -e
-- curl -sL https://github.com/digitalocean/doctl/releases/download/v1.7.2/doctl-1.7.2-linux-amd64.tar.gz | tar -xzv
-- sudo mv doctl /usr/local/bin
-- doctl auth init -t $do_token
-- ./tests/remove_server.sh $do_image_slug
-- ./tests/init_server.sh $do_image_slug
-- ./init_ssh.sh
-- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -q root@dev.andock.ci exit
+- ./init-travis.sh $type $image
 - ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git
@@ -30,6 +24,3 @@ script:
 - bats server.bats
 - bats build.bats
 - bats fin.bats
-
-after_script:
-- ./remove_server.sh $do_image_slug
