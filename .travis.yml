@@ -7,7 +7,7 @@ services:
 - docker
 env:
   matrix:
-  - image='ubuntu-18-04-x64' type='digital-ocean'
+  - image='ubuntu-18-04-x64' type='lxd'
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
@@ -16,6 +16,7 @@ before_install:
 - set -e
 - cd tests
 - ./init-travis.sh $type $image
+- cd ..
 - ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git
