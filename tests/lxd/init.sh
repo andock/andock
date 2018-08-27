@@ -1,11 +1,12 @@
 #!/usr/bin/env sh
 set -e
-
+echo "launch container"
 # Create container.
 sudo lxc launch ubuntu-daily:18.04 andock -c security.nesting=true
 
+echo "done. Sleep to be sure everything is up"
 sleep 10
-
+echo "Getting container ip..."
 # Get ip.
 andock_lxc_container_ip=$(sudo lxc list "andock" -c 4 | awk '!/IPV4/{ if ( $2 != "" ) print $2}')
 
