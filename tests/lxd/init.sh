@@ -1,6 +1,15 @@
 #!/usr/bin/env sh
 set -e
-echo "launch container"
+
+container_exists=$(sudo lxc list| grep andock)
+
+if [ "${container_exists}" != "" ]; then
+    echo "Found existing andock container. Removing...."
+    ./remove.sh
+    echo "Removing done."
+fi
+
+echo "Launch container"
 # Create container.
 sudo lxc launch ubuntu-daily:18.04 andock -c security.nesting=true
 
@@ -14,9 +23,9 @@ andock_lxc_container_ip=$(sudo lxc list "andock" -c 4 | awk '!/IPV4/{ if ( $2 !=
 sudo lxc file push authorized_keys andock/root/.ssh/authorized_keys
 sudo lxc exec andock -- chown root:root /root/.ssh/authorized_keys
 sudo lxc exec andock -- chmod 600 /root/.ssh/authorized_keys
-
+# Clean up local host.
+sudo sed -i '/dev.andock.ci/d' /etc/hosts
 # Update local hosts file.
-
     echo "
 ${andock_lxc_container_ip} dev.andock.ci" | sudo tee --append /etc/hosts
 
