@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
-set -e
 
-container_exists=$(sudo lxc list| grep andock)
+
+container_exists=$(lxc list| grep andock)
 
 if [ "${container_exists}" != "" ]; then
     echo "Found existing andock container. Removing...."
@@ -9,6 +9,7 @@ if [ "${container_exists}" != "" ]; then
     echo "Removing done."
 fi
 
+set -e
 echo "Launch container"
 # Create container.
 sudo lxc launch ubuntu-daily:18.04 andock -c security.nesting=true
