@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo apt-get install docker-ce=17.10.0-ce
 sudo apt-get -qq update;
+sudo apt-get -y install docker-ce=17.10.0-ce
 sudo apt-get -y install snapd;
 sudo snap install lxd;
 sudo sh -c 'echo PATH=/snap/bin:$PATH >> /etc/environment';
