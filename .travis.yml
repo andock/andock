@@ -22,7 +22,7 @@ before_install:
 script:
 - bats server.bats
 - sudo lxc exec andock -- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-- sudo lxc exec andock -- apt-get -qq update;
-- sudo lxc exec andock -- apt-get -y install docker-ce=17.10.0-ce
+- sudo lxc exec andock -- sudo apt-get -qq update;
+- sudo lxc exec andock -- sudo apt-get -y install docker-ce=17.10.0-ce
 - bats build.bats
 - bats fin.bats
