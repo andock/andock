@@ -6,7 +6,7 @@ php:
 env:
   matrix:
   - image='ubuntu-18-04-x64' type='lxd'
-  - image='ubuntu-18-04-x64' type='digitalocean'
+  #- image='ubuntu-18-04-x64' type='digitalocean'
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
@@ -21,5 +21,8 @@ before_install:
 
 script:
 - bats server.bats
+- sudo lxc exec andock -- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- sudo lxc exec andock -- apt-get -qq update;
+- sudo lxc exec andock -- apt-get -y install docker-ce=17.10.0-ce
 - bats build.bats
 - bats fin.bats

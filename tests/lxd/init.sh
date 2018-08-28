@@ -36,6 +36,7 @@ if [ "${TRAVIS}" = "true" ]; then
     sudo lxc exec andock -- mount -t cgroup cgroup -o net_cls /sys/fs/cgroup/net_cls
     sudo lxc exec andock -- mount -t cgroup cgroup -o net_prio /sys/fs/cgroup/net_prio
 fi
+
 # Clean up local host.
 sudo sed -i '/dev.andock.ci/d' /etc/hosts
 # Update local hosts file.
