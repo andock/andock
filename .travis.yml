@@ -1,12 +1,14 @@
 sudo: required
 dist: trusty
 language: php
+php:
+  - "7.1"
 services:
 - docker
 env:
   matrix:
   - image='ubuntu-18-04-x64' type='lxd'
-  #- image='ubuntu-18-04-x64' type='digitalocean'
+  - image='ubuntu-18-04-x64' type='digitalocean'
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
@@ -18,6 +20,7 @@ before_install:
 - ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git
+
 script:
 - bats server.bats
 - bats build.bats
