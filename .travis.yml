@@ -3,8 +3,6 @@ dist: trusty
 language: php
 php:
   - "7.1"
-services:
-- docker
 env:
   matrix:
   - image='ubuntu-18-04-x64' type='lxd'
@@ -20,7 +18,7 @@ before_install:
 - ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git
-
+- sudo apt install docker-ce=17.09.1~ce-0~ubuntu
 script:
 - bats server.bats
 - bats build.bats
