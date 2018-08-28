@@ -10,6 +10,7 @@ fi
 
 cd ${test_method}
 
+
 echo "Install $test_method components..."
 ./install.sh
 echo "Initialize ssh configuration..."
