@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 # exit on fail
-set -eo pipefail
 # setup LXD group
 sudo groupadd --system lxd
 sudo usermod -a -G lxd $USER
