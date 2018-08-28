@@ -12,13 +12,14 @@ env:
   - ENCRYPTION_LABEL: fe3d37fe6546
 
 before_install:
+- sudo apt install docker-ce=17.09.1~ce-0~ubuntu
 - cd tests
 - ./init-travis.sh $type $image
 - cd ..
 - ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git
-- sudo apt install docker-ce=17.09.1~ce-0~ubuntu
+
 script:
 - bats server.bats
 - bats build.bats
