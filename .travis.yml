@@ -1,6 +1,6 @@
 sudo: required
 dist: trusty
-language: genericphp:
+language: generic
 services:
 - docker
 env:
