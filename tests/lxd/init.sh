@@ -25,17 +25,17 @@ sudo lxc file push authorized_keys andock/root/.ssh/authorized_keys
 sudo lxc exec andock -- chown root:root /root/.ssh/authorized_keys
 sudo lxc exec andock -- chmod 600 /root/.ssh/authorized_keys
 
-
-sudo lxc exec andock -- mount -o remount,rw /sys/fs/cgroup/
-sudo lxc exec andock -- mkdir /sys/fs/cgroup/cpu
-sudo lxc exec andock -- mkdir /sys/fs/cgroup/cpuacct
-sudo lxc exec andock -- mkdir /sys/fs/cgroup/net_cls
-sudo lxc exec andock -- mkdir /sys/fs/cgroup/net_prio
-sudo lxc exec andock -- mount -t cgroup cgroup -o cpu /sys/fs/cgroup/cpu
-sudo lxc exec andock -- mount -t cgroup cgroup -o cpuacct /sys/fs/cgroup/cpuacct
-sudo lxc exec andock -- mount -t cgroup cgroup -o net_cls /sys/fs/cgroup/net_cls
-sudo lxc exec andock -- mount -t cgroup cgroup -o net_prio /sys/fs/cgroup/net_prio
-
+if [ "${TRAVIS}" = "true" ]; then
+    sudo lxc exec andock -- mount -o remount,rw /sys/fs/cgroup/
+    sudo lxc exec andock -- mkdir /sys/fs/cgroup/cpu
+    sudo lxc exec andock -- mkdir /sys/fs/cgroup/cpuacct
+    sudo lxc exec andock -- mkdir /sys/fs/cgroup/net_cls
+    sudo lxc exec andock -- mkdir /sys/fs/cgroup/net_prio
+    sudo lxc exec andock -- mount -t cgroup cgroup -o cpu /sys/fs/cgroup/cpu
+    sudo lxc exec andock -- mount -t cgroup cgroup -o cpuacct /sys/fs/cgroup/cpuacct
+    sudo lxc exec andock -- mount -t cgroup cgroup -o net_cls /sys/fs/cgroup/net_cls
+    sudo lxc exec andock -- mount -t cgroup cgroup -o net_prio /sys/fs/cgroup/net_prio
+fi
 # Clean up local host.
 sudo sed -i '/dev.andock.ci/d' /etc/hosts
 # Update local hosts file.
