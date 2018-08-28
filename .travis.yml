@@ -1,8 +1,6 @@
 sudo: required
 dist: trusty
-language: php
-php:
-  - "7.1"
+language: genericphp:
 services:
 - docker
 env:
