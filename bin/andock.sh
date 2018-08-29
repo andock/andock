@@ -29,6 +29,9 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 
 export ANSIBLE_SSH_PIPELINING=True
 
+#export ANSIBLE_SSH_ARGS="-t -t"
+
+#export ANSIBLE_DEBUG=1
 config_git_target_repository_path=""
 config_base_domains=""
 config_project_name=""

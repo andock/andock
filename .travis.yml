@@ -5,8 +5,9 @@ services:
 - docker
 env:
   matrix:
-  - image='ubuntu-18-04-x64' type='lxd'
-  - image='ubuntu-18-04-x64' type='digitalocean'
+  - image='ubuntu-18-04-x64' type='lxd' root_user=root
+  - image='ubuntu-18-04-x64' type='digitalocean' root_user=root
+  - image='ubuntu-18-04-x64' type='travisssh' root_user=travis
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546

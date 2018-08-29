@@ -9,12 +9,12 @@ setup() {
 }
 
 @test "server:install" {
-  ../../bin/andock.sh server:install "andock" "root"  -e "sudo_nopasswd=true"
+  ../../bin/andock.sh server:install "andock" "${root_user}" -e "sudo_nopasswd=true"
 
 }
 
 @test "server:update" {
-  ../../bin/andock.sh server:update "andock"
+  ../../bin/andock.sh server:update "andock" "${root_user}" -e "sudo_nopasswd=true"
 }
 
 @test "server:ssh-add" {
