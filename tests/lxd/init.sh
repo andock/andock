@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+./remove.sh
 
 container_exists=$(sudo lxc list| grep andock)
 
