@@ -880,7 +880,7 @@ fi
 # Than we check if the command needs an connection.
 # And if yes we check if the connection exists.
 case "$1" in
-    server:install|server:update|server:info|server:ssh-add|fin)
+    server:install|server:update|server:info|server:ssh-add|fin|build)
     check_connect $connection
     echo-green "Use connection: $connection"
     ;;

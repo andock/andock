@@ -19,3 +19,4 @@ echo "Start components..."
 ./init.sh $image
 
 
+
