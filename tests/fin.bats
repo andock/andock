@@ -2,12 +2,11 @@
 
 # Run server.bats before.
 
-setup() {
-    cd demo-project
-}
+load setup_helper
+
 
 @test "fin init" {
-    run ../../bin/andock.sh fin init -e "branch=master"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin init -e "branch=master"
     [ $status = 0 ]
 }
 
@@ -22,15 +21,15 @@ setup() {
 }
 
 @test "fin update" {
-    ../../bin/andock.sh fin update -e "branch=master"
+    ../../bin/andock.sh @${ANDOCK_CONNECTION} fin update -e "branch=master"
 }
 
 @test "fin test" {
-    ../../bin/andock.sh fin test -e "branch=master"
+    ../../bin/andock.sh @${ANDOCK_CONNECTION} fin test -e "branch=master"
 }
 
 @test "fin rm" {
-  ../../bin/andock.sh fin rm -e "branch=master"
+  ../../bin/andock.sh @${ANDOCK_CONNECTION} fin rm -e "branch=master"
 }
 
 @test "fin rm: Testing page status" {

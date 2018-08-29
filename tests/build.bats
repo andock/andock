@@ -1,12 +1,12 @@
 #!/usr/bin/env bats
 
-# Run server.bats before.
+# Run server.bats first.
 
-setup() {
-    cd demo-project
-}
+
+load setup_helper
 
 @test "build" {
-  ../../bin/andock.sh build -e "branch=master"
+  ../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=master"
 }
 
+load teardown_helper
