@@ -1,4 +1,4 @@
 sudo mkdir -p /usr/local/bin &&
-sudo curl -fsSL https://raw.githubusercontent.com/andock/andock/master/bin/acp-docksal.sh -o /usr/local/bin/acp &&
-sudo chmod +x /usr/local/bin/acp
+sudo curl -fsSL https://raw.githubusercontent.com/andock/andock/master/bin/andock-docksal.sh -o /usr/local/bin/andock &&
+sudo chmod +x /usr/local/bin/andock
 echo "andock wrapper was installed successfully"
