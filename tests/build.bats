@@ -6,7 +6,7 @@
 load setup_helper
 
 @test "build" {
-  ../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=master"
+  ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build -e "branch=master"
 }
 
 load teardown_helper
