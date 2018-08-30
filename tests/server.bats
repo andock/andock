@@ -9,6 +9,12 @@ load setup_helper
 @test "server:install" {
   ../../bin/andock.sh @${ANDOCK_CONNECTION} server:install "andock" "${ANDOCK_ROOT_USER}" -e "sudo_nopasswd=true"
 }
+@test "SSH connect to localhost" {
+  if [ "${ANDOCK_CONNECTION}" = "local" ]; then
+    skip "Skip test for non local connections"
+  fi
+  echo $(ssh -o BatchMode=yes -o ConnectTimeout=5 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no andock@dev.andock.ci echo ok 2>&1)
+}
 
 @test "Check docksal.env file " {
   if [ "${ANDOCK_CONNECTION}" != "travisssh" ]; then
