@@ -29,6 +29,7 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 
 export ANSIBLE_SSH_PIPELINING=True
 
+export ANSIBLE_SCP_IF_SSH=y
 #export ANSIBLE_SSH_ARGS="-t -t"
 
 #export ANSIBLE_DEBUG=1
