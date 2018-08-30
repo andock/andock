@@ -12,8 +12,8 @@ chmod 600 ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/id_rsa
 eval `ssh-agent -s`
 ssh-add ~/.ssh/id_rsa
-cat ~/.ssh/id_rsa
-mv -fv ssh-config ~/.ssh/config
+cat /etc/ssh/sshd_config
+#mv -fv ssh-config ~/.ssh/config
 
 echo $(ssh -o BatchMode=yes -o ConnectTimeout=5 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no travis@localhost echo ok 2>&1)
 echo $(ssh -o BatchMode=yes -o ConnectTimeout=5 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no travis@127.0.0.1 echo ok 2>&1)
