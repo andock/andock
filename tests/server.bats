@@ -10,6 +10,43 @@ load setup_helper
   ../../bin/andock.sh @${ANDOCK_CONNECTION} server:install "andock" "${ANDOCK_ROOT_USER}" -e "sudo_nopasswd=true"
 }
 
+@test "Check docksal.env file " {
+  if [ "${ANDOCK_CONNECTION}" != "travisssh" ]; then
+    skip "Skip test for non local connections"
+  fi
+  cd /home/andock
+  run stat .docksal/docksal.env
+  [ $status = 0 ]
+}
+
+@test "Check stacks folder" {
+  if [ "${ANDOCK_CONNECTION}" != "travisssh" ]; then
+    skip "Skip test for non local connections"
+  fi
+  cd /home/andock
+  run stat .docksal/stacks
+  [ $status = 0 ]
+}
+
+@test "Check authorized_keys file" {
+  if [ "${ANDOCK_CONNECTION}" != "travisssh" ]; then
+    skip "Skip test for non local connections"
+  fi
+  cd /home/andock
+  run sudo stat .ssh/authorized_keys
+  [ $status = 0 ]
+}
+
+@test "Check fin version" {
+  if [ "${ANDOCK_CONNECTION}" != "travisssh" ]; then
+    skip "Skip test for non local connections"
+  fi
+  cd /home/andock
+  run sudo su andock -c 'fin version'
+  [ $status = 0 ]
+}
+
+
 @test "server:update" {
   ../../bin/andock.sh @${ANDOCK_CONNECTION} server:update "andock" "${ANDOCK_ROOT_USER}" -e "sudo_nopasswd=true"
 }
