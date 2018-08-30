@@ -8,8 +8,8 @@ env:
   # lxd is not working on travis.
   #- image='ubuntu-18-04-x64' type='lxd' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
   - image='ubuntu-18-04-x64' type='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
-  - image='ubuntu-18-04-x64' type='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=local
-  - image='ubuntu-18-04-x64' type='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=default
+  - image='ubuntu-18-04-x64' type='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=local ANSIBLE_DEBUG=1
+  - image='ubuntu-18-04-x64' type='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=default ANSIBLE_DEBUG=1
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546

@@ -33,5 +33,5 @@ ${doctl_ip} master.demo-project.dev.andock.ci" | sudo tee --append /etc/hosts
 fi
 
 
-echo "JUUUPPI!. Sleep for 2 minutes to be sure everything is up."
+echo "Sleep for 2 minutes to be sure everything is up."
 sleep 120

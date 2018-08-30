@@ -8,7 +8,6 @@ load setup_helper
 
 @test "server:install" {
   ../../bin/andock.sh @${ANDOCK_CONNECTION} server:install "andock" "${ANDOCK_ROOT_USER}" -e "sudo_nopasswd=true"
-
 }
 
 @test "server:update" {

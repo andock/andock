@@ -14,3 +14,5 @@ eval `ssh-agent -s`
 ssh-add ~/.ssh/id_rsa
 cat ~/.ssh/id_rsa
 mv -fv ssh-config ~/.ssh/config
+
+echo $(ssh -o BatchMode=yes -o ConnectTimeout=5 travis@localhost echo ok 2>&1)
