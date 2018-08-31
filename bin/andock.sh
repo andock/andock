@@ -551,7 +551,7 @@ run_fin_run ()
     local exec_path=$1 && shift
 
     # Run the playbook.
-    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook -i --become --become_user=andock "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
     if [[ $? == 0 ]]; then
         echo-green "fin exec was finished successfully."
     else
@@ -602,7 +602,7 @@ run_fin ()
     esac
 
     # Run the playbook.
-    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
 
     # Handling playbook results.
     if [[ $? == 0 ]]; then
@@ -812,7 +812,7 @@ run_server_ssh_add ()
         shift
     fi
 
-    ansible-playbook -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$ssh_key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
+    ansible-playbook --become --become_user=andock -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$ssh_key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
 
@@ -857,7 +857,7 @@ run_server_install ()
         echo-green "andock password is: ${andock_pw}"
         echo-green "andock server was installed successfully."
     else
-        ansible-playbook --become-user=andock -vvv -e ${andock_pw_option} -e "ansible_ssh_user=andock" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook --become --become_user=andock -e ${andock_pw_option} -e "ansible_ssh_user=andock" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock server was updated successfully."
     fi
 }
