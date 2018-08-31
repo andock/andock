@@ -5,6 +5,7 @@ Thanks for your interest in contributing to andock!
 There are many ways you can help the project:
 
 - [Report issues](#report-issues)
+- [Run tests](#run-tests)
 - [Contribute code](#contribute-code)
 
 
@@ -20,6 +21,22 @@ When reporting a functionality related issue, please provide diagnostics informa
 We aim to provide cross-platform support and need to know what's under the hood in your particular case.
 
 Listing detailed steps to reproduce an issue will also help us understand the problem better and fix it faster.   
+
+
+## Run tests
+
+Following test environments are available:
+
+- `lxd` The favorite test type for ubuntu users.
+- `vagrant` Good old vagrant.
+- `digitalocean` Run tests against an digital ocean droplet.
+
+
+To run automated tests on your local maschine install either [lxd](https://tutorials.ubuntu.com/tutorial/tutorial-setting-up-lxd-1604#0) or [vagrant](https://www.vagrantup.com/docs/installation/) and run: 
+```
+cd tests
+./init-local "lxd|vagrant|digitalocean"
+```
 
 
 ## Contribute code
@@ -41,20 +58,4 @@ To contribute to the project:
 Each PR goes through automated tests on [Travis CI](https://travis-ci.org/andock/andock/pull_requests).
 If your PR does not pass the tests, you either have to fix the code or fix the test.
 
-
-Run tests on your local environment:
-
-Following local test types are available:
-
-- `lxd` The favorite test type for ubuntu users.
-- `vagrant` Good old vagrant.
-- `digitalocean` Run tests against an digital ocean droplet.
-
-## Run tests
-
-To run automated tests on your local maschine install either [lxd](https://tutorials.ubuntu.com/tutorial/tutorial-setting-up-lxd-1604#0) or [vagrant](https://www.vagrantup.com/docs/installation/) and run: 
-```
-cd tests
-./init-local "lxd|vagrant|digitalocean"
-```
 
