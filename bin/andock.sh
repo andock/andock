@@ -857,7 +857,7 @@ run_server_install ()
         echo-green "andock password is: ${andock_pw}"
         echo-green "andock server was installed successfully."
     else
-        ansible-playbook --become --become_user=andock -e ${andock_pw_option} -e "ansible_ssh_user=andock" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook --become --become-user=andock -e ${andock_pw_option} -e "ansible_ssh_user=andock" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock server was updated successfully."
     fi
 }
