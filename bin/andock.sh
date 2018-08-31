@@ -518,7 +518,7 @@ run_build ()
     branch_name=$(get_current_branch)
     echo-green "Building branch <${branch_name}>..."
 
-    ansible-playbook -vvv --become=true --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
+    ansible-playbook -vvv --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
     if [[ $? == 0 ]]; then
         echo-green "Branch ${branch_name} was builded successfully"
     else
