@@ -7,7 +7,7 @@ load setup_helper
 }
 
 @test "server:install" {
-  ../../bin/andock.sh @${ANDOCK_CONNECTION} server:install "andock" "${ANDOCK_ROOT_USER}" -e "sudo_nopasswd=true"
+  ../../bin/andock.sh @${ANDOCK_CONNECTION} server:install "andock" "${ANDOCK_ROOT_USER}"
 }
 
 @test "Check docksal.env file " {
@@ -48,7 +48,7 @@ load setup_helper
 
 
 @test "server:update" {
-  ../../bin/andock.sh @${ANDOCK_CONNECTION} server:update "andock" "${ANDOCK_ROOT_USER}" -e "sudo_nopasswd=true"
+  ../../bin/andock.sh @${ANDOCK_CONNECTION} server:update "andock" "${ANDOCK_ROOT_USER}"
 }
 
 @test "server:ssh-add" {
