@@ -5,7 +5,7 @@ ANDOCK_VERSION=0.0.2
 
 REQUIREMENTS_ANDOCK_BUILD='0.0.8'
 REQUIREMENTS_ANDOCK_FIN='0.0.7'
-REQUIREMENTS_ANDOCK_SERVER='0.0.14'
+REQUIREMENTS_ANDOCK_SERVER='0.0.15'
 REQUIREMENTS_SSH_KEYS='0.3'
 
 DEFAULT_CONNECTION_NAME="default"
@@ -29,6 +29,10 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 
 export ANSIBLE_SSH_PIPELINING=True
 
+#export ANSIBLE_SCP_IF_SSH=y
+#export ANSIBLE_SSH_ARGS="-t -t"
+
+#export ANSIBLE_DEBUG=1
 config_git_target_repository_path=""
 config_base_domains=""
 config_project_name=""
@@ -334,7 +338,8 @@ show_help ()
     printh "generate:config" "Generate andock project configuration."
     echo
     printh "Project build management:" "" "yellow"
-    printh "build" "Build project and push it to target branch."
+    printh "build" "Build project and push it to artifact repository."
+    printh "deploy" "Build and deploy."
     echo
     printh "Control remote docksal:" "" "yellow"
     printh "fin init"  "Clone git repository and init tasks."
@@ -513,7 +518,7 @@ run_build ()
     branch_name=$(get_current_branch)
     echo-green "Building branch <${branch_name}>..."
 
-    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
+    ansible-playbook -vvv --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
     if [[ $? == 0 ]]; then
         echo-green "Branch ${branch_name} was builded successfully"
     else
@@ -546,7 +551,7 @@ run_fin_run ()
     local exec_path=$1 && shift
 
     # Run the playbook.
-    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook -i --become --become-user=andock "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
     if [[ $? == 0 ]]; then
         echo-green "fin exec was finished successfully."
     else
@@ -587,7 +592,7 @@ run_fin ()
 
     # Validate tag name. Show help if needed.
     case $tag in
-        init|up|update|test|stop|rm|exec)
+        init|up|update|test|stop|rm|exec|"init,update")
             echo-green "Start fin ${tag}..."
         ;;
         *)
@@ -597,7 +602,7 @@ run_fin ()
     esac
 
     # Run the playbook.
-    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
 
     # Handling playbook results.
     if [[ $? == 0 ]]; then
@@ -807,7 +812,7 @@ run_server_ssh_add ()
         shift
     fi
 
-    ansible-playbook -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$ssh_key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
+    ansible-playbook --become --become-user=andock -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$ssh_key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
 
@@ -846,12 +851,13 @@ run_server_install ()
     fi
 
     if [ "$tag" = "install" ]; then
+    echo "$@"
         ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
-        ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock password is: ${andock_pw}"
         echo-green "andock server was installed successfully."
     else
-        ansible-playbook -e ${andock_pw_option} -e "ansible_ssh_user=andock" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook --become --become-user=andock -e ${andock_pw_option} -e "ansible_ssh_user=andock" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock server was updated successfully."
     fi
 }
@@ -875,7 +881,7 @@ fi
 # Than we check if the command needs an connection.
 # And if yes we check if the connection exists.
 case "$1" in
-    server:install|server:update|server:info|server:ssh-add|fin)
+    server:install|server:update|server:info|server:ssh-add|fin|build)
     check_connect $connection
     echo-green "Use connection: $connection"
     ;;
@@ -917,9 +923,14 @@ case "$command" in
   connect)
 	run_connect "$@"
   ;;
-   build)
+  build)
 	run_build "$connection" "$@"
   ;;
+  deploy)
+    run_build "$connection" "$@"
+	run_fin "$connection" "init,update" "$@"
+  ;;
+
   fin)
 	run_fin "$connection" "$@"
   ;;

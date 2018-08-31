@@ -1,35 +1,31 @@
 sudo: required
 dist: trusty
-language: php
-php:
-  - "7.1"
+language: generic
 services:
 - docker
 env:
   matrix:
-  - do_image_slug=ubuntu-18-04-x64
+  # lxd is not working on travis.
+  # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='lxd' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
+  - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
+  - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=local
+  # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=travisssh
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
 
 before_install:
-- set -e
-- curl -sL https://github.com/digitalocean/doctl/releases/download/v1.7.2/doctl-1.7.2-linux-amd64.tar.gz | tar -xzv
-- sudo mv doctl /usr/local/bin
-- doctl auth init -t $do_token
-- ./tests/remove_server.sh $do_image_slug
-- ./tests/init_server.sh $do_image_slug
-- ./init_ssh.sh
-- ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -q root@dev.andock.ci exit
+- cd tests
+- ./init-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
+- cd ..
 - ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git
 
 script:
-- set -e
 - bats server.bats
 - bats build.bats
 - bats fin.bats
 
 after_script:
-- ./remove_server.sh $do_image_slug
+- ./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
