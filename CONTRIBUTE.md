@@ -12,7 +12,7 @@ There are many ways you can help the project:
 
 ## Report issues
 
-First search the [issue queue](https://github.com/docksal/docksal/issues). 
+First search the [issue queue](https://github.com/andock/andock/issues). 
 Others may have experienced the same or a similar issue and have already found a solution or a workaround.
 
 File a new issue if your problem looks to be brand new.
@@ -36,6 +36,9 @@ To run automated tests on your local maschine install either [lxd](https://tutor
 ```
 cd tests
 ./init-local "lxd|vagrant|digitalocean"
+bats server.bats
+bats build.bats
+bats fin.bats
 ```
 
 
