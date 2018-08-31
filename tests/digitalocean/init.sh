@@ -14,7 +14,7 @@ if [ "${slug}" = "" ]; then
     slug="ubuntu-18-04-x64"
 fi
 
-cleanup.sh $slug
+./cleanup.sh $slug
 
 # Create new droplet.
 echo "Create new droplet with image id: andock-travis-${slug}"
