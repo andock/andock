@@ -24,5 +24,7 @@ before_install:
 
 script:
 - bats server.bats
+- cd demo-project
+- ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build -e "branch=master"
 - bats build.bats
 - bats fin.bats
