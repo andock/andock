@@ -6,17 +6,17 @@ services:
 env:
   matrix:
   # lxd is not working on travis.
-  # - test_image='ubuntu-18-04-x64' type='lxd' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
-  - test_image='ubuntu-18-04-x64' type='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
-  - test_image='ubuntu-18-04-x64' type='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=local
-  # - test_image='ubuntu-18-04-x64' type='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=travisssh
+  # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='lxd' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
+  - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
+  - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=local
+  # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=travisssh
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
 
 before_install:
 - cd tests
-- ./init-travis.sh $type $test_image
+- ./init-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
 - cd ..
 - ./bin/andock.sh _install-andock
 - cd tests
@@ -26,3 +26,6 @@ script:
 - bats server.bats
 - bats build.bats
 - bats fin.bats
+
+after_script:
+- ./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE

@@ -11,7 +11,7 @@ load setup_helper
 }
 
 @test "Check docksal.env file " {
-  if [ "${ANDOCK_CONNECTION}" != "local" ]; then
+  if [ "${ANDOCK_TEST_TYPE}" != "travis" ]; then
     skip "Skip test for non local connections"
   fi
   cd /home/andock
@@ -20,7 +20,7 @@ load setup_helper
 }
 
 @test "Check stacks folder" {
-  if [ "${ANDOCK_CONNECTION}" != "local" ]; then
+  if [ "${ANDOCK_TEST_TYPE}" != "travis" ]; then
     skip "Skip test for non local connections"
   fi
   cd /home/andock
@@ -29,7 +29,7 @@ load setup_helper
 }
 
 @test "Check authorized_keys file" {
-  if [ "${ANDOCK_CONNECTION}" != "local" ]; then
+  if [ "${ANDOCK_TEST_TYPE}" != "travis" ]; then
     skip "Skip test for non local connections"
   fi
   cd /home/andock
@@ -38,7 +38,7 @@ load setup_helper
 }
 
 @test "Check fin version" {
-  if [ "${ANDOCK_CONNECTION}" != "local" ]; then
+  if [ "${ANDOCK_TEST_TYPE}" != "travis" ]; then
     skip "Skip test for non local connections"
   fi
   cd /home/andock

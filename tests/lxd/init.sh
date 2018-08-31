@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 
-./remove.sh
+cleanup.sh
 
 container_exists=$(sudo lxc list| grep andock)
 
 if [ "${container_exists}" != "" ]; then
     echo "Found existing andock container. Removing...."
-    ./remove.sh
+    cleanup.sh
     echo "Removing done."
 fi
 
