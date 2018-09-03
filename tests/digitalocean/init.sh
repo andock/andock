@@ -6,13 +6,14 @@ set -e
 
 slug=$1
 
-shift
-
-assign_ip=$1
 # Set default to "ubuntu-18-04-x64"
 if [ "${slug}" = "" ]; then
     slug="ubuntu-18-04-x64"
+    else
+    shift
 fi
+
+assign_ip=$1
 
 ./cleanup.sh $slug
 

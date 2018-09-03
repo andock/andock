@@ -4,7 +4,7 @@ ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=0.0.2
 
 REQUIREMENTS_ANDOCK_BUILD='0.0.8'
-REQUIREMENTS_ANDOCK_FIN='0.0.7'
+REQUIREMENTS_ANDOCK_FIN='0.1.1'
 REQUIREMENTS_ANDOCK_SERVER='0.0.15'
 REQUIREMENTS_SSH_KEYS='0.3'
 
@@ -518,7 +518,7 @@ run_build ()
     branch_name=$(get_current_branch)
     echo-green "Building branch <${branch_name}>..."
 
-    ansible-playbook -vvv --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
+    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
     if [[ $? == 0 ]]; then
         echo-green "Branch ${branch_name} was builded successfully"
     else
@@ -662,6 +662,7 @@ generate_config ()
     fi
 
     local virtual_host_pattern && virtual_host_pattern=$(_ask "Please enter your virtual host pattern. [{{ branch }}.${project_name}.com]")
+
     if [ "$virtual_host_pattern" = "" ]; then
         virtual_host_pattern="{{ branch }}.${project_name}.com"
     fi
@@ -684,6 +685,10 @@ git_repository_path: ${git_repository_path}
 ## Mounts are linked via volumnes: into the docker container.
 # mounts:
 #   - { name: 'files', src: 'files', path: 'docroot/files' }
+
+## Let's encrypt.
+## Uncomment to enable let's encrypt certificate generation.
+# letsencrypt_enable: true
 
 ## ansible build hooks.
 ## The hooks that will be triggered when the environment is builded/initialized/updated.
