@@ -18,7 +18,6 @@ After that run:
 ```
 fin andock connect
 fin andock server:install
-fin andock server:ssh-add "ssh-rsa AAAAB3NzaC1yc2EA ..."
 ```
 
 #### Generate project configuration
@@ -26,27 +25,20 @@ fin andock server:ssh-add "ssh-rsa AAAAB3NzaC1yc2EA ..."
 fin andock config:generate
 ```
 This will create some required config files and templates for init, build, test and update hooks. 
-#### Build project (optional)
-@TODO If you like to build your project and push it to target repository before you check it out on andock server.
-[See](./build.md)
-#### Initialize remote environment
-```
-fin andock fin init
-```
 
-#### Update remote environment  
+#### Build 
 ```
-fin andock fin update
+fin andock build
 ```
-
-#### Run tests
+Here you can find more configuration options for the [build process](../configuration/build.md)
+#### Deploy 
 ```
-fin andock fin test
+fin andock deploy
 ```
 
 ### Congratulations, the installation is finished!
 
 ### Read more:
-* [CI server automation](ci.md)
+* [CI server automation](../integrations/ci.md)
 ### Example hook configurations:
 1. [Drupal](../configuration/example-drupal-hooks.md)

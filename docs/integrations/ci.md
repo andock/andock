@@ -1,0 +1,6 @@
+# CI configuration
+
+## Travis (standalone).
+
+
+

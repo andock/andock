@@ -9,10 +9,10 @@ Here is a short overview of the used configuration files:
 |----------------------------|:------------|
 | `andock.yml`            | Main configuration file.
 | `andock.${branch}.yml`            | Branch specific configuration file. (optional)
-| `hooks/build_tasks.yml`    | Build hook fired while `fin acp build`. |
-| `hooks/init_tasks.yml`     | Build hook fired while `fin acp fin init` |
-| `hooks/update_tasks.yml`   | Build hook fired while `fin acp fin update`|
-| `hooks/test_tasks.yml`     | Build hook fired while `fin acp fin test`|
+| `hooks/build_tasks.yml`    | Build hook fired while `fin andock build`. |
+| `hooks/init_tasks.yml`     | Build hook fired while `fin andock fin init, fin andock deploy` |
+| `hooks/update_tasks.yml`   | Build hook fired while `fin andock fin update, fin andock deploy`|
+| `hooks/test_tasks.yml`     | Build hook fired while `fin andock fin test`|
 
 ## The andock configuration file `.andock/andock.yml`:
 
@@ -22,6 +22,7 @@ Here is a short overview of the used configuration files:
  * ` git_repository_path:` The git checkout repository.
 virtual_hosts:
      default: "www.domain.com"
+
 #### Mounts:
 Mounts describe writeable persistent volumnes in the docker container.
 Mounts are linked via volumnes: into the docker container.
@@ -34,7 +35,7 @@ mounts:
 * `path: ` The folder path under /var/www inside the docker container. 
 
 #### docksal.env environment
-You can pass any variable to docksal-local.env
+You can pass any variable to `docksal-local.env`
 
 #### Sample:
 ```
@@ -49,6 +50,12 @@ For example configure your production domain to the master environment `.andock/
 virtual_hosts:
   default: "www.domain.com"
 ```
+
+#### Hooks
+Andock supports build and deploy (init_tasks, update_tasks) hooks.
+* [Build hooks](build.md)
+* [Fin hooks](fin.md)
+
 
 !!! tip Own template generation files?
     To overwrite the generation templates you can define your own template files.

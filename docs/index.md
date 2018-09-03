@@ -11,6 +11,7 @@ A docksal hosting solution.<br>
 * One environment per branch.
 * Extendable with init, update, tests ansible hooks.
 * drush support including drush sql-sync without extra ssh container.
+* Let's Encrypt support.
 * Easy to integrate in your CI environment.
 
 ## For what can you use andock?
@@ -27,5 +28,3 @@ A docksal hosting solution.<br>
 ## Getting started:
 * [New to andock. Get the Big picture](big-picture/introduction.md)
 * [5 minutes setup](getting-started/docksal.md)
-
-

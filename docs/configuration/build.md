@@ -1,5 +1,5 @@
 # Build configuration 
-The build steps are configured in `.andock/hooks/build_tasks.yml`.
+The build tasks are configured in `.andock/hooks/build_tasks.yml`.
 Run `andock build` to start the build.
 
 ### Sample build_tasks.yml

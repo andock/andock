@@ -39,7 +39,6 @@ Standalone:
   andock command reference   0.0.1
 
   connect                    Connect andock to andock server
-  (.) ssh-add <ssh-key>      Add private SSH key <ssh-key> variable to the agent store.
 
   Server management:         
   server:install [root_user, default=root] [andock_pass, default=keygen]  Install andock server.
@@ -51,6 +50,7 @@ Standalone:
 
   Project build management:  
   build                      Build project and push it to target branch.
+  deploy                     Deploy builded artifact
 
   Control remote docksal:    
   fin init                   Clone git repository and init tasks.
