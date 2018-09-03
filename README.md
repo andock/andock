@@ -73,4 +73,4 @@ Standalone:
 
 
 ## Contributing to andock
-Check the [Contributing docs](CONTRIBUTE.md) on how to get involved or run tests on your local maschine.
+Check the [Contributing docs](CONTRIBUTING.md) on how to get involved or run tests on your local maschine.
