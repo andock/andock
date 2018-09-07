@@ -13,3 +13,5 @@ COPY bin/andock.sh /usr/local/bin/andock
 
 RUN chmod +x /usr/local/bin/andock
 RUN andock _install-andock
+
+ENTRYPOINT /bin/bash
