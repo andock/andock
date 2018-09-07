@@ -9,15 +9,21 @@ The `andock cli` is a command line interface to andock.
 * [5 minutes setup](https://andock.readthedocs.io/en/latest/getting-started/docksal/)
 
 ## Installation
-Docksal addon:
+Docksal addon (prefered):
 ```
-    fin addon install andock
     fin addon install andock
 ```
 Standalone: 
 ```
     curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock | sh
 ```
+Andock inside docksal:
+
+Thin command line tool which install andock and execute andock inside the cli container.  
+```
+    curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock-docksal | sh
+```
+
 
 ## Updates
 Update with this command:
@@ -34,6 +40,12 @@ Standalone:
 ```
     andock help
 ```
+
+Andock inside docksal:
+```
+    andock help
+```
+
 # Commands:
 ```bash
   andock command reference   0.0.1
@@ -53,7 +65,7 @@ Standalone:
   deploy                     Deploy builded artifact
 
   Control remote docksal:    
-  fin init                   Clone git repository and init tasks.
+  fin init                   Clone git repository and run init tasks.
   fin up                     Start services.
   fin update                 Pull changes and run update tasks.
   fin test                   Run UI tests.

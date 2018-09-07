@@ -1,4 +1,4 @@
 sudo mkdir -p /usr/local/bin &&
-sudo curl -fsSL https://raw.githubusercontent.com/andock/andock/master/andock/acp.sh -o /usr/local/bin/andock &&
+sudo curl -fsSL https://raw.githubusercontent.com/andock/andock/master/andock/andock.sh -o /usr/local/bin/andock &&
 sudo chmod +x /usr/local/bin/andock &&
 andock _install-andock

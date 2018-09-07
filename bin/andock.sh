@@ -342,10 +342,10 @@ show_help ()
     printh "deploy" "Build and deploy."
     echo
     printh "Control remote docksal:" "" "yellow"
-    printh "fin init"  "Clone git repository and init tasks."
+    printh "fin init"  "Clone git repository and run init tasks."
     printh "fin up"  "Start services."
     printh "fin update"  "Pull changes and run update tasks."
-    printh "fin test"  "Run UI tests."
+    printh "fin test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "fin stop" "Stop services."
     printh "fin rm" "Remove environment."
     echo
