@@ -1,6 +1,6 @@
 # Fin Hooks 
 
-Andock is handles the creation updating and removing of environments. Each lifecycle step is configurable through an ansible hook file.
+Andock is handling the creation updating and removing of environments. Each lifecycle step is configurable through an ansible hook file.
 
 | File name                  | Description |
 |----------------------------|:------------|

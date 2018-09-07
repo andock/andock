@@ -11,6 +11,7 @@ fi
 service_name=$(fin ps | sed -n 's/\(.*\)_andock_1\(.*\)/\1/p')
 if [[ ${service_name} != "" ]]; then
         export CONTAINER_NAME='andock'
+        export container_user='docker'
     else
         export CONTAINER_NAME='cli'
 fi
