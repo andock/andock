@@ -62,16 +62,17 @@ RUN set -xe; \
 	curl -fsSL https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64-slim -o /usr/local/bin/gomplate; \
 	chmod +x /usr/local/bin/gomplate
 
-USER docker
-
-USER root
 
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/startup.sh /opt/startup.sh
 
+# Copy configs and scripts
+COPY --chown=docker:docker docker/.ssh /home/docker/.ssh
 
 
 ENV \
+    # ssh-agent proxy socket (requires docksal/ssh-agent)
+    SSH_AUTH_SOCK=/.ssh-agent/proxy-socket \
 	TERM=xterm \
 	PROJECT_ROOT=/var/www \
 	# Default values for HOST_UID and HOST_GUI to match the default Ubuntu user. These are used in startup.sh
@@ -86,8 +87,12 @@ COPY bin/andock.sh /usr/local/bin/andock
 
 RUN chmod +x /usr/local/bin/andock
 RUN andock _install-andock
+USER docker
 
+# Update andock configurations as docker user.
+RUN andock cup
 
+USER root
 # Starter script
 ENTRYPOINT ["/opt/startup.sh"]
 

@@ -23,6 +23,21 @@ uid_gid_reset ()
 	fi
 }
 
+# Helper function to render configs from go templates using gomplate
+render_tmpl ()
+{
+	local file="${1}"
+	local tmpl="${1}.tmpl"
+
+	if [[ -f "${tmpl}" ]]; then
+		echo-debug "Rendering template: ${tmpl}..."
+		gomplate --file "${tmpl}" --out "${file}"
+	else
+		echo-debug "Error: Template file not found: ${tmpl}"
+		return 1
+	fi
+}
+
 add_ssh_key ()
 {
 	echo-debug "Adding a private SSH key from SECRET_SSH_PRIVATE_KEY..."
