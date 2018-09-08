@@ -20,6 +20,11 @@ load setup_helper
     [[ "$output" =~ "Hello Andock" ]]
 }
 
+@test "fin-run: Execute fin version" {
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin-run "version" -e "branch=master"
+    [ $status = 0 ]
+}
+
 @test "fin update" {
     ../../bin/andock.sh @${ANDOCK_CONNECTION} fin update -e "branch=master"
 }

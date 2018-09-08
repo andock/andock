@@ -552,7 +552,7 @@ run_fin_run ()
     local exec_path=$1 && shift
 
     # Run the playbook.
-    ansible-playbook -i --become --become-user=andock "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
     if [[ $? == 0 ]]; then
         echo-green "fin exec was finished successfully."
     else
