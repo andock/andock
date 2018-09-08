@@ -339,7 +339,8 @@ show_help ()
     echo
     printh "Project build management:" "" "yellow"
     printh "build" "Build project and push it to artifact repository."
-    printh "deploy" "Build and deploy."
+    printh "deploy" "Deploy project."
+    printh "bp" "Build and deploy project."
     echo
     printh "Control remote docksal:" "" "yellow"
     printh "fin init"  "Clone git repository and run init tasks."
@@ -932,6 +933,10 @@ case "$command" in
 	run_build "$connection" "$@"
   ;;
   deploy)
+    #run_build "$connection" "$@"
+	run_fin "$connection" "init,update" "$@"
+  ;;
+  bp)
     run_build "$connection" "$@"
 	run_fin "$connection" "init,update" "$@"
   ;;
