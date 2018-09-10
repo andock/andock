@@ -5,7 +5,7 @@
 
 HOME_DIR='/home/docker'
 
-DEBUG=${DEBUG:-1}
+DEBUG=${DEBUG:-0}
 # Turn debugging ON when andock is started in the service mode
 [[ "$1" == "supervisord" ]] && DEBUG=1
 
