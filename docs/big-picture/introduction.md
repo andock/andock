@@ -1,6 +1,6 @@
 # Big picture.
 
-andock is designed to host your docksal project in the cloud. You can use andock for feature branch based development environment BUT it is also designed to use it in production for small to medium sized projects. You are free to choose your cloud solution.
+andock is designed to host your docksal project in the cloud or on any bare metal server. You can use andock for feature branch based development environment BUT it is also designed to use it in production for small to medium sized projects. You are free to choose your cloud solution.
 
 Your code must be managed by GIT. andock will generate one environment for each branch. The configuration is driven by a small number of YAML files in your Git repository
 
@@ -18,7 +18,7 @@ Configure your project:
 [Configure your project](../configuration/andock.md) 
  
 
-## "build &amp; fin"
+## "build &amp; deploy"
 Here a short overview of the two main phases.
 ### The build phase.
 * Checks out your git repository 
@@ -27,11 +27,19 @@ Here a short overview of the two main phases.
 * If everything works fine the artifact is pushed to a local artifact repository.
 
 [See configuration](../configuration/build.md)
-### Fin lifecycle.
-With andock fin you can create/start/stop/update/remove docksal environment  
+### The deploy phase.
 * Checks out the builded artifact 
-* Generates `docksal-local.yml` configuration files.
-* create/start/stop/update/remove docksal environment
+* Starts or update an andock environment
+## Andock fin lifecycle
+With andock fin you can create/start/stop/update/remove docksal environment.  
+* Checks out the builded artifact 
+* Generates `docksal-local.yml` and `docksal-local.env` configuration files.
+* Create docksal environment
+* Start docksal environment
+* Generate Let's encrypt certificates.
+* Update docksal environment
+* Stop docksal environment
+* Remove docksal environment
 
 [See configuration](../configuration/fin.md)
 
