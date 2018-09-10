@@ -7,6 +7,7 @@ dist: trusty
 language: generic
 before_install:
 - curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock | sh
+- . andock ssh-add "$SSH_PRIVATE_KEY"
 
 script:
 - andock build
@@ -14,45 +15,50 @@ script:
 
 ```
 
-## Gitlab (standalone).
+## Gitlab (docker).
 ```
 stages:
   - build
-  - deploy 
-build_app:
-    stage: build
-deploy_app:
-  stage: deploy
-  image: docksal/ci-agent:edge-base 
-  script:   
-    - echo "deploy staging"
-    - source /usr/local/bin/build-env
-    - export DOMAIN=$CI_ENVIRONMENT_SLUG.$CI_PROJECT_NAME.$DOCKSAL_HOST     # set docksal DOMAIN to gitlab environment
-    - build-init
-    - ssh docker-host "cd $REMOTE_BUILD_DIR && fin init"
+  - deploy
+
+before_script:
+  - . andock ssh-add "$SSH_PRIVATE_KEY"
+  - andock version
+
+build:
+  stage: build
+  image: andockio/andock:latest
+  script:
+    - andock build
   environment:
-    name: review/$CI_COMMIT_REF_NAME
-    url: http://$CI_ENVIRONMENT_SLUG.$CI_PROJECT_NAME.$DOCKSAL_HOST         # Create environment in gitlab, see README.md for $DOCKASL_HOST_IP
-    on_stop: stop_review                                                    # Make removal of branches possible
+    name: andock/$CI_COMMIT_REF_NAME
+    url: http://$CI_ENVIRONMENT_SLUG.$CI_PROJECT_NAME.example.com
+    on_stop: stop_environment
   only:
     - branches
-  except:
-    - master
 
-
-# remove review from server. Automatic when branch is deleted, or manual in gitlab.
-stop_review:
+deploy:
   stage: deploy
-  image: docksal/ci-agent:edge-base 
+  image: andockio/andock:latest
+  script:
+    - andock deploy
+  environment:
+    name: andock/$CI_COMMIT_REF_NAME
+    url: http://$CI_ENVIRONMENT_SLUG.$CI_PROJECT_NAME.example.com
+    on_stop: stop_environment
+  only:
+    - branches
+
+stop_environment:
+  stage: deploy
+  image: andockio/andock:latest
   variables:
     GIT_STRATEGY: none
   script:
-    - echo "Remove review app"
-    - source /usr/local/bin/build-env
-    - build-init
-    - ssh docker-host "cd $REMOTE_BUILD_DIR && fin remove && rm -rf $REMOTE_BUILD_DIR"  # remove docksal environment & code
+    - andock fin remove
   when: manual
   environment:
-    name: review/$CI_COMMIT_REF_NAME
+    name: andock/$CI_COMMIT_REF_NAME
     action: stop
+
 ```
