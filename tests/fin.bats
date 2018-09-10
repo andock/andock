@@ -12,7 +12,7 @@ load setup_helper
 
 @test "fin init: Testing page status" {
     run 'curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"'
-    [[ "$output" =~ "HTTP/1.1 201 OK" ]]
+    [[ "$output" =~ "HTTP/1.1 200 OK" ]]
 }
 
 @test "fin init: Testing page content" {
