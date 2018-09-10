@@ -3,7 +3,7 @@
 ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=0.0.4
 
-REQUIREMENTS_ANDOCK_BUILD='0.0.9'
+REQUIREMENTS_ANDOCK_BUILD='0.0.9<'
 REQUIREMENTS_ANDOCK_FIN='0.1.5'
 REQUIREMENTS_ANDOCK_SERVER='0.0.16'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -884,6 +884,12 @@ else
     connection=${DEFAULT_CONNECTION_NAME}
 fi
 
+org_path=${PWD}
+# ansible playbooks needs to be called from project_root.
+# So cd to root path
+root_path=$(find_root_path)
+cd "$root_path"
+
 # Than we check if the command needs an connection.
 # And if yes we check if the connection exists.
 case "$1" in
@@ -892,12 +898,6 @@ case "$1" in
     echo-green "Use connection: $connection"
     ;;
 esac
-
-org_path=${PWD}
-# ansible playbooks needs to be called from project_root.
-# So cd to root path
-root_path=$(find_root_path)
-cd "$root_path"
 
 # Store the command.
 command=$1
