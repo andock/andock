@@ -2,6 +2,16 @@
 The build tasks are configured in `.andock/hooks/build_tasks.yml`.
 Run `andock build` to start the build.
 
+## Configuration options overview:
+
+| Option                     | Description |
+|----------------------------|:------------|
+| `cache_build`            | Enable or disable build cache. Default is `true`.
+| `git_artifact_repository_path`            | The builded artifact is pushed to this repository. Andock generate one repository for each project.   
+| `fin_up_while_build`            | Run fin up while build. Default is `false`
+| `target_branch_suffix`            | The suffix of the artifact branch name. Default is `no suffix`
+ 
+
 ### Sample build_tasks.yml
 ```yaml
 - name: Composer
@@ -38,4 +48,5 @@ vendor
 ## 
 
 !!! tip "No build needed?"
-    Build the project on your own CI or there is no need to build the project? You can define your git repository as artifact repository. Add your git repository to `git_artifact_repository_path`. 
+    Build the project on your own CI or there is no need to build the project? You can define your git repository as artifact repository. Add your git repository to `git_artifact_repository_path`.
+    
