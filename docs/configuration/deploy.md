@@ -1,4 +1,4 @@
-# Fin Hooks 
+# Deploy 
 
 <b>Andock</b> is handling the creation updating and removing of environments. Each lifecycle step is configurable through an ansible hook file.
 
@@ -9,7 +9,7 @@
 | `hooks/test_tasks.yml`     | Hook fired while `fin test`|
 
 ### Init hook
-The `init hook` runs after the environment is created. if `fin init` or `fin deploy` is called a second time the init hook will not be fired.
+The `init hook` fired after the environment is created. if `fin init` or `fin deploy` is called a second time the init hook will not be fired again. You must call first `fin rm` to reinitizialize the environment again.  
 ### Update hook:
 The `update hook` runs after each `fin update` or `fin deploy`
 ### Test hook:
@@ -30,7 +30,7 @@ The `test hook` runs after each `fin test`. This hook should be used to run `beh
  - name: Composer install
    command: "fin exec composer install"
    args:
-     chdir: "{{ project_path }}"
+     chdir: "{{ environment_path }}"
  - name: Clear cache
    command: "fin drush cr"
    args:

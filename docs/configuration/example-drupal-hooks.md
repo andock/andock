@@ -6,7 +6,6 @@
   command: "fin init"
   args:
     chdir: "{{ docroot_path }}"
-  when: instance_exists_before == false
 ```
 
 ### update_tasks.yml
@@ -14,7 +13,7 @@
 - name: Composer install
   command: "fin exec composer install"
   args:
-    chdir: "{{ project_path }}"
+    chdir: "{{ envrionment_path }}"
 - name: Clear cache
   command: "fin drush cr"
   args:

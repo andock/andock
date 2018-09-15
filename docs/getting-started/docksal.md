@@ -1,7 +1,12 @@
 # 5 minutes setup instruction
 
+## Preperation
+The easiest way to test andock is to create a cloud box on aws or digital ocean etc. with ubuntu 16.04 or 18.04 and point an wildcard dns like *.dev.yourdomain.com to the server.
 
-[System requirements](/system-requirements.md)
+If you want to test on your local maschine you can use any virtual maschine with an ubuntu 16.04 or 18.04 image and add an host entry to your virtual. 
+
+
+[See system requirements](/system-requirements.md) 
 #### Install addon
 ```
 fin addon install andock
@@ -11,9 +16,6 @@ fin addon install andock
 fin andock enable
 ```
 #### Setup the andock server
-The easiest way to test andock is to create a cloud box on aws or digital ocean etc. with ubuntu 16.04 or 18.04.
-
-After that run:
 
 ```
 fin andock connect
@@ -31,6 +33,7 @@ This will create some required config files and templates for init, build, test 
 fin andock build
 ```
 Here you can find more configuration options for the [build process](../configuration/build.md)
+
 #### Deploy 
 ```
 fin andock deploy

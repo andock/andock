@@ -14,7 +14,7 @@ pages:
   - Configuration:
     - andock.yml: configuration/andock.md
     - Build: configuration/build.md
-    - Fin: configuration/fin.md
+    - Deploy: configuration/deploy.md
     - Let's Encrypt: configuration/letsencrypt.md
     - Hook configurations:
       - Drupal: configuration/example-drupal-hooks.md
