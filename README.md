@@ -48,9 +48,10 @@ Andock inside docksal:
 
 # Commands:
 ```bash
-  andock command reference   0.0.1
+ andock command reference   0.0.4
 
   connect                    Connect andock to andock server
+  (.) ssh-add <ssh-key>      Add private SSH key <ssh-key> variable to the agent store.
 
   Server management:         
   server:install [root_user, default=root] [andock_pass, default=keygen]  Install andock server.
@@ -61,18 +62,16 @@ Andock inside docksal:
   generate:config            Generate andock project configuration.
 
   Project build management:  
-  build                      Build project and push it to target branch.
-  deploy                     Deploy builded artifact
+  build                      Build project and push it to artifact repository.
 
-  Control remote docksal:    
-  fin init                   Clone git repository and run init tasks.
-  fin up                     Start services.
-  fin update                 Pull changes and run update tasks.
-  fin test                   Run UI tests.
-  fin stop                   Stop services.
-  fin rm                     Remove environment.
+  Environment management:    
+  deploy                     Deploy environment.
+  up                         Start services.
+  test                       Run UI tests. (Like behat, phantomjs etc.)
+  stop                       Stop services.
+  rm                         Remove environment.
 
-  fin-run <command> <path>   Run any fin command.
+  fin <command> <path>       Run any fin command.
 
   Drush:                     
   drush:generate-alias       Generate drush alias.
