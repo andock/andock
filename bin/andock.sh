@@ -339,18 +339,15 @@ show_help ()
     echo
     printh "Project build management:" "" "yellow"
     printh "build" "Build project and push it to artifact repository."
-    printh "deploy" "Deploy project."
-    printh "bp" "Build and deploy project."
     echo
-    printh "Control remote docksal:" "" "yellow"
-    printh "fin init"  "Clone git repository and run init tasks."
-    printh "fin up"  "Start services."
-    printh "fin update"  "Pull changes and run update tasks."
-    printh "fin test"  "Run UI tests. (Like behat, phantomjs etc.)"
-    printh "fin stop" "Stop services."
-    printh "fin rm" "Remove environment."
+    printh "Environment management:" "" "yellow"
+    printh "deploy" "Deploy environment."
+    printh "up"  "Start services."
+    printh "test"  "Run UI tests. (Like behat, phantomjs etc.)"
+    printh "stop" "Stop services."
+    printh "rm" "Remove environment."
     echo
-    printh "fin-run <command> <path>" "Run any fin command."
+    printh "fin <command> <path>" "Run any fin command."
 
     echo
     printh "Drush:" "" "yellow"
@@ -893,7 +890,7 @@ cd "$root_path"
 # Than we check if the command needs an connection.
 # And if yes we check if the connection exists.
 case "$1" in
-    server:install|server:update|server:info|server:ssh-add|fin|build)
+    server:install|server:update|server:info|server:ssh-add|fin|build|bp|deploy|rm|up|stop)
     check_connect $connection
     echo-green "Use connection: $connection"
     ;;
@@ -936,16 +933,25 @@ case "$command" in
     #run_build "$connection" "$@"
 	run_fin "$connection" "init,update" "$@"
   ;;
-  bp)
-    run_build "$connection" "$@"
-	run_fin "$connection" "init,update" "$@"
+  rm)
+    #run_build "$connection" "$@"
+	run_fin "$connection" "rm" "$@"
+  ;;
+  up)
+    #run_build "$connection" "$@"
+	run_fin "$connection" "up" "$@"
+  ;;
+  test)
+    #run_build "$connection" "$@"
+	run_fin "$connection" "test" "$@"
+  ;;
+  stop)
+    #run_build "$connection" "$@"
+	run_fin "$connection" "stop" "$@"
   ;;
 
   fin)
-	run_fin "$connection" "$@"
-  ;;
-  fin-run)
-    run_fin_run "$connection" "$1" "$2"
+	run_fin_run "$connection" "$1" "$2"
   ;;
   alias)
 	run_alias
