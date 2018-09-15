@@ -329,15 +329,15 @@ show_help ()
 
     echo
     printh "Server management:" "" "yellow"
-    printh "server:install [root_user, default=root] [andock_pass, default=keygen]" "Install andock server."
-    printh "server:update [root_user, default=root]" "Update andock server."
-    printh "server:ssh-add [root_user, default=root]" "Add public ssh key to andock server."
+    printh "server:install" "Install andock server."
+    printh "server:update" "Update andock server."
+    printh "server:ssh-add" "Add public ssh key to andock server."
 
     echo
     printh "Project configuration:" "" "yellow"
     printh "generate:config" "Generate andock project configuration."
     echo
-    printh "Project build management:" "" "yellow"
+    printh "Build management:" "" "yellow"
     printh "build" "Build project and push it to artifact repository."
     echo
     printh "Environment management:" "" "yellow"
@@ -347,7 +347,7 @@ show_help ()
     printh "stop" "Stop services."
     printh "rm" "Remove environment."
     echo
-    printh "fin <command> <path>" "Run any fin command."
+    printh "fin <command>" "Fin remote control."
 
     echo
     printh "Drush:" "" "yellow"
@@ -529,7 +529,7 @@ run_build ()
 # @param $1 The Connection.
 # @param $2 The fin command.
 # @param $3 The exec path.
-run_fin_run ()
+run_fin ()
 {
 
     # Check if connection exists
@@ -561,7 +561,7 @@ run_fin_run ()
 # Ansible playbook wrapper for role andock.fin
 # @param $1 Connection
 # @param $2 Tag
-run_fin ()
+run_environment ()
 {
 
     # Check if connection exists
@@ -890,7 +890,7 @@ cd "$root_path"
 # Than we check if the command needs an connection.
 # And if yes we check if the connection exists.
 case "$1" in
-    server:install|server:update|server:info|server:ssh-add|fin|build|bp|deploy|rm|up|stop)
+    server:install|server:update|server:info|server:ssh-add|fin|build|deploy|rm|up|stop)
     check_connect $connection
     echo-green "Use connection: $connection"
     ;;
@@ -930,28 +930,27 @@ case "$command" in
 	run_build "$connection" "$@"
   ;;
   deploy)
-    #run_build "$connection" "$@"
-	run_fin "$connection" "init,update" "$@"
+	run_environment "$connection" "init,update" "$@"
   ;;
   rm)
-    #run_build "$connection" "$@"
-	run_fin "$connection" "rm" "$@"
+	run_environment "$connection" "rm" "$@"
   ;;
   up)
-    #run_build "$connection" "$@"
-	run_fin "$connection" "up" "$@"
+	run_environment "$connection" "up" "$@"
   ;;
   test)
-    #run_build "$connection" "$@"
-	run_fin "$connection" "test" "$@"
+	run_environment "$connection" "test" "$@"
   ;;
   stop)
-    #run_build "$connection" "$@"
-	run_fin "$connection" "stop" "$@"
+	run_environment "$connection" "stop" "$@"
   ;;
 
   fin)
-	run_fin_run "$connection" "$1" "$2"
+    fin_sub_path=""
+    if [[ "$org_path" != "$root_path" ]]; then
+        fin_sub_path=$(echo ${org_path#${root_path}"/"})
+    fi
+	run_fin "$connection" "$1" "$fin_sub_path"
   ;;
   alias)
 	run_alias
