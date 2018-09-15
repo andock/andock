@@ -1,33 +1,44 @@
 # Build configuration 
-The build tasks are configured in `.andock/hooks/build_tasks.yml`.
-Run `andock build` to start the build.
+
+Run `andock build` to start the build. 
+ 
+!!! tip "Run your own builds?"
+    If you build the project on your CI? Add the repository including the build artifacts as `git_artifact_repository_path` to the `andock.yml` and just run `andock deploy`.
 
 ## Configuration options overview:
 
 | Option                     | Description |
 |----------------------------|:------------|
 | `cache_build`            | Enable or disable build cache. Default is `true`.
-| `git_artifact_repository_path`            | The builded artifact is pushed to this repository. Andock generate one repository for each project.   
 | `fin_up_while_build`            | Run fin up while build. Default is `false`
 | `target_branch_suffix`            | The suffix of the artifact branch name. Default is `no suffix`
+| `git_artifact_repository_path`            | The builded artifact is pushed to this repository. Andock generate one repository for each project.   
  
 
-### Sample build_tasks.yml
+## build_tasks.yml
+The build tasks are configured in `.andock/hooks/build_tasks.yml`.
+### Sample: 
 ```yaml
 - name: Composer
   command: "composer install"
   args:
-    chdir: "{{ checkout_path }}"
+    chdir: "{{ buid_path }}"
 - name: npm install
   command: "npm install"
   args:
-    chdir: "{{ checkout_path }}/docroot/themes/custom/theme"
+    chdir: "{{ buid_path }}/docroot/themes/custom/theme"
 - name: Compile scss
   command: "npm run compile"
   args:
-    chdir: "{{ checkout_path }}/docroot/themes/custom/theme"
+    chdir: "{{ buid_path }}/docroot/themes/custom/theme"
 ```
-### .gitignore
+### Path options overview:
+
+| Path                     | Description |
+|----------------------------|:------------|
+| `build_path`            | The build checkout path.
+
+## .gitignore
 To commit builded artifacts the folders must be removed from .gitignore.
 To easily manage this you can use ansible file blocks.
 ```
@@ -35,7 +46,7 @@ To easily manage this you can use ansible file blocks.
 Folders  
 #### END REMOVE ANDOCK ###
 ```
-#### Sample:
+### Sample:
 ```
 #### BEGIN REMOVE ANDOCK ###
 docroot/core
@@ -46,7 +57,4 @@ vendor
 #### END REMOVE ANDOCK ###
 ```
 ## 
-
-!!! tip "No build needed?"
-    Build the project on your own CI or there is no need to build the project? You can define your git repository as artifact repository. Add your git repository to `git_artifact_repository_path`.
     
