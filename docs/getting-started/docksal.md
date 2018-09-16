@@ -19,12 +19,12 @@ fin andock enable
 
 ```
 fin andock connect
-fin andock server:install
+fin andock server install
 ```
 
 #### Generate project configuration
 ```
-fin andock config:generate
+fin andock config generate
 ```
 This will create some required config files and templates for init, build, test and update hooks. 
 

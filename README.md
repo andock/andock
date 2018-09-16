@@ -48,38 +48,40 @@ Andock inside docksal:
 
 # Commands:
 ```bash
- andock command reference   0.0.4
+  andock command reference   0.0.5
+ 
+   connect                    Connect andock to andock server
+   (.) ssh-add <ssh-key>      Add private SSH key <ssh-key> variable to the agent store.
+ 
+   Server management:         
+   server install             Install andock server.
+   server update              Update andock server.
+   server ssh-add             Add public ssh key to andock server.
+ 
+   Project configuration:     
+   config generate            Generate andock project configuration.
+ 
+   Build management:          
+   build                      Build the current project.
+ 
+   Environment management:    
+   environment deploy (deploy)  Deploy environment.
+   environment up             Start services.
+   environment test           Run UI tests. (Like behat, phantomjs etc.)
+   environment stop           Stop services.
+   environment rm             Remove environment.
+   environment url            Print environment urls.
+ 
+   fin <command>              Fin remote control.
+ 
+   Drush:                     
+   drush generate-alias       Generate drush alias.
+ 
+   version (v, -v)            Print andock version. [v, -v] - prints short version
+   alias                      Print andock alias.
+ 
+   self-update                Update andock
 
-  connect                    Connect andock to andock server
-  (.) ssh-add <ssh-key>      Add private SSH key <ssh-key> variable to the agent store.
-
-  Server management:         
-  server:install [root_user, default=root] [andock_pass, default=keygen]  Install andock server.
-  server:update [root_user, default=root]  Update andock server.
-  server:ssh-add [root_user, default=root]  Add public ssh key to andock server.
-
-  Project configuration:     
-  generate:config            Generate andock project configuration.
-
-  Project build management:  
-  build                      Build project and push it to artifact repository.
-
-  Environment management:    
-  deploy                     Deploy environment.
-  up                         Start services.
-  test                       Run UI tests. (Like behat, phantomjs etc.)
-  stop                       Stop services.
-  rm                         Remove environment.
-
-  fin <command> <path>       Run any fin command.
-
-  Drush:                     
-  drush:generate-alias       Generate drush alias.
-
-  version (v, -v)            Print andock version. [v, -v] - prints short version
-  alias                      Print andock alias.
-
-  self-update                Update andock
 ```
 
 

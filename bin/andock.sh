@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=0.0.4
+ANDOCK_VERSION=0.0.5
 
-REQUIREMENTS_ANDOCK_BUILD='0.0.9'
-REQUIREMENTS_ANDOCK_FIN='0.1.5'
+REQUIREMENTS_ANDOCK_BUILD='0.1.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.2.1'
 REQUIREMENTS_ANDOCK_SERVER='0.0.16'
 REQUIREMENTS_SSH_KEYS='0.3'
 
@@ -29,10 +29,10 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 
 export ANSIBLE_SSH_PIPELINING=True
 
-#export ANSIBLE_SCP_IF_SSH=y
-#export ANSIBLE_SSH_ARGS="-t -t"
+export ANSIBLE_STDOUT_CALLBACK=yaml
 
 #export ANSIBLE_DEBUG=1
+
 config_git_target_repository_path=""
 config_base_domains=""
 config_project_name=""
@@ -209,8 +209,19 @@ generate_playbooks()
 - hosts: andock-docksal-server
   gather_facts: true
   roles:
-    - { role: key-tec.fin }
+    - { role: key-tec.environment }
 " > "${ANDOCK_PLAYBOOK}/fin.yml"
+
+    echo "---
+- hosts: andock-docksal-server
+  gather_facts: false
+  tasks:
+    - include_role:
+        name: key-tec.fin
+        vars_from: default.yml
+    - debug: 'X'
+
+" > "${ANDOCK_PLAYBOOK}/fin_run.yml"
 
 
     echo "---
@@ -272,7 +283,7 @@ install_configuration ()
     generate_playbooks
     echo-green "Installing roles:"
     ansible-galaxy install key-tec.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
-    ansible-galaxy install key-tec.fin,v${REQUIREMENTS_ANDOCK_FIN} --force
+    ansible-galaxy install key-tec.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
     ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
     ansible-galaxy install key-tec.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
 
@@ -329,29 +340,30 @@ show_help ()
 
     echo
     printh "Server management:" "" "yellow"
-    printh "server:install" "Install andock server."
-    printh "server:update" "Update andock server."
-    printh "server:ssh-add" "Add public ssh key to andock server."
+    printh "server install" "Install andock server."
+    printh "server update" "Update andock server."
+    printh "server ssh-add" "Add public ssh key to andock server."
 
     echo
     printh "Project configuration:" "" "yellow"
-    printh "generate:config" "Generate andock project configuration."
+    printh "config generate" "Generate andock project configuration."
     echo
     printh "Build management:" "" "yellow"
-    printh "build" "Build project and push it to artifact repository."
+    printh "build" "Build the current project."
     echo
     printh "Environment management:" "" "yellow"
-    printh "deploy" "Deploy environment."
-    printh "up"  "Start services."
-    printh "test"  "Run UI tests. (Like behat, phantomjs etc.)"
-    printh "stop" "Stop services."
-    printh "rm" "Remove environment."
+    printh "environment deploy (deploy)" "Deploy environment."
+    printh "environment up"  "Start services."
+    printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
+    printh "environment stop" "Stop services."
+    printh "environment rm" "Remove environment."
+    printh "environment url" "Print environment urls."
     echo
     printh "fin <command>" "Fin remote control."
 
     echo
     printh "Drush:" "" "yellow"
-    printh "drush:generate-alias" "Generate drush alias."
+    printh "drush generate-alias" "Generate drush alias."
 
     echo
     printh "version (v, -v)" "Print andock version. [v, -v] - prints short version"
@@ -417,7 +429,7 @@ check_settings_path ()
 {
     local path="$PWD/.andock/andock.yml"
     if [ ! -f $path ]; then
-        echo-error "Settings not found. Run andock generate:config"
+        echo-error "Settings not found. Run andock config generate"
         exit 1
     fi
 }
@@ -591,7 +603,7 @@ run_environment ()
     # Validate tag name. Show help if needed.
     case $tag in
         init|up|update|test|stop|rm|exec|"init,update")
-            echo-green "Start fin ${tag}..."
+            echo-green "Start environment ${tag}..."
         ;;
         *)
             echo-yellow "Unknown tag '$tag'. See 'andock help' for list of available commands" && \
@@ -604,7 +616,7 @@ run_environment ()
 
     # Handling playbook results.
     if [[ $? == 0 ]]; then
-        echo-green "fin ${tag} was finished successfully."
+        echo-green "environment ${tag} was finished successfully."
     else
         echo-error $DEFAULT_ERROR_MESSAGE
         exit 1;
@@ -612,11 +624,11 @@ run_environment ()
 }
 
 
-#---------------------------------- GENERATE ---------------------------------
+#---------------------------------- CONFIG ---------------------------------
 
 # Generate fin hooks.
 # @param $1 The hook name.
-generate_config_fin_hook()
+config_generate_fin_hook()
 {
     echo "- name: Init andock environment
   command: \"fin $1\"
@@ -627,7 +639,7 @@ generate_config_fin_hook()
 }
 
 # Generate composer hook.
-generate_config_compser_hook()
+config_generate_compser_hook()
 {
     echo "- name: composer install
   command: \"fin exec -T composer install\"
@@ -638,13 +650,13 @@ generate_config_compser_hook()
 
 # Generate empty hook file.
 # @param $1 The hook name.
-generate_config_empty_hook()
+config_generate_empty_hook()
 {
     echo "---" > ".andock/hooks/$1_tasks.yml"
 }
 
 # Generate configuration.
-generate_config ()
+config_generate ()
 {
     if [[ -f ".andock/andock.yml" ]]; then
         echo-yellow ".andock/andock.yml already exists"
@@ -698,16 +710,16 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
 " > .andock/andock.yml
 
     if [[ "$build" = 1 && $(_confirmAndReturn "Do you use composer to build your project?") == 1 ]]; then
-        generate_config_compser_hook "build"
+        config_generate_compser_hook "build"
     else
-        generate_config_empty_hook "build"
+        config_generate_empty_hook "build"
     fi
 
-    generate_config_fin_hook "init"
+    config_generate_fin_hook "init"
 
-    generate_config_empty_hook "update"
+    config_generate_empty_hook "update"
 
-    generate_config_empty_hook "test"
+    config_generate_empty_hook "test"
 
     if [[ $? == 0 ]]; then
         echo-green "Configuration was generated. Configure your hooks and start with ${yellow}andock build${NC}"
@@ -901,87 +913,130 @@ command=$1
 shift
 # Finally. Run the command.
 case "$command" in
-  _install-andock)
-    install_andock "$@"
-  ;;
-  _update-andock)
-    install_configuration "$@"
-  ;;
-  cup)
-    install_configuration "$@"
-  ;;
-  self-update)
-    self_update "$@"
-  ;;
-  ssh-add)
-    ssh_add "$@"
-  ;;
-  generate-playbooks)
-    generate_playbooks
-  ;;
-  generate:config)
-    cd $org_path
-    generate_config
-  ;;
-  connect)
-	run_connect "$@"
-  ;;
-  build)
-	run_build "$connection" "$@"
-  ;;
-  deploy)
-	run_environment "$connection" "init,update" "$@"
-  ;;
-  rm)
-	run_environment "$connection" "rm" "$@"
-  ;;
-  up)
-	run_environment "$connection" "up" "$@"
-  ;;
-  test)
-	run_environment "$connection" "test" "$@"
-  ;;
-  stop)
-	run_environment "$connection" "stop" "$@"
-  ;;
+    _install-andock)
+        install_andock "$@"
+    ;;
+    _update-andock)
+        install_configuration "$@"
+    ;;
+    cup)
+        install_configuration "$@"
+    ;;
+    self-update)
+        self_update "$@"
+    ;;
+    ssh-add)
+        ssh_add "$@"
+    ;;
+    generate-playbooks)
+        generate_playbooks
+    ;;
+    config)
+        case "$1" in
+            generate)
+                shift
+                cd $org_path
+                config_generate
+            ;;
+            *)
+                echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
+                exit 1
+            ;;
+        esac
+        ;;
+    connect)
+	    run_connect "$@"
+    ;;
+    build)
+	    run_build "$connection" "$@"
+    ;;
+    deploy)
+	    run_environment "$connection" "init,update" "$@"
+    ;;
+    environment)
+        case "$1" in
+            deploy)
+	            run_environment "$connection" "init,update" "$@"
+            ;;
+            rm)
+                shift
+                run_environment "$connection" "rm" "$@"
+            ;;
+            up)
+                shift
+                run_environment "$connection" "up" "$@"
+            ;;
+            stop)
+                shift
+                run_environment "$connection" "stop" "$@"
+            ;;
+            test)
+                shift
+                run_environment "$connection" "test" "$@"
+            ;;
+            url)
+                shift
+                run_fin "$connection" "vhosts" ""
+            ;;
+            *)
+                echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
+                exit 1
+            ;;
+        esac
+        ;;
+    fin)
+        fin_sub_path=""
+        if [[ "$org_path" != "$root_path" ]]; then
+            fin_sub_path=$(echo ${org_path#${root_path}"/"})
+        fi
+	    run_fin "$connection" "$1" "$fin_sub_path"
+    ;;
+    alias)
+	    run_alias
+    ;;
+    drush)
+        case "$1" in
+            generate-alias)
+                shift
+                run_drush_generate
+            ;;
+            *)
+                echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
+                exit 1
+            ;;
+        esac
+        ;;
+    server)
+        case "$1" in
+            install)
+                shift
+                run_server_install "$connection" "install" "$@"
+            ;;
+            update)
+                shift
+                run_server_install "$connection" "update" "$@"
+            ;;
+            ssh-add)
+                shift
+                run_server_ssh_add "$connection" "$1" "$2"
+             ;;
+            *)
+                echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
+                exit 1
+            ;;
+        esac
+        ;;
 
-  fin)
-    fin_sub_path=""
-    if [[ "$org_path" != "$root_path" ]]; then
-        fin_sub_path=$(echo ${org_path#${root_path}"/"})
-    fi
-	run_fin "$connection" "$1" "$fin_sub_path"
-  ;;
-  alias)
-	run_alias
-  ;;
-  drush:generate-alias)
-	run_drush_generate
-  ;;
-
-
-  server:install)
-	run_server_install "$connection" "install" "$@"
-  ;;
-  server:update)
-	run_server_install "$connection" "update" "$@"
-  ;;
-  server:info)
-	run_server_info "$connection" "$@"
-  ;;
-  server:ssh-add)
-	run_server_ssh_add "$connection" "$1" "$2"
-  ;;
-  help|"")
-    show_help
-  ;;
-  -v | v)
-    version --short
-  ;;
-  version)
-	version
-  ;;
+    help|"")
+        show_help
+    ;;
+    -v | v)
+        version --short
+    ;;
+    version)
+	    version
+    ;;
 	*)
-    echo-yellow "Unknown command '$command'. See 'andock help' for list of available commands" && \
-    exit 1
-esac
+        echo-yellow "Unknown command '$command'. See 'andock help' for list of available commands" && \
+        exit 1
+    esac
