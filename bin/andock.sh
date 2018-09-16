@@ -944,6 +944,10 @@ case "$command" in
     ;;
     environment)
         case "$1" in
+            rm)
+                shift
+                run_environment "$connection" "rm" "$@"
+            ;;
             up)
                 shift
                 run_environment "$connection" "up" "$@"
