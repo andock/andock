@@ -338,14 +338,15 @@ show_help ()
     printh "generate:config" "Generate andock project configuration."
     echo
     printh "Build management:" "" "yellow"
-    printh "build" "Build project and push it to artifact repository."
+    printh "build" "Build the current project."
     echo
     printh "Environment management:" "" "yellow"
-    printh "deploy" "Deploy environment."
-    printh "up"  "Start services."
-    printh "test"  "Run UI tests. (Like behat, phantomjs etc.)"
-    printh "stop" "Stop services."
-    printh "rm" "Remove environment."
+    printh "environment:deploy" "Deploy environment."
+    printh "environment:up"  "Start services."
+    printh "environment:test"  "Run UI tests. (Like behat, phantomjs etc.)"
+    printh "environment:stop" "Stop services."
+    printh "environment:rm" "Remove environment."
+    printh "environment:url" "Print vhosts."
     echo
     printh "fin <command>" "Fin remote control."
 
@@ -929,22 +930,24 @@ case "$command" in
   build)
 	run_build "$connection" "$@"
   ;;
-  deploy)
+  environment:deploy)
 	run_environment "$connection" "init,update" "$@"
   ;;
-  rm)
+  environment:rm)
 	run_environment "$connection" "rm" "$@"
   ;;
-  up)
+  environment:up)
 	run_environment "$connection" "up" "$@"
   ;;
-  test)
+  environment:test)
 	run_environment "$connection" "test" "$@"
   ;;
-  stop)
+  environment:stop)
 	run_environment "$connection" "stop" "$@"
   ;;
-
+  environment:url)
+	run_fin "$connection" "vhosts" "$fin_sub_path"
+  ;;
   fin)
     fin_sub_path=""
     if [[ "$org_path" != "$root_path" ]]; then

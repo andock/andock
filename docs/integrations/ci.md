@@ -32,7 +32,7 @@ before_install:
 
 script:
 - andock build
-- andock deploy
+- andock environment:deploy
 
 ```
 
@@ -63,7 +63,7 @@ deploy:
   stage: deploy
   image: andockio/andock:latest
   script:
-    - andock deploy
+    - andock environment:deploy
   environment:
     name: andock/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.$CI_PROJECT_NAME.example.com
@@ -77,7 +77,7 @@ stop_environment:
   variables:
     GIT_STRATEGY: none
   script:
-    - andock fin rm
+    - andock environment:rm
   when: manual
   environment:
     name: andock/$CI_COMMIT_REF_NAME

@@ -6,7 +6,7 @@ load setup_helper
 
 
 @test "deploy" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin deploy -e "branch=master"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin environment:deploy -e "branch=master"
     [ $status = 0 ]
 }
 
@@ -20,24 +20,29 @@ load setup_helper
     [[ "$output" =~ "Hello Andock" ]]
 }
 
+@test "url: Show url" {
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment:url -e "branch=master"
+    [ $status = 0 ]
+}
+
 @test "fin: Execute fin version" {
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin "version" -e "branch=master"
     [ $status = 0 ]
 }
 
 @test "up" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} up -e "branch=master"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment:up -e "branch=master"
     [ $status = 0 ]
 }
 
 
 @test "test" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} test -e "branch=master"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment:test -e "branch=master"
     [ $status = 0 ]
 }
 
 @test "rm" {
-  run ../../bin/andock.sh @${ANDOCK_CONNECTION} rm -e "branch=master"
+  run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment:rm -e "branch=master"
   [ $status = 0 ]
 }
 
