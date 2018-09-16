@@ -418,7 +418,7 @@ check_settings_path ()
 {
     local path="$PWD/.andock/andock.yml"
     if [ ! -f $path ]; then
-        echo-error "Settings not found. Run andock generate:config"
+        echo-error "Settings not found. Run andock config generate"
         exit 1
     fi
 }
