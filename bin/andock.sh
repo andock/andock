@@ -1,10 +1,10 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=0.0.4
+ANDOCK_VERSION=0.0.5
 
-REQUIREMENTS_ANDOCK_BUILD='0.0.9'
-REQUIREMENTS_ANDOCK_FIN='0.1.5'
+REQUIREMENTS_ANDOCK_BUILD='0.1.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.2.1'
 REQUIREMENTS_ANDOCK_SERVER='0.0.16'
 REQUIREMENTS_SSH_KEYS='0.3'
 
@@ -29,10 +29,10 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 
 export ANSIBLE_SSH_PIPELINING=True
 
-#export ANSIBLE_SCP_IF_SSH=y
-#export ANSIBLE_SSH_ARGS="-t -t"
+export ANSIBLE_STDOUT_CALLBACK=yaml
 
 #export ANSIBLE_DEBUG=1
+
 config_git_target_repository_path=""
 config_base_domains=""
 config_project_name=""
@@ -209,8 +209,19 @@ generate_playbooks()
 - hosts: andock-docksal-server
   gather_facts: true
   roles:
-    - { role: key-tec.fin }
+    - { role: key-tec.environment }
 " > "${ANDOCK_PLAYBOOK}/fin.yml"
+
+    echo "---
+- hosts: andock-docksal-server
+  gather_facts: false
+  tasks:
+    - include_role:
+        name: key-tec.fin
+        vars_from: default.yml
+    - debug: 'X'
+
+" > "${ANDOCK_PLAYBOOK}/fin_run.yml"
 
 
     echo "---
@@ -272,7 +283,7 @@ install_configuration ()
     generate_playbooks
     echo-green "Installing roles:"
     ansible-galaxy install key-tec.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
-    ansible-galaxy install key-tec.fin,v${REQUIREMENTS_ANDOCK_FIN} --force
+    ansible-galaxy install key-tec.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
     ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
     ansible-galaxy install key-tec.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
 
@@ -341,12 +352,12 @@ show_help ()
     printh "build" "Build the current project."
     echo
     printh "Environment management:" "" "yellow"
-    printh "deploy" "Deploy environment."
+    printh "environment deploy (deploy)" "Deploy environment."
     printh "environment up"  "Start services."
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
     printh "environment rm" "Remove environment."
-    printh "environment url" "Print vhosts."
+    printh "environment url" "Print environment urls."
     echo
     printh "fin <command>" "Fin remote control."
 
@@ -592,7 +603,7 @@ run_environment ()
     # Validate tag name. Show help if needed.
     case $tag in
         init|up|update|test|stop|rm|exec|"init,update")
-            echo-green "Start fin ${tag}..."
+            echo-green "Start environment ${tag}..."
         ;;
         *)
             echo-yellow "Unknown tag '$tag'. See 'andock help' for list of available commands" && \
@@ -605,7 +616,7 @@ run_environment ()
 
     # Handling playbook results.
     if [[ $? == 0 ]]; then
-        echo-green "fin ${tag} was finished successfully."
+        echo-green "environment ${tag} was finished successfully."
     else
         echo-error $DEFAULT_ERROR_MESSAGE
         exit 1;
@@ -944,6 +955,9 @@ case "$command" in
     ;;
     environment)
         case "$1" in
+            deploy)
+	            run_environment "$connection" "init,update" "$@"
+            ;;
             rm)
                 shift
                 run_environment "$connection" "rm" "$@"
@@ -962,7 +976,7 @@ case "$command" in
             ;;
             url)
                 shift
-                run_environment "$connection" "url" "$@"
+                run_fin "$connection" "vhosts" ""
             ;;
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \

@@ -15,9 +15,24 @@ Run `andock build` to start the build.
 | `git_artifact_repository_path`            | The builded artifact is pushed to this repository. Andock generate one repository for each project.   
  
 
-## build_tasks.yml
+## Path options overview:
+
+| Path                     | Description |
+|----------------------------|:------------|
+| `build_path`            | The build checkout path.
+
+## Hooks
+
+Hooks can be registered in your andock.yml. 
+
+| File name                  | Description |
+|----------------------------|:------------|
+| `build_tasks`     | Hook fired while `andock build` |
+| `build_done_tasks`     | Hook fired after `andock build`|
+| `build_failed_tasks`     | Hook fired after `andock build` failed|
+
 The build tasks are configured in `.andock/hooks/build_tasks.yml`.
-### Sample: 
+### Sample hooks: 
 ```yaml
 - name: Composer
   command: "composer install"
@@ -32,11 +47,6 @@ The build tasks are configured in `.andock/hooks/build_tasks.yml`.
   args:
     chdir: "{{ buid_path }}/docroot/themes/custom/theme"
 ```
-### Path options overview:
-
-| Path                     | Description |
-|----------------------------|:------------|
-| `build_path`            | The build checkout path.
 
 ## .gitignore
 To commit builded artifacts the folders must be removed from .gitignore.
