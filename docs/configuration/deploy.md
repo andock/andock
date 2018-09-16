@@ -4,16 +4,16 @@
 
 | File name                  | Description |
 |----------------------------|:------------|
-| `hooks/init_tasks.yml`     | Hook fired while `andock environment:deploy` |
-| `hooks/update_tasks.yml`   | Hook fired while `andock environment:deploy`|
-| `hooks/test_tasks.yml`     | Hook fired while `andock environment:test`|
+| `hooks/init_tasks.yml`     | Hook fired while `andock deploy` |
+| `hooks/update_tasks.yml`   | Hook fired while `andock deploy`|
+| `hooks/test_tasks.yml`     | Hook fired while `andock environment test`|
 
 ### Init hook
-The `init hook` fired after the environment is created. if `andock environment:deploy` is called a second time the init hook will not be fired again. You must call first `andock environment:rm` to reinitizialize the environment again.  
+The `init hook` fired after the environment is created. if `andock deploy` is called a second time the init hook will not be fired again. You must call first `andock environment rm` to reinitizialize the environment again.  
 ### Update hook:
-The `update hook` runs after each `anddock environment:deploy`
+The `update hook` runs after each `anddock deploy`
 ### Test hook:
-The `test hook` runs after each `andock environment:test`. This hook should be used to run `behat` or other ui tests.
+The `test hook` runs after each `andock environment test`. This hook should be used to run `behat` or other ui tests.
 
 ## Samples:
 ### init_tasks.yml

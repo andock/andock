@@ -329,9 +329,9 @@ show_help ()
 
     echo
     printh "Server management:" "" "yellow"
-    printh "server:install" "Install andock server."
-    printh "server:update" "Update andock server."
-    printh "server:ssh-add" "Add public ssh key to andock server."
+    printh "server install" "Install andock server."
+    printh "server update" "Update andock server."
+    printh "server ssh-add" "Add public ssh key to andock server."
 
     echo
     printh "Project configuration:" "" "yellow"
@@ -341,18 +341,18 @@ show_help ()
     printh "build" "Build the current project."
     echo
     printh "Environment management:" "" "yellow"
-    printh "environment:deploy" "Deploy environment."
-    printh "environment:up"  "Start services."
-    printh "environment:test"  "Run UI tests. (Like behat, phantomjs etc.)"
-    printh "environment:stop" "Stop services."
-    printh "environment:rm" "Remove environment."
-    printh "environment:url" "Print vhosts."
+    printh "deploy" "Deploy environment."
+    printh "environment up"  "Start services."
+    printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
+    printh "environment stop" "Stop services."
+    printh "environment rm" "Remove environment."
+    printh "environment url" "Print vhosts."
     echo
     printh "fin <command>" "Fin remote control."
 
     echo
     printh "Drush:" "" "yellow"
-    printh "drush:generate-alias" "Generate drush alias."
+    printh "drush generate-alias" "Generate drush alias."
 
     echo
     printh "version (v, -v)" "Print andock version. [v, -v] - prints short version"
@@ -902,89 +902,115 @@ command=$1
 shift
 # Finally. Run the command.
 case "$command" in
-  _install-andock)
-    install_andock "$@"
-  ;;
-  _update-andock)
-    install_configuration "$@"
-  ;;
-  cup)
-    install_configuration "$@"
-  ;;
-  self-update)
-    self_update "$@"
-  ;;
-  ssh-add)
-    ssh_add "$@"
-  ;;
-  generate-playbooks)
-    generate_playbooks
-  ;;
-  generate:config)
-    cd $org_path
-    generate_config
-  ;;
-  connect)
-	run_connect "$@"
-  ;;
-  build)
-	run_build "$connection" "$@"
-  ;;
-  environment:deploy)
-	run_environment "$connection" "init,update" "$@"
-  ;;
-  environment:rm)
-	run_environment "$connection" "rm" "$@"
-  ;;
-  environment:up)
-	run_environment "$connection" "up" "$@"
-  ;;
-  environment:test)
-	run_environment "$connection" "test" "$@"
-  ;;
-  environment:stop)
-	run_environment "$connection" "stop" "$@"
-  ;;
-  environment:url)
-	run_fin "$connection" "vhosts" "$fin_sub_path"
-  ;;
-  fin)
-    fin_sub_path=""
-    if [[ "$org_path" != "$root_path" ]]; then
-        fin_sub_path=$(echo ${org_path#${root_path}"/"})
-    fi
-	run_fin "$connection" "$1" "$fin_sub_path"
-  ;;
-  alias)
-	run_alias
-  ;;
-  drush:generate-alias)
-	run_drush_generate
-  ;;
+    _install-andock)
+        install_andock "$@"
+    ;;
+    _update-andock)
+        install_configuration "$@"
+    ;;
+    cup)
+        install_configuration "$@"
+    ;;
+    self-update)
+        self_update "$@"
+    ;;
+    ssh-add)
+        ssh_add "$@"
+    ;;
+    generate-playbooks)
+        generate_playbooks
+    ;;
+    generate)
+        case "$1" in
+            config)
+                shift
+                cd $org_path
+                generate_config
+            ;;
+            *)
+                echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
+                exit 1
+            ;;
+        esac
+        ;;
+    connect)
+	    run_connect "$@"
+    ;;
+    build)
+	    run_build "$connection" "$@"
+    ;;
+    deploy)
+	    run_environment "$connection" "init,update" "$@"
+    ;;
+    environment)
+        case "$1" in
+            up)
+                shift
+                run_environment "$connection" "up" "$@"
+            ;;
+            stop)
+                shift
+                run_environment "$connection" "stop" "$@"
+            ;;
+            test)
+                shift
+                run_environment "$connection" "test" "$@"
+            ;;
+            url)
+                shift
+                run_environment "$connection" "url" "$@"
+            ;;
+            *)
+                echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
+                exit 1
+            ;;
+        esac
+        ;;
+    fin)
+        fin_sub_path=""
+        if [[ "$org_path" != "$root_path" ]]; then
+            fin_sub_path=$(echo ${org_path#${root_path}"/"})
+        fi
+	    run_fin "$connection" "$1" "$fin_sub_path"
+    ;;
+    alias)
+	    run_alias
+    ;;
+    drush:generate-alias)
+	    run_drush_generate
+    ;;
 
+    server)
+        case "$1" in
+            install)
+                shift
+                run_server_install "$connection" "install" "$@"
+            ;;
+            update)
+                shift
+                run_server_install "$connection" "update" "$@"
+            ;;
+            ssh-add)
+                shift
+                run_server_ssh_add "$connection" "$1" "$2"
+             ;;
+            *)
+                echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
+                exit 1
+            ;;
+        esac
+        ;;
 
-  server:install)
-	run_server_install "$connection" "install" "$@"
-  ;;
-  server:update)
-	run_server_install "$connection" "update" "$@"
-  ;;
-  server:info)
-	run_server_info "$connection" "$@"
-  ;;
-  server:ssh-add)
-	run_server_ssh_add "$connection" "$1" "$2"
-  ;;
-  help|"")
-    show_help
-  ;;
-  -v | v)
-    version --short
-  ;;
-  version)
-	version
-  ;;
+    help|"")
+        show_help
+    ;;
+    -v | v)
+        version --short
+    ;;
+    version)
+	    version
+    ;;
 	*)
-    echo-yellow "Unknown command '$command'. See 'andock help' for list of available commands" && \
-    exit 1
-esac
+        echo-yellow "Unknown command '$command'. See 'andock help' for list of available commands" && \
+        exit 1
+    esac
