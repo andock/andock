@@ -77,7 +77,7 @@ stop_environment:
   variables:
     GIT_STRATEGY: none
   script:
-    - andock fin remove
+    - andock fin rm
   when: manual
   environment:
     name: andock/$CI_COMMIT_REF_NAME

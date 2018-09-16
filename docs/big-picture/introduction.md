@@ -17,8 +17,9 @@ You can use andock with or without an CI server.
 Here a short overview of the two main phases.
 
 ### The build phase.
-You can optionally build your project with anodck. It also possible to build it with other tools like Acquia blt. 
-* Checks out your git repository 
+You can optionally build your project with anodck. It also possible to build it with other tools like Acquia blt.
+ 
+* Checks out your git repository.
 * Run all task from `hooks/build.yaml`.
 * Optionally `fin up` a build environment to run unit tests like you would do it .
 * Push the result to an artifact repository.

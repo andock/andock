@@ -25,7 +25,7 @@ before_install:
 script:
 - bats server.bats
 - bats build.bats
-- bats fin.bats
+- bats environment.bats
 
 after_script:
 - ./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
