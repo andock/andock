@@ -11,7 +11,7 @@
 
 ## Hooks
 
-Hooks can be registered in your andock.yml. 
+Hooks can be registered in your `andock.yml`. 
 
 | File name                  | Description |
 |----------------------------|:------------|
@@ -20,6 +20,12 @@ Hooks can be registered in your andock.yml.
 | `hook_test_tasks`     | Hook fired while `andock environment test`|
 | `deploy_done_tasks`     | Hook fired after `andock deploy`|
 | `deploy_failed_tasks`     | Hook fired after `andock deploy` failed|
+
+### Registration sample:
+andock.yaml
+```
+hook_init_tasks: "{{project_path}}/.andock/hooks/hook_init_tasks.yml"
+```
 
 ### Init hook
 The `init hook` is fired after the environment is created. if `andock deploy` is called a second time the init hook will not be fired again. You must call first `andock environment rm` to reinitizialize the environment again.  

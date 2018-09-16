@@ -31,8 +31,14 @@ Hooks can be registered in your andock.yml.
 | `build_done_tasks`     | Hook fired after `andock build`|
 | `build_failed_tasks`     | Hook fired after `andock build` failed|
 
-The build tasks are configured in `.andock/hooks/build_tasks.yml`.
-### Sample hooks: 
+### Registration sample:
+andock.yaml
+```
+hook_build_tasks: "{{project_path}}/.andock/hooks/build_tasks.yml"
+```
+
+### Sample hooks:
+The build tasks are configured in `.andock/hooks/build_tasks.yml`. 
 ```yaml
 - name: Composer
   command: "composer install"
