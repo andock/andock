@@ -335,7 +335,7 @@ show_help ()
 
     echo
     printh "Project configuration:" "" "yellow"
-    printh "generate:config" "Generate andock project configuration."
+    printh "config generate" "Generate andock project configuration."
     echo
     printh "Build management:" "" "yellow"
     printh "build" "Build the current project."
@@ -613,11 +613,11 @@ run_environment ()
 }
 
 
-#---------------------------------- GENERATE ---------------------------------
+#---------------------------------- CONFIG ---------------------------------
 
 # Generate fin hooks.
 # @param $1 The hook name.
-generate_config_fin_hook()
+config_generate_fin_hook()
 {
     echo "- name: Init andock environment
   command: \"fin $1\"
@@ -628,7 +628,7 @@ generate_config_fin_hook()
 }
 
 # Generate composer hook.
-generate_config_compser_hook()
+config_generate_compser_hook()
 {
     echo "- name: composer install
   command: \"fin exec -T composer install\"
@@ -639,13 +639,13 @@ generate_config_compser_hook()
 
 # Generate empty hook file.
 # @param $1 The hook name.
-generate_config_empty_hook()
+config_generate_empty_hook()
 {
     echo "---" > ".andock/hooks/$1_tasks.yml"
 }
 
 # Generate configuration.
-generate_config ()
+config_generate ()
 {
     if [[ -f ".andock/andock.yml" ]]; then
         echo-yellow ".andock/andock.yml already exists"
@@ -699,16 +699,16 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
 " > .andock/andock.yml
 
     if [[ "$build" = 1 && $(_confirmAndReturn "Do you use composer to build your project?") == 1 ]]; then
-        generate_config_compser_hook "build"
+        config_generate_compser_hook "build"
     else
-        generate_config_empty_hook "build"
+        config_generate_empty_hook "build"
     fi
 
-    generate_config_fin_hook "init"
+    config_generate_fin_hook "init"
 
-    generate_config_empty_hook "update"
+    config_generate_empty_hook "update"
 
-    generate_config_empty_hook "test"
+    config_generate_empty_hook "test"
 
     if [[ $? == 0 ]]; then
         echo-green "Configuration was generated. Configure your hooks and start with ${yellow}andock build${NC}"
@@ -920,12 +920,12 @@ case "$command" in
     generate-playbooks)
         generate_playbooks
     ;;
-    generate)
+    config)
         case "$1" in
-            config)
+            generate)
                 shift
                 cd $org_path
-                generate_config
+                config_generate
             ;;
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
@@ -976,10 +976,18 @@ case "$command" in
     alias)
 	    run_alias
     ;;
-    drush:generate-alias)
-	    run_drush_generate
-    ;;
-
+    drush)
+        case "$1" in
+            generate-alias)
+                shift
+                run_drush_generate
+            ;;
+            *)
+                echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
+                exit 1
+            ;;
+        esac
+        ;;
     server)
         case "$1" in
             install)
