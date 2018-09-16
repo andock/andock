@@ -18,8 +18,8 @@ Hooks can be registered in your `andock.yml`.
 | `hook_init_tasks`     | Hook fired while `andock deploy` (if the environment is new)|
 | `hook_update_tasks`   | Hook fired while `andock deploy` (if the environment already exists)|
 | `hook_test_tasks`     | Hook fired while `andock environment test`|
-| `deploy_done_tasks`     | Hook fired after `andock deploy`|
-| `deploy_failed_tasks`     | Hook fired after `andock deploy` failed|
+| `hook_deploy_done_tasks`     | Hook fired after `andock deploy`|
+| `hook_deploy_failed_tasks`     | Hook fired after `andock deploy` failed|
 
 ### Registration sample:
 andock.yaml

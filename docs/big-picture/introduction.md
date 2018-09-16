@@ -33,7 +33,7 @@ You can optionally build your project with anodck. It also possible to build it 
 * Starts or update an docksal environment
 * Generate Let's encrypt certificates.
 
-[See configuration](../configuration/deploy.md)
+[See configuration](../configuration/environment.md)
 ### Getting started?
 If you are new to andock and want to give it a try: 
 [5 minutes setup](../getting-started/docksal.md)
