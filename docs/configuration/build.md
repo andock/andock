@@ -5,7 +5,7 @@ Run `andock build` to start the build.
 !!! tip "Run your own builds?"
     If you build the project on your CI? Add the repository including the build artifacts as `git_artifact_repository_path` to the `andock.yml` and just run `andock deploy`.
 
-## Configuration options overview:
+## Configuration options:
 
 | Option                     | Description |
 |----------------------------|:------------|
@@ -15,7 +15,7 @@ Run `andock build` to start the build.
 | `git_artifact_repository_path`            | The builded artifact is pushed to this repository. Andock generate one repository for each project.   
  
 
-## Path options overview:
+## Path environment variables:
 
 | Path                     | Description |
 |----------------------------|:------------|

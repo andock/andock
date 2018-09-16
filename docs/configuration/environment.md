@@ -1,6 +1,13 @@
 # Environment 
 
-<b>Andock</b> creates updates and destroy environments. Customizeable through ansible hooks.
+<b>Andock</b> creates updates and destroy environments. Customizeable through ansible hooks and configuration options inside your `andock.yaml`
+
+## Path environment variables:
+
+| Path                     | Description |
+|----------------------------|:------------|
+| `environment_path`            | The root directory of the environment.
+| `docroot_path`            | The docroot path.
 
 ## Hooks
 
