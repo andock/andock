@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=0.0.5
+ANDOCK_VERSION=0.0.7
 
 REQUIREMENTS_ANDOCK_BUILD='0.1.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.2.1'
-REQUIREMENTS_ANDOCK_SERVER='0.0.16'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.2.2'
+REQUIREMENTS_ANDOCK_SERVER='0.0.18'
 REQUIREMENTS_SSH_KEYS='0.3'
 
 DEFAULT_CONNECTION_NAME="default"
@@ -34,7 +34,7 @@ export ANSIBLE_STDOUT_CALLBACK=yaml
 #export ANSIBLE_DEBUG=1
 
 config_git_target_repository_path=""
-config_base_domains=""
+config_virtual_hosts=""
 config_project_name=""
 config_git_repository_path=""
 
@@ -202,14 +202,14 @@ generate_playbooks()
     echo "---
 - hosts: andock-docksal-server
   roles:
-    - { role: key-tec.build }
+    - { role: andock.build }
 " > "${ANDOCK_PLAYBOOK}/build.yml"
 
     echo "---
 - hosts: andock-docksal-server
   gather_facts: true
   roles:
-    - { role: key-tec.environment }
+    - { role: andock.environment }
 " > "${ANDOCK_PLAYBOOK}/fin.yml"
 
     echo "---
@@ -217,7 +217,7 @@ generate_playbooks()
   gather_facts: false
   tasks:
     - include_role:
-        name: key-tec.fin
+        name: andock.fin
         vars_from: default.yml
     - debug: 'X'
 
@@ -237,7 +237,7 @@ generate_playbooks()
     echo "---
 - hosts: andock-docksal-server
   roles:
-    - { role: key-tec.server }
+    - { role: andock.server }
 " > "${ANDOCK_PLAYBOOK}/server_install.yml"
 
 }
@@ -279,13 +279,13 @@ install_andock()
 install_configuration ()
 {
     mkdir -p $ANDOCK_INVENTORY_GLOBAL
-    #export ANSIBLE_RETRY_FILES_ENABLED="False"
     generate_playbooks
     echo-green "Installing roles:"
-    ansible-galaxy install key-tec.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
-    ansible-galaxy install key-tec.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
+    ansible-galaxy install andock.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
+    ansible-galaxy install andock.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
+    ansible-galaxy install andock.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
     ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
-    ansible-galaxy install key-tec.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
+
 
 }
 
@@ -379,7 +379,8 @@ version ()
 	if [[ $1 == '--short' ]]; then
 		echo "$ANDOCK_VERSION"
 	else
-		echo "andock version: $ANDOCK_VERSION"
+		echo-green "andock version: $ANDOCK_VERSION"
+		echo ""
 		echo "Roles:"
 		echo "andock.build: $REQUIREMENTS_ANDOCK_BUILD"
 		echo "andock.fin: $REQUIREMENTS_ANDOCK_FIN"
@@ -780,12 +781,9 @@ if (isset(\$_drush_context['DRUSH_TARGET_SITE_ALIAS'])) {
     # source .docksal/docksal.env for DOCROOT.
     source .docksal/docksal.env
     # Generate one alias for each configured domain.
-    local domains
-    domains=$(echo $config_base_domains | tr " " "\n")
-    # Loop through each domain to generate one alias for each subsite.
-    for domain in $domains
-        do
-            local url="http://${branch_name}.${domain}"
+    local default_virtual_domain && default_virtual_domain=${config_virtual_hosts_default/"{{ branch }}"/${branch_name}}
+    echo $default_virtual_domain
+exit
             echo "
 \$aliases['${branch_name}'] = array (
   'root' => '/var/www/${DOCROOT}',
@@ -795,8 +793,6 @@ if (isset(\$_drush_context['DRUSH_TARGET_SITE_ALIAS'])) {
   'ssh-options' => '-o SendEnv=LC_ANDOCK_ENV'
 );
 " >> $drush_file
-        done
-
     echo-green  "Drush alias for branch \"${branch_name}\" was generated successfully."
     echo-green  "See ${drush_file}"
 }
@@ -902,7 +898,7 @@ cd "$root_path"
 # Than we check if the command needs an connection.
 # And if yes we check if the connection exists.
 case "$1" in
-    server:install|server:update|server:info|server:ssh-add|fin|build|deploy|rm|up|stop)
+    server|environment|build|deploy)
     check_connect $connection
     echo-green "Use connection: $connection"
     ;;
