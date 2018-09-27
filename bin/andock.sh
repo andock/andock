@@ -381,9 +381,9 @@ version ()
 	else
 		echo-green "andock version: $ANDOCK_VERSION"
 		echo ""
-		echo "Roles:"
+		echo-green "Roles:"
 		echo "andock.build: $REQUIREMENTS_ANDOCK_BUILD"
-		echo "andock.fin: $REQUIREMENTS_ANDOCK_FIN"
+		echo "andock.environment: $REQUIREMENTS_ANDOCK_ENVIRONMENT"
 		echo "andock.server: $REQUIREMENTS_ANDOCK_SERVER"
 	fi
 
@@ -405,6 +405,17 @@ get_default_project_name ()
     else
         echo "${ANDOCK_PROJECT_NAME}"
     fi
+}
+
+# Returns the parsed default virtual name
+get_default_virtual_host ()
+{
+    local branch_name && branch_name=$(get_current_branch)
+    local default_virtual_domain && default_virtual_domain=${config_virtual_hosts_default/"{{ branch }}"/${branch_name}}
+    default_virtual_domain=${default_virtual_domain/"{{branch}}"/${branch_name}}
+    default_virtual_domain=${default_virtual_domain/"{{ branch}}"/${branch_name}}
+    default_virtual_domain=${default_virtual_domain/"{{branch }}"/${branch_name}}
+    echo $default_virtual_domain
 }
 
 # Returns the path project root folder.
@@ -635,17 +646,16 @@ config_generate_fin_hook()
   command: \"fin $1\"
   args:
     chdir: \"{{ docroot_path }}\"
-  when: environment_exists_before == false
 " > ".andock/hooks/$1_tasks.yml"
 }
 
 # Generate composer hook.
-config_generate_compser_hook()
+config_generate_composer_hook()
 {
     echo "- name: composer install
   command: \"fin exec -T composer install\"
   args:
-    chdir: \"{{ checkout_path }}\"
+    chdir: \"{{ build_path }}\"
 " > ".andock/hooks/$1_tasks.yml"
 }
 
@@ -711,7 +721,7 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
 " > .andock/andock.yml
 
     if [[ "$build" = 1 && $(_confirmAndReturn "Do you use composer to build your project?") == 1 ]]; then
-        config_generate_compser_hook "build"
+        config_generate_composer_hook "build"
     else
         config_generate_empty_hook "build"
     fi
@@ -755,16 +765,25 @@ run_alias ()
 run_drush_generate ()
 {
     set -e
-    # Abort if andock is configured.
+
+    # Abort if andock is not configured.
     check_settings_path
+
     # Load settings.
     get_settings
-    local branch_name
+
+    # Source .docksal.env
+    source .docksal/docksal.env
+
     # Read current branch.
-    branch_name=$(get_current_branch)
+    local branch_name && branch_name=$(get_current_branch)
+
+    # Load default_virtual_host_name
+    local default_virtual_domain && default_virtual_domain=$(get_default_virtual_host)
 
     # Generate drush folder if not exists
     mkdir -p drush
+
     # The local drush file.
     local drush_file="drush/${config_project_name}.aliases.drushrc.php"
 
@@ -778,17 +797,13 @@ if (isset(\$_drush_context['DRUSH_TARGET_SITE_ALIAS'])) {
   putenv ('LC_ANDOCK_ENV=' . substr(\$_drush_context['DRUSH_TARGET_SITE_ALIAS'], 1));
 }" > ${drush_file}
     fi
-    # source .docksal/docksal.env for DOCROOT.
-    source .docksal/docksal.env
-    # Generate one alias for each configured domain.
-    local default_virtual_domain && default_virtual_domain=${config_virtual_hosts_default/"{{ branch }}"/${branch_name}}
-    echo $default_virtual_domain
-exit
+
+    local docroot=${DOCROOT:-docroot}
             echo "
 \$aliases['${branch_name}'] = array (
-  'root' => '/var/www/${DOCROOT}',
-  'uri' => '${url}',
-  'remote-host' => '${domain}',
+  'root' => '/var/www/${docroot}',
+  'uri' => 'http://${default_virtual_domain}',
+  'remote-host' => '${default_virtual_domain}',
   'remote-user' => 'andock',
   'ssh-options' => '-o SendEnv=LC_ANDOCK_ENV'
 );
