@@ -1,3 +1,8 @@
+[![Latest Release](https://img.shields.io/github/release/andock/andock.svg?style=flat-square)](https://github.com/andock/andock/releases/latest) [![Build Status](https://img.shields.io/travis/docksal/docksal.svg?style=flat-square)](https://travis-ci.org/docksal/docksal)
+
+[![Setup Instructions](https://img.shields.io/badge/%E2%9A%99-%20Setup%20Instructions%20-blue.svg)](https://andock.readthedocs.io/en/latest/)
+[![Gitter](https://img.shields.io/gitter/room/andock/community-support.svg)](https://gitter.im/andock/community-support?source=orgpage)
+
 ![alt text](images/logo_circle.svg "andock")
 # andock - docksal and ansible powered hosting.
 
@@ -5,14 +10,12 @@
 A docksal hosting solution.<br>
 
 ## Key features
-* Easy to use command line tool.
-* Use ansible to remote control docksal.
-* Easy configuration.
-* One environment per branch.
-* Extendable with init, update, tests ansible hooks.
-* drush support including drush sql-sync without extra ssh container.
+* One environment for each branch.
+* Code-driven environment configuration.
 * Let's Encrypt support.
 * Easy to integrate in your CI environment.
+* Easy to use command line tool.
+* drush support including drush sql-sync without extra ssh container.
 
 ## For what can you use andock?
 * Host your project including environments support for every branch.
