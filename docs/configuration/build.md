@@ -10,9 +10,11 @@ Run `andock build` to start the build.
 | Option                     | Description |
 |----------------------------|:------------|
 | `cache_build`            | Enable or disable build cache. Default is `true`.
-| `fin_up_while_build`            | Run fin up while build. Default is `false`
+| `fin_up_during_build`            | Run fin up during build. Default is `false`
 | `target_branch_suffix`            | The suffix of the artifact branch name. Default is `no suffix`
-| `git_artifact_repository_path`            | The builded artifact is pushed to this repository. Andock generate one repository for each project.   
+| `git_artifact_repository_path`            | The builded artifact is pushed to this repository. Andock generate one repository for each project.
+| `remove_gitignore_during_build`            | Remove all .gitignore files before deploy to artifact repository. Default is `true`
+
  
 
 ## Path environment variables:
@@ -54,9 +56,11 @@ The build tasks are configured in `.andock/hooks/build_tasks.yml`.
     chdir: "{{ buid_path }}/docroot/themes/custom/theme"
 ```
 
-## .gitignore
-To commit builded artifacts the folders must be removed from .gitignore.
-To easily manage this you can use ansible file blocks.
+## Advanced build configuration
+
+### .gitignore
+If you need more control which files/folders should be part of the build artifact you can set `remove_gitignore_during_build` to `false` in your `andock.yml`.
+Parts between `#### BEGIN REMOVE ANDOCK ###` will be removed in any .gitignore file.
 ```
 #### BEGIN REMOVE ANDOCK ###
 Folders  

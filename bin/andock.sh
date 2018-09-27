@@ -3,7 +3,7 @@
 ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=0.0.7
 
-REQUIREMENTS_ANDOCK_BUILD='0.1.0'
+REQUIREMENTS_ANDOCK_BUILD='0.2.0'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='0.2.2'
 REQUIREMENTS_ANDOCK_SERVER='0.0.18'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -592,9 +592,11 @@ run_environment ()
     check_settings_path
 
     # Load settings.
-    local settings_path
-    settings_path="$(get_settings_path)"
+    local settings_path && settings_path="$(get_settings_path)"
     get_settings
+
+    # Source .docksal.env
+    source .docksal/docksal.env
 
     # Load branch specific {branch}.andock.yml file if exist.
     local branch_settings_path
