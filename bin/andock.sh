@@ -829,8 +829,6 @@ run_server_ssh_add ()
     else
         local key=$1
     fi
-
-    local ssh_key="command=\"andock-server _bridge \$SSH_ORIGINAL_COMMAND\" $key"
     shift
 
     if [ "$1" = "" ]; then
@@ -840,7 +838,7 @@ run_server_ssh_add ()
         shift
     fi
 
-    ansible-playbook --become --become-user=andock -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$ssh_key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
+    ansible-playbook --become --become-user=andock -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
 
