@@ -3,8 +3,8 @@
 ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=0.0.7
 
-REQUIREMENTS_ANDOCK_BUILD='0.3.1'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.3.1'
+REQUIREMENTS_ANDOCK_BUILD='0.4.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.4.0'
 REQUIREMENTS_ANDOCK_SERVER='0.2.0'
 REQUIREMENTS_SSH_KEYS='0.3'
 
@@ -20,6 +20,7 @@ ANDOCK_PLAYBOOK="$ANDOCK_HOME/playbooks"
 ANDOCK_PROJECT_NAME=""
 
 URL_REPO="https://raw.githubusercontent.com/andock/andock"
+BASHIDS_URL="https://raw.githubusercontent.com/benwilber/bashids/master/bashids"
 URL_ANDOCK="${URL_REPO}/master/bin/andock.sh"
 DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 
@@ -255,6 +256,10 @@ install_andock()
     sudo apt-get update
     sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev -y
 
+    # Install bashids
+    sudo curl -fsSL https://raw.githubusercontent.com/benwilber/bashids/master/bashids -o /usr/local/bin/bashids &&
+    sudo chmod +x /usr/local/bin/bashids
+
     set -e
 
     # Don't install own pip inside travis.
@@ -339,25 +344,26 @@ show_help ()
     printh "(.) ssh-add <ssh-key>" "Add private SSH key <ssh-key> variable to the agent store."
 
     echo
-    printh "Server management:" "" "yellow"
+    printh "Server:" "" "yellow"
     printh "server install" "Install andock server."
     printh "server update" "Update andock server."
     printh "server ssh-add" "Add public ssh key to andock server."
 
     echo
-    printh "Project configuration:" "" "yellow"
+    printh "Project:" "" "yellow"
     printh "config generate" "Generate andock project configuration."
     echo
-    printh "Build management:" "" "yellow"
+    printh "Build:" "" "yellow"
     printh "build" "Build the current project."
     echo
-    printh "Environment management:" "" "yellow"
+    printh "Environment:" "" "yellow"
     printh "environment deploy (deploy)" "Deploy environment."
     printh "environment up"  "Start services."
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
     printh "environment rm" "Remove environment."
     printh "environment url" "Print environment urls."
+    printh "environment ssh" "SSH into environment."
     echo
     printh "fin <command>" "Fin remote control."
 
@@ -582,6 +588,17 @@ run_fin ()
     fi
 }
 
+# SSH connection to environment
+# @param $1 Connection
+run_environment_ssh ()
+{
+    local connection && connection=$1
+
+#ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
+    local command && command=$(ansible -i "${ANDOCK_INVENTORY}/${connection}" all ^C debug -a "msg='{{inventory_hostname}}'")
+    echo $command
+}
+
 # Ansible playbook wrapper for role andock.fin
 # @param $1 Connection
 # @param $2 Tag
@@ -691,11 +708,15 @@ config_generate ()
     fi
     mkdir -p ".andock"
     mkdir -p ".andock/hooks"
+    # Generate unique project id.
+
+    local project_id && project_id=$(bashids -e -s ${project_name} $(date +%s))
 
     echo "# andock.yml (version: ${ANDOCK_VERSION})
 
 ## The name of this project, which must be unique within a andock server.
 project_name: \"${project_name}\"
+project_id: \"${project_id}\"
 
 ## The virtual host configuration pattern.
 virtual_hosts:
@@ -981,6 +1002,11 @@ case "$command" in
                 shift
                 run_fin "$connection" "vhosts" ""
             ;;
+            ssh)
+                shift
+                run_environment_ssh "$connection"
+            ;;
+
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
                 exit 1
