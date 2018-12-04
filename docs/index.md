@@ -1,18 +1,15 @@
-![alt text](images/logo_circle.svg "andock")
 # andock - docksal and ansible powered hosting.
 
 ## What is andock?
 A docksal hosting solution.<br>
 
 ## Key features
-* Easy to use command line tool.
-* Use ansible to remote control docksal.
-* Easy configuration.
-* One environment per branch.
-* Extendable with init, update, tests ansible hooks.
-* drush support including drush sql-sync without extra ssh container.
+* One environment for each branch.
+* Code-driven environment configuration.
 * Let's Encrypt support.
 * Easy to integrate in your CI environment.
+* Easy to use command line tool.
+* drush support including drush sql-sync without extra ssh container.
 
 ## For what can you use andock?
 * Host your project including environments support for every branch.

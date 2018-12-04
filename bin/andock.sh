@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=0.0.7
+ANDOCK_VERSION=0.0.8
 
-REQUIREMENTS_ANDOCK_BUILD='0.1.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.2.2'
-REQUIREMENTS_ANDOCK_SERVER='0.0.18'
+REQUIREMENTS_ANDOCK_BUILD='0.4.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.4.0'
+REQUIREMENTS_ANDOCK_SERVER='0.2.0'
 REQUIREMENTS_SSH_KEYS='0.3'
 
 DEFAULT_CONNECTION_NAME="default"
@@ -20,6 +20,7 @@ ANDOCK_PLAYBOOK="$ANDOCK_HOME/playbooks"
 ANDOCK_PROJECT_NAME=""
 
 URL_REPO="https://raw.githubusercontent.com/andock/andock"
+BASHIDS_URL="https://raw.githubusercontent.com/benwilber/bashids/master/bashids"
 URL_ANDOCK="${URL_REPO}/master/bin/andock.sh"
 DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 
@@ -257,6 +258,10 @@ install_andock()
 
     set -e
 
+    # Install bashids
+    sudo curl -fsSL ${BASHIDS_URL} -o /usr/local/bin/bashids &&
+    sudo chmod +x /usr/local/bin/bashids
+
     # Don't install own pip inside travis.
     if [ "${TRAVIS}" = "true" ]; then
         sudo pip install ansible=="${ANSIBLE_VERSION}"
@@ -339,25 +344,26 @@ show_help ()
     printh "(.) ssh-add <ssh-key>" "Add private SSH key <ssh-key> variable to the agent store."
 
     echo
-    printh "Server management:" "" "yellow"
+    printh "Server:" "" "yellow"
     printh "server install" "Install andock server."
     printh "server update" "Update andock server."
     printh "server ssh-add" "Add public ssh key to andock server."
 
     echo
-    printh "Project configuration:" "" "yellow"
+    printh "Project:" "" "yellow"
     printh "config generate" "Generate andock project configuration."
     echo
-    printh "Build management:" "" "yellow"
+    printh "Build:" "" "yellow"
     printh "build" "Build the current project."
     echo
-    printh "Environment management:" "" "yellow"
+    printh "Environment:" "" "yellow"
     printh "environment deploy (deploy)" "Deploy environment."
     printh "environment up"  "Start services."
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
     printh "environment rm" "Remove environment."
     printh "environment url" "Print environment urls."
+    printh "environment ssh" "SSH into environment."
     echo
     printh "fin <command>" "Fin remote control."
 
@@ -381,9 +387,9 @@ version ()
 	else
 		echo-green "andock version: $ANDOCK_VERSION"
 		echo ""
-		echo "Roles:"
+		echo-green "Roles:"
 		echo "andock.build: $REQUIREMENTS_ANDOCK_BUILD"
-		echo "andock.fin: $REQUIREMENTS_ANDOCK_FIN"
+		echo "andock.environment: $REQUIREMENTS_ANDOCK_ENVIRONMENT"
 		echo "andock.server: $REQUIREMENTS_ANDOCK_SERVER"
 	fi
 
@@ -405,6 +411,17 @@ get_default_project_name ()
     else
         echo "${ANDOCK_PROJECT_NAME}"
     fi
+}
+
+# Returns the parsed default virtual name
+get_default_virtual_host ()
+{
+    local branch_name && branch_name=$(get_current_branch)
+    local default_virtual_domain && default_virtual_domain=${config_virtual_hosts_default/"{{ branch }}"/${branch_name}}
+    default_virtual_domain=${default_virtual_domain/"{{branch}}"/${branch_name}}
+    default_virtual_domain=${default_virtual_domain/"{{ branch}}"/${branch_name}}
+    default_virtual_domain=${default_virtual_domain/"{{branch }}"/${branch_name}}
+    echo $default_virtual_domain
 }
 
 # Returns the path project root folder.
@@ -479,9 +496,40 @@ get_current_branch ()
     fi
 }
 
+
+# Returns the git branch name
+# of the current working directory
+get_ansible_info ()
+{
+    local connection && connection=$1
+    shift
+    local command && command=$1
+    shift
+
+    local settings_path && settings_path="$(get_settings_path)"
+    # Load branch specific {branch}.andock.yml file if exist.
+    local branch_settings_path
+    branch_settings_path="$(get_branch_settings_path)"
+    local branch_settings_config=""
+    if [ "${branch_settings_path}" != "" ]; then
+        local branch_settings_config="-e @${branch_settings_path}"
+    fi
+
+    # Get the current branch.
+    local branch_name
+    branch_name=$(get_current_branch)
+
+    # Source .docksal.env for docroot
+    source .docksal/docksal.env
+
+    local ansible_output && ansible_output=$(ansible -o -e "docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
+
+    local command && command=$(echo ${ansible_output} | grep -o -P '(?<=AN__).*(?=__AN)')
+    echo $command
+}
 #----------------------- ANSIBLE PLAYBOOK WRAPPERS ------------------------
 
-# Generate ansible inventory files inside .andock/connections folder.
+# Generate ansible inventory files in .andock/connections.
 # @param $1 The Connection name.
 # @param $2 The andock host name.
 # @param $3 The exec path.
@@ -571,6 +619,17 @@ run_fin ()
     fi
 }
 
+# SSH connection to environment
+# @param $1 Connection
+run_environment_ssh ()
+{
+
+    local command && command=$(get_ansible_info "$1" "ssh {{branch}}-{{project_id|lower}}@{{inventory_hostname}} -p 2222")
+
+    echo-green "Connect: $command"
+    eval $command
+}
+
 # Ansible playbook wrapper for role andock.fin
 # @param $1 Connection
 # @param $2 Tag
@@ -581,9 +640,11 @@ run_environment ()
     check_settings_path
 
     # Load settings.
-    local settings_path
-    settings_path="$(get_settings_path)"
+    local settings_path && settings_path="$(get_settings_path)"
     get_settings
+
+    # Source .docksal.env
+    source .docksal/docksal.env
 
     # Load branch specific {branch}.andock.yml file if exist.
     local branch_settings_path
@@ -613,7 +674,7 @@ run_environment ()
     esac
 
     # Run the playbook.
-    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
 
     # Handling playbook results.
     if [[ $? == 0 ]]; then
@@ -635,17 +696,16 @@ config_generate_fin_hook()
   command: \"fin $1\"
   args:
     chdir: \"{{ docroot_path }}\"
-  when: environment_exists_before == false
 " > ".andock/hooks/$1_tasks.yml"
 }
 
 # Generate composer hook.
-config_generate_compser_hook()
+config_generate_composer_hook()
 {
     echo "- name: composer install
   command: \"fin exec -T composer install\"
   args:
-    chdir: \"{{ checkout_path }}\"
+    chdir: \"{{ build_path }}\"
 " > ".andock/hooks/$1_tasks.yml"
 }
 
@@ -679,11 +739,15 @@ config_generate ()
     fi
     mkdir -p ".andock"
     mkdir -p ".andock/hooks"
+    # Generate unique project id.
+
+    local project_id && project_id=$(bashids -e -s ${project_name} $(date +%s))
 
     echo "# andock.yml (version: ${ANDOCK_VERSION})
 
 ## The name of this project, which must be unique within a andock server.
 project_name: \"${project_name}\"
+project_id: \"${project_id,,}\"
 
 ## The virtual host configuration pattern.
 virtual_hosts:
@@ -711,7 +775,7 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
 " > .andock/andock.yml
 
     if [[ "$build" = 1 && $(_confirmAndReturn "Do you use composer to build your project?") == 1 ]]; then
-        config_generate_compser_hook "build"
+        config_generate_composer_hook "build"
     else
         config_generate_empty_hook "build"
     fi
@@ -754,45 +818,31 @@ run_alias ()
 
 run_drush_generate ()
 {
-    set -e
-    # Abort if andock is configured.
-    check_settings_path
-    # Load settings.
-    get_settings
-    local branch_name
+    local drush_file && drush_file=$(get_ansible_info "$1" "drush/{{project_name}}.aliases.drushrc.php")
+
     # Read current branch.
-    branch_name=$(get_current_branch)
+    local branch_name && branch_name=$(get_current_branch)
+
+    local alias && alias=$(get_ansible_info "$1" "\$aliases['{{branch}}'] = array (
+  'root' => '/var/www/{{docroot|default('docroot')}}',
+  'uri' => 'http://{{virtual_hosts.default}}',
+  'remote-user' => '{{project_id|default(project_name)|lower}}',
+  'remote-host' => '{{inventory_hostname}}',
+  'ssh-options' => \'-p 2222\'
+);")
 
     # Generate drush folder if not exists
     mkdir -p drush
-    # The local drush file.
-    local drush_file="drush/${config_project_name}.aliases.drushrc.php"
 
     # Check if a drush file already exists. If not generate a stub which export
     # the alias name to LC_ANDOCK_ENV.
     # Based on LC_ANDOCK_ENV andock server jumps into the correct cli container
     if [ ! -f ${drush_file} ]; then
         echo "<?php
-\$_drush_context = drush_get_context();
-if (isset(\$_drush_context['DRUSH_TARGET_SITE_ALIAS'])) {
-  putenv ('LC_ANDOCK_ENV=' . substr(\$_drush_context['DRUSH_TARGET_SITE_ALIAS'], 1));
-}" > ${drush_file}
+" > ${drush_file}
     fi
-    # source .docksal/docksal.env for DOCROOT.
-    source .docksal/docksal.env
-    # Generate one alias for each configured domain.
-    local default_virtual_domain && default_virtual_domain=${config_virtual_hosts_default/"{{ branch }}"/${branch_name}}
-    echo $default_virtual_domain
-exit
-            echo "
-\$aliases['${branch_name}'] = array (
-  'root' => '/var/www/${DOCROOT}',
-  'uri' => '${url}',
-  'remote-host' => '${domain}',
-  'remote-user' => 'andock',
-  'ssh-options' => '-o SendEnv=LC_ANDOCK_ENV'
-);
-" >> $drush_file
+
+    echo $alias | sed 's/\\n/\n/g' >> $drush_file
     echo-green  "Drush alias for branch \"${branch_name}\" was generated successfully."
     echo-green  "See ${drush_file}"
 }
@@ -812,8 +862,6 @@ run_server_ssh_add ()
     else
         local key=$1
     fi
-
-    local ssh_key="command=\"andock-server _bridge \$SSH_ORIGINAL_COMMAND\" $key"
     shift
 
     if [ "$1" = "" ]; then
@@ -823,7 +871,7 @@ run_server_ssh_add ()
         shift
     fi
 
-    ansible-playbook --become --become-user=andock -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$ssh_key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
+    ansible-playbook --become --become-user=andock -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
 
@@ -861,14 +909,13 @@ run_server_install ()
         shift
     fi
 
-    if [ "$tag" = "install" ]; then
-    echo "$@"
+    if [ "${tag}" = "install" ]; then
         ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
         ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock password is: ${andock_pw}"
         echo-green "andock server was installed successfully."
     else
-        ansible-playbook --become --become-user=andock -e ${andock_pw_option} -e "ansible_ssh_user=andock" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook -e "${andock_pw_option}" -e "ansible_ssh_user=${root_user}" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock server was updated successfully."
     fi
 }
@@ -974,6 +1021,11 @@ case "$command" in
                 shift
                 run_fin "$connection" "vhosts" ""
             ;;
+            ssh)
+                shift
+                run_environment_ssh "$connection" "$@"
+            ;;
+
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
                 exit 1
@@ -994,7 +1046,7 @@ case "$command" in
         case "$1" in
             generate-alias)
                 shift
-                run_drush_generate
+                run_drush_generate "$connection"
             ;;
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \

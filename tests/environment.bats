@@ -35,7 +35,6 @@ load setup_helper
     [ $status = 0 ]
 }
 
-
 @test "test" {
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment test -e "branch=master"
     [ $status = 0 ]

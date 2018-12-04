@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+        !/usr/bin/env sh
 # exit on fail
 # setup LXD group
 sudo groupadd --system lxd

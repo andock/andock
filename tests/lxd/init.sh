@@ -1,12 +1,22 @@
 #!/usr/bin/env sh
 
-cleanup.sh
+if ! [ -x "$(command -v lxc)" ]; then
+  sudo apt-get install lxc
+fi
+
+if ! [ -x "$(command -v lxd)" ]; then
+  sudo apt-get install lxd
+  lxd init
+fi
+
+./cleanup.sh
+
 
 container_exists=$(sudo lxc list| grep andock)
 
 if [ "${container_exists}" != "" ]; then
     echo "Found existing andock container. Removing...."
-    cleanup.sh
+    ./cleanup.sh
     echo "Removing done."
 fi
 

@@ -1,3 +1,8 @@
+[![Latest Release](https://img.shields.io/github/release/andock/andock.svg?style=flat-square)](https://github.com/andock/andock/releases/latest) [![Build Status](https://img.shields.io/travis/andock/andock.svg?style=flat-square)](https://travis-ci.org/andock/andock)
+
+[![Setup Instructions](https://img.shields.io/badge/%E2%9A%99-%20Setup%20Instructions%20-blue.svg)](https://andock.readthedocs.io/en/latest/)
+[![Gitter](https://img.shields.io/gitter/room/andock/community-support.svg)](https://gitter.im/andock/community-support?source=orgpage)
+
 ![alt text](docs/images/logo_circle.svg "andock")
 
 # andock cli - docksal and ansible powered hosting.
