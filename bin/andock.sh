@@ -256,11 +256,11 @@ install_andock()
     sudo apt-get update
     sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev -y
 
-    # Install bashids
-    sudo curl -fsSL https://raw.githubusercontent.com/benwilber/bashids/master/bashids -o /usr/local/bin/bashids &&
-    sudo chmod +x /usr/local/bin/bashids
-
     set -e
+
+    # Install bashids
+    sudo curl -fsSL ${BASHIDS_URL} -o /usr/local/bin/bashids &&
+    sudo chmod +x /usr/local/bin/bashids
 
     # Don't install own pip inside travis.
     if [ "${TRAVIS}" = "true" ]; then
@@ -496,9 +496,40 @@ get_current_branch ()
     fi
 }
 
+
+# Returns the git branch name
+# of the current working directory
+get_ansible_info ()
+{
+    local connection && connection=$1
+    shift
+    local command && command=$1
+    shift
+
+    local settings_path && settings_path="$(get_settings_path)"
+    # Load branch specific {branch}.andock.yml file if exist.
+    local branch_settings_path
+    branch_settings_path="$(get_branch_settings_path)"
+    local branch_settings_config=""
+    if [ "${branch_settings_path}" != "" ]; then
+        local branch_settings_config="-e @${branch_settings_path}"
+    fi
+
+    # Get the current branch.
+    local branch_name
+    branch_name=$(get_current_branch)
+
+    # Source .docksal.env for docroot
+    source .docksal/docksal.env
+
+    local ansible_output && ansible_output=$(ansible -o -e "docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
+
+    local command && command=$(echo ${ansible_output} | grep -o -P '(?<=AN__).*(?=__AN)')
+    echo $command
+}
 #----------------------- ANSIBLE PLAYBOOK WRAPPERS ------------------------
 
-# Generate ansible inventory files inside .andock/connections folder.
+# Generate ansible inventory files in .andock/connections.
 # @param $1 The Connection name.
 # @param $2 The andock host name.
 # @param $3 The exec path.
@@ -592,11 +623,11 @@ run_fin ()
 # @param $1 Connection
 run_environment_ssh ()
 {
-    local connection && connection=$1
 
-#ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
-    local command && command=$(ansible -i "${ANDOCK_INVENTORY}/${connection}" all ^C debug -a "msg='{{inventory_hostname}}'")
-    echo $command
+    local command && command=$(get_ansible_info "$1" "ssh {{branch}}-{{project_id|lower}}@{{inventory_hostname}} -p 2222")
+
+    echo-green "Connect: $command"
+    eval $command
 }
 
 # Ansible playbook wrapper for role andock.fin
@@ -643,7 +674,7 @@ run_environment ()
     esac
 
     # Run the playbook.
-    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
 
     # Handling playbook results.
     if [[ $? == 0 ]]; then
@@ -716,7 +747,7 @@ config_generate ()
 
 ## The name of this project, which must be unique within a andock server.
 project_name: \"${project_name}\"
-project_id: \"${project_id}\"
+project_id: \"${project_id,,}\"
 
 ## The virtual host configuration pattern.
 virtual_hosts:
@@ -787,43 +818,31 @@ run_alias ()
 
 run_drush_generate ()
 {
-    set -e
-
-    # Abort if andock is not configured.
-    check_settings_path
-
-    # Load settings.
-    get_settings
-
-    # Source .docksal.env
-    source .docksal/docksal.env
+    local drush_file && drush_file=$(get_ansible_info "$1" "drush/{{project_name}}.aliases.drushrc.php")
 
     # Read current branch.
     local branch_name && branch_name=$(get_current_branch)
 
-    # Load default_virtual_host_name
-    local default_virtual_domain && default_virtual_domain=$(get_default_virtual_host)
+    local alias && alias=$(get_ansible_info "$1" "\$aliases['{{branch}}'] = array (
+  'root' => '/var/www/{{docroot|default('docroot')}}',
+  'uri' => 'http://{{virtual_hosts.default}}',
+  'remote-user' => '{{project_id|default(project_name)|lower}}',
+  'remote-host' => '{{inventory_hostname}}',
+  'ssh-options' => \'-p 2222\'
+);")
 
     # Generate drush folder if not exists
     mkdir -p drush
 
-    # The local drush file.
-    local drush_file="drush/${config_project_name}.aliases.drushrc.php"
-
     # Check if a drush file already exists. If not generate a stub which export
     # the alias name to LC_ANDOCK_ENV.
     # Based on LC_ANDOCK_ENV andock server jumps into the correct cli container
+    if [ ! -f ${drush_file} ]; then
+        echo "<?php
+" > ${drush_file}
+    fi
 
-    local docroot=${DOCROOT:-docroot}
-            echo "
-\$aliases['${branch_name}'] = array (
-  'root' => '/var/www/${docroot}',
-  'uri' => 'http://${default_virtual_domain}',
-  'remote-host' => '${default_virtual_domain}',
-  'remote-user' => 'andock',
-  'ssh-options' => '-p 2222'
-);
-" >> $drush_file
+    echo $alias | sed 's/\\n/\n/g' >> $drush_file
     echo-green  "Drush alias for branch \"${branch_name}\" was generated successfully."
     echo-green  "See ${drush_file}"
 }
@@ -1004,7 +1023,7 @@ case "$command" in
             ;;
             ssh)
                 shift
-                run_environment_ssh "$connection"
+                run_environment_ssh "$connection" "$@"
             ;;
 
             *)
@@ -1027,7 +1046,7 @@ case "$command" in
         case "$1" in
             generate-alias)
                 shift
-                run_drush_generate
+                run_drush_generate "$connection"
             ;;
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
