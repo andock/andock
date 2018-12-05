@@ -6,6 +6,8 @@ ANDOCK_VERSION=0.0.8
 REQUIREMENTS_ANDOCK_BUILD='0.4.0'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='0.4.0'
 REQUIREMENTS_ANDOCK_SERVER='0.2.0'
+REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
+REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
 REQUIREMENTS_SSH_KEYS='0.3'
 
 DEFAULT_CONNECTION_NAME="default"
@@ -344,31 +346,31 @@ show_help ()
     printh "(.) ssh-add <ssh-key>" "Add private SSH key <ssh-key> variable to the agent store."
 
     echo
-    printh "Server:" "" "yellow"
+    printh "Server:" "" "green"
     printh "server install" "Install andock server."
     printh "server update" "Update andock server."
     printh "server ssh-add" "Add public ssh key to andock server."
 
     echo
-    printh "Project:" "" "yellow"
+    printh "Project:" "" "green"
     printh "config generate" "Generate andock project configuration."
     echo
-    printh "Build:" "" "yellow"
+    printh "Build:" "" "green"
     printh "build" "Build the current project."
     echo
-    printh "Environment:" "" "yellow"
+    printh "Environment:" "" "green"
     printh "environment deploy (deploy)" "Deploy environment."
     printh "environment up"  "Start services."
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
     printh "environment rm" "Remove environment."
     printh "environment url" "Print environment urls."
-    printh "environment ssh" "SSH into environment."
+    printh "environment ssh [--container] <command>" "SSH into environment. Specify a differnt container than cli with --container <SERVICE>"
     echo
     printh "fin <command>" "Fin remote control."
 
     echo
-    printh "Drush:" "" "yellow"
+    printh "Drush:" "" "green"
     printh "drush generate-alias" "Generate drush alias."
 
     echo
@@ -505,7 +507,7 @@ get_ansible_info ()
     shift
     local command && command=$1
     shift
-
+    local arg && arg=$1
     local settings_path && settings_path="$(get_settings_path)"
     # Load branch specific {branch}.andock.yml file if exist.
     local branch_settings_path
@@ -522,7 +524,7 @@ get_ansible_info ()
     # Source .docksal.env for docroot
     source .docksal/docksal.env
 
-    local ansible_output && ansible_output=$(ansible -o -e "docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
+    local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
 
     local command && command=$(echo ${ansible_output} | grep -o -P '(?<=AN__).*(?=__AN)')
     echo $command
@@ -623,11 +625,18 @@ run_fin ()
 # @param $1 Connection
 run_environment_ssh ()
 {
-
-    local command && command=$(get_ansible_info "$1" "ssh {{branch}}-{{project_id|lower}}@{{inventory_hostname}} -p 2222")
-
-    echo-green "Connect: $command"
-    eval $command
+    local connection && connection=$1
+    shift
+    local prefix && prefix=""
+    if [[ "$1" = "--container" ]]; then
+        shift
+        prefix="---$1"
+        shift
+    fi
+    local command && command=$(get_ansible_info "$connection" "{{branch}}-{{project_id|lower}}{{arg}}@{{inventory_hostname}}" "$prefix")
+    local fullcommand && fullcommand="ssh -p 2222 ${command} ${*}"
+    echo-green "Connect: $fullcommand"
+    eval $fullcommand
 }
 
 # Ansible playbook wrapper for role andock.fin
@@ -910,12 +919,12 @@ run_server_install ()
     fi
 
     if [ "${tag}" = "install" ]; then
-        ansible andock-docksal-server -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
+        ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
         ansible-playbook -e "ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock password is: ${andock_pw}"
         echo-green "andock server was installed successfully."
     else
-        ansible-playbook -e "${andock_pw_option}" -e "ansible_ssh_user=${root_user}" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo-green "andock server was updated successfully."
     fi
 }
