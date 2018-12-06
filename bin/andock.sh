@@ -19,7 +19,6 @@ ANDOCK_HOME="$HOME/.andock"
 ANDOCK_INVENTORY="./.andock/connections"
 ANDOCK_INVENTORY_GLOBAL="$ANDOCK_HOME/connections"
 ANDOCK_PLAYBOOK="$ANDOCK_HOME/playbooks"
-ANDOCK_PROJECT_NAME=""
 
 URL_REPO="https://raw.githubusercontent.com/andock/andock"
 BASHIDS_URL="https://raw.githubusercontent.com/benwilber/bashids/master/bashids"
@@ -621,6 +620,14 @@ run_fin ()
     fi
 }
 
+# Shows environment url
+# @param $1 Connection
+run_environment_url ()
+{
+    local url && url=$(get_ansible_info "$connection" "{{(letsencrypt_enable == true) | ternary('https','http')}}://{{virtual_hosts.default}}")
+    echo $url
+}
+
 # SSH connection to environment
 # @param $1 Connection
 run_environment_ssh ()
@@ -687,7 +694,18 @@ run_environment ()
 
     # Handling playbook results.
     if [[ $? == 0 ]]; then
-        echo-green "environment ${tag} was finished successfully."
+        case $tag in
+            "init,update")
+                local vhost && vhost=$(run_environment_url ${connection})
+                echo-green "Environment deploy was finished successfully."
+                echo
+                echo-green "Visit: ${vhost}"
+                echo
+            ;;
+            *)
+                echo-green "Environment ${tag} was finished successfully."
+            ;;
+        esac
     else
         echo-error $DEFAULT_ERROR_MESSAGE
         exit 1;
@@ -702,7 +720,7 @@ run_environment ()
 config_generate_fin_hook()
 {
     echo "- name: Init andock environment
-  command: \"fin $1\"
+  command: \"fin ${1}-andock\"
   args:
     chdir: \"{{ docroot_path }}\"
 " > ".andock/hooks/$1_tasks.yml"
@@ -711,8 +729,8 @@ config_generate_fin_hook()
 # Generate composer hook.
 config_generate_composer_hook()
 {
-    echo "- name: composer install
-  command: \"fin exec -T composer install\"
+    echo "- name: Composer install
+  command: \"fin rc -T composer install\"
   args:
     chdir: \"{{ build_path }}\"
 " > ".andock/hooks/$1_tasks.yml"
@@ -783,11 +801,7 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
 
 " > .andock/andock.yml
 
-    if [[ "$build" = 1 && $(_confirmAndReturn "Do you use composer to build your project?") == 1 ]]; then
-        config_generate_composer_hook "build"
-    else
-        config_generate_empty_hook "build"
-    fi
+    config_generate_composer_hook "build"
 
     config_generate_fin_hook "init"
 
@@ -1028,7 +1042,7 @@ case "$command" in
             ;;
             url)
                 shift
-                run_fin "$connection" "vhosts" ""
+                run_environment_url "$connection"
             ;;
             ssh)
                 shift
