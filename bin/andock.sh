@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=0.0.9
+ANDOCK_VERSION=0.0.10
 
 REQUIREMENTS_ANDOCK_BUILD='0.4.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.4.0'
-REQUIREMENTS_ANDOCK_SERVER='0.2.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.5.0'
+REQUIREMENTS_ANDOCK_SERVER='0.2.1'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -272,7 +272,7 @@ install_andock()
         sudo pip install ansible=="${ANSIBLE_VERSION}"
         rm get-pip.py
     fi
-    sudo pip install urllib3 pyOpenSSL ndg-httpsclient pyasn1
+    sudo pip install urllib3 pyOpenSSL ndg-httpsclient pyasn1 jmespath
 
     which ssh-agent || ( sudo apt-get update -y && sudo apt-get install openssh-client -y )
 
@@ -624,7 +624,7 @@ run_fin ()
 # @param $1 Connection
 run_environment_url ()
 {
-    local url && url=$(get_ansible_info "$connection" "{{(letsencrypt_enable == true) | ternary('https','http')}}://{{virtual_hosts.default}}")
+    local url && url=$(get_ansible_info "$connection" "{{(letsencrypt_enable == true) | ternary('https','http')}}://{{virtual_hosts.default.virtual_host}}")
     echo $url
 }
 
@@ -772,21 +772,24 @@ config_generate ()
 
     echo "# andock.yml (version: ${ANDOCK_VERSION})
 
-## The name of this project, which must be unique within a andock server.
+## The display name and the id of the project.
 project_name: \"${project_name}\"
 project_id: \"${project_id,,}\"
-
-## The virtual host configuration pattern.
-virtual_hosts:
-  default: \"${virtual_host_pattern}\"
 
 ## The git checkout repository.
 git_repository_path: ${git_repository_path}
 
-## Mounts describe writeable persistent volumnes in the docker container.
-## Mounts are linked via volumnes: into the docker container.
+## The virtual host configuration pattern.
+virtual_hosts:
+  default:
+    virtual_host: \"${virtual_host_pattern}\"
+    container: web
+
+## Mounts describe writeable persistent volumes in the docker container.
+## Mounts are linked via volumes: into the docker container.
 # mounts:
-#   - { name: 'files', src: 'files', path: 'docroot/files' }
+#   files:
+#     path: 'docroot/files'
 
 ## Let's encrypt.
 ## Uncomment to enable let's encrypt certificate generation.
@@ -848,7 +851,7 @@ run_drush_generate ()
 
     local alias && alias=$(get_ansible_info "$1" "\$aliases['{{branch}}'] = array (
   'root' => '/var/www/{{docroot|default('docroot')}}',
-  'uri' => 'http://{{virtual_hosts.default}}',
+  'uri' => 'http://{{virtual_hosts.default.virtual_host}}',
   'remote-user' => '{{project_id|default(project_name)|lower}}',
   'remote-host' => '{{inventory_hostname}}',
   'ssh-options' => \'-p 2222\'
@@ -1022,6 +1025,7 @@ case "$command" in
     environment)
         case "$1" in
             deploy)
+                shift
 	            run_environment "$connection" "init,update" "$@"
             ;;
             rm)

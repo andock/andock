@@ -16,7 +16,7 @@ echo "Install $test_method components..."
 echo "Initialize ssh configuration..."
 ./init_ssh.sh
 echo "Start components..."
-./init.sh $image
+./init.sh $image "true"
 
 
 

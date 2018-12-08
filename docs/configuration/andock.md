@@ -16,42 +16,52 @@ Here is a short overview of the used configuration files:
 
 ## The andock configuration file `.andock/andock.yml`:
 
-#### Base configuration:
- * ` project_name: ` The name of this project, which must be unique within an andock server.
- * ` virtual_hosts:` The virtual host configuration pattern.
+### Base configuration:
+ * ` project_name: ` The display name of this project. 
+ * ` project_id:` The id of this project, which must be unique within an andock server. This id used for folder names etc.  
  * ` git_repository_path:` The git checkout repository.
-virtual_hosts:
-     default: "www.domain.com"
 
-#### Mounts:
+### Virtual hosts:
+A virtual host pattern describes how HTTP requests forwarded to container.
+The `default` 
+``` 
+virtual_hosts:
+  default: 
+    virtual_host: "{{branch}}.www.domain.com"
+    container: web
+``` 
+
+### Mounts:
 Mounts describe writeable persistent volumnes in the docker container.
 Mounts are linked via volumnes: into the docker container.
 ``` 
 mounts:
-  - { name: 'files', src: 'files', path: 'docroot/files' }
+  files
+    path: 'docroot/files'
 ```
-* `name: ` The unique name of the mount.
-* `src: ` The src folder name of the mount.
+* `key: ` The unique name of the mount.
 * `path: ` The folder path under /var/www inside the docker container. 
 
-#### docksal.env environment
+### docksal.env environment
 You can pass any variable to `docksal-local.env`
 
-#### Sample:
+#### Samples:
 ```
 docksal_env:
   DOCKSAL_STACK: acquia
 ``` 
-### Environment/branch specific overwrites `.andock/andock.{{ branch }}.yml`:
+## Environment/branch specific overwrites `.andock/andock.{{ branch }}.yml`:
 To overwrite configuration for a specific environment you can add an branch specific setting.
 
 For example configure your production domain to the master environment `.andock/andock.master.yml`.
 ```
 virtual_hosts:
-  default: "www.domain.com"
+  default: 
+    virtual_host: "www.domain.com"
+    container: web
 ```
 
-#### Hooks
+## Hooks
 Andock supports build and deploy (init_tasks, update_tasks) hooks.
 
 * [Build hooks](build.md)
