@@ -21,11 +21,15 @@ before_install:
 - ./bin/andock.sh _install-andock
 - cd tests
 - git clone https://github.com/andock/demo-project.git
+- git clone https://github.com/andock/demo-drupal.git
 
 script:
 - bats server.bats
 - bats build.bats
 - bats environment.bats
+
+# Install demo drupal.
+- bats drupal.bats
 
 after_script:
 - ./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE

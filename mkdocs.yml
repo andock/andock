@@ -20,4 +20,5 @@ pages:
       - Drupal: configuration/example-drupal-hooks.md
   - Integrations:
     - CI: integrations/ci.md
+    - Drush: integrations/drush.md
     - Notfication: integrations/notifications.md

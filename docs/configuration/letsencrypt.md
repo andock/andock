@@ -8,13 +8,6 @@ letsencrypt_enable: true
 
 Andock creates an certificate for each vitual_host and stores them into .docksal/certs. Docksal loads all certificates in this folder.
 
-## Advanced domain configuration
-If you need a differnt domain for your certificate than the virtual host (if you use an varnish for example) you can configure domains seperatly. 
-
-```yaml
-letsencrypt_domains:
-  default: "www.{{ branch }}.example.com"
-```
 
 ## Configuration options overview:
 
