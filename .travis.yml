@@ -29,7 +29,9 @@ script:
 - bats environment.bats
 
 # Install demo drupal.
+- if [ "${ANDOCK_TEST_TYPE}" = "digitalocean" ]; then
 - bats drupal.bats
+- fi
 
 after_script:
 - ./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
