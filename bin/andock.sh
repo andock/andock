@@ -414,17 +414,6 @@ get_default_project_name ()
     fi
 }
 
-# Returns the parsed default virtual name
-get_default_virtual_host ()
-{
-    local branch_name && branch_name=$(get_current_branch)
-    local default_virtual_domain && default_virtual_domain=${config_virtual_hosts_default/"{{ branch }}"/${branch_name}}
-    default_virtual_domain=${default_virtual_domain/"{{branch}}"/${branch_name}}
-    default_virtual_domain=${default_virtual_domain/"{{ branch}}"/${branch_name}}
-    default_virtual_domain=${default_virtual_domain/"{{branch }}"/${branch_name}}
-    echo $default_virtual_domain
-}
-
 # Returns the path project root folder.
 find_root_path () {
     path=$(pwd)
