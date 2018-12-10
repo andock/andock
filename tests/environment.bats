@@ -49,3 +49,13 @@ load setup_helper
     run 'curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"'
     [[ "$output" =~ "" ]]
 }
+
+teardown() {
+    echo "Status: $status"
+    echo "Output:"
+    echo "================================================================"
+    for line in "${lines[@]}"; do
+        echo $line
+    done
+    echo "================================================================"
+}

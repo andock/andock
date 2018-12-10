@@ -9,4 +9,12 @@ load setup_helper
   ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build -e "branch=master"
 }
 
-load teardown_helper
+teardown() {
+    echo "Status: $status"
+    echo "Output:"
+    echo "================================================================"
+    for line in "${lines[@]}"; do
+        echo $line
+    done
+    echo "================================================================"
+}

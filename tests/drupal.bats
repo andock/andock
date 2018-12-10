@@ -58,3 +58,13 @@ setup() {
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin deploy -e "branch=develop"
     [ $status = 0 ]
 }
+
+teardown() {
+    echo "Status: $status"
+    echo "Output:"
+    echo "================================================================"
+    for line in "${lines[@]}"; do
+        echo $line
+    done
+    echo "================================================================"
+}
