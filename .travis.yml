@@ -22,6 +22,7 @@ before_install:
 - cd tests
 - git clone https://github.com/andock/demo-project.git
 - git clone https://github.com/andock/demo-drupal.git
+- get.docksal.io | sh
 
 script:
 - bats server.bats
@@ -30,6 +31,9 @@ script:
 
 # Install demo drupal.
 - if [ "${ANDOCK_TEST_TYPE}" = "digitalocean" ]; then
+- cd demo-drupal
+- fin init
+- cd ..
 - bats drupal.bats
 - fi
 

@@ -7,5 +7,4 @@ setup() {
     if [ "${ANDOCK_ROOT_USER}" = "" ]; then
         export ANDOCK_ROOT_USER="root"
     fi
-    fin init
 }
