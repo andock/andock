@@ -22,7 +22,7 @@ before_install:
 - cd tests
 - git clone https://github.com/andock/demo-project.git
 - git clone https://github.com/andock/demo-drupal.git
-- get.docksal.io | sh
+- sudo curl -fsSL get.docksal.io | sh
 
 script:
 - bats server.bats
