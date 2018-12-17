@@ -30,7 +30,7 @@ script:
 - bats environment.bats
 
 # Install demo drupal.
-- if [ "${ANDOCK_TEST_TYPE}" = "digitalocean" ]; then cd demo-drupal; fin init; cd ..; export ANDOCK_TEST_SUFFIX=$(date +%s); bats drupal.bats; fi
+- if [ "${ANDOCK_TEST_TYPE}" = "digitalocean" ]; then cd demo-drupal; fin init; cd ..; bats drupal.bats; fi
 
 after_script:
 - ./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
