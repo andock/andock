@@ -841,7 +841,7 @@ run_drush_generate ()
     local alias && alias=$(get_ansible_info "$1" "\$aliases['{{branch}}'] = array (
   'root' => '/var/www/{{docroot|default('docroot')}}',
   'uri' => 'http://{{virtual_hosts.default.virtual_host}}',
-  'remote-user' => '{{project_id|default(project_name)|lower}}',
+  'remote-user' => '{{branch}}-{{project_id|default(project_name)|lower}}',
   'remote-host' => '{{inventory_hostname}}',
   'ssh-options' => \'-p 2222\'
 );")
@@ -849,9 +849,7 @@ run_drush_generate ()
     # Generate drush folder if not exists
     mkdir -p drush
 
-    # Check if a drush file already exists. If not generate a stub which export
-    # the alias name to LC_ANDOCK_ENV.
-    # Based on LC_ANDOCK_ENV andock server jumps into the correct cli container
+    # Check if a drush file already exists.
     if [ ! -f ${drush_file} ]; then
         echo "<?php
 " > ${drush_file}
