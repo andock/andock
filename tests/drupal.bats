@@ -15,11 +15,11 @@ setup() {
 
 
 @test "build drupal" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin build -e "branch=master"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin build -e "branch=master, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
 }
 @test "deploy drupal" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin deploy -e "branch=master"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin deploy -e "branch=master, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
 }
 
@@ -30,7 +30,7 @@ setup() {
 
 @test "drush sql-sync @elf @remote" {
     cd web
-    run fin drush sql-sync @self @demo-drupal.master -y
+    run fin drush --local sql-sync @self @demo-drupal.master -y
     [ $status = 0 ]
 }
 
@@ -41,7 +41,7 @@ setup() {
 
 @test "drush sql-sync @remote @elf" {
     cd web
-    run fin drush sql-sync @demo-drupal.master @self -y
+    run fin drush --local sql-sync @demo-drupal.master @self -y
     [ $status = 0 ]
 }
 
@@ -53,9 +53,9 @@ setup() {
 @test "Setup dev environment" {
     cd web
     git checkout develop
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin build -e "branch=develop"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin build -e "branch=develop, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin deploy -e "branch=develop"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin deploy -e "branch=develop, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
 }
 
