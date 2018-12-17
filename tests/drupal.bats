@@ -14,11 +14,11 @@ setup() {
 }
 
 
-@test "build drupal" {
+@test "build drupal ${ANDOCK_TEST_SUFFIX}" {
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin build -e "branch=master, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
 }
-@test "deploy drupal" {
+@test "deploy drupal ${ANDOCK_TEST_SUFFIX}" {
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin deploy -e "branch=master, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
 }
@@ -28,25 +28,25 @@ setup() {
     [[ "$output" =~ "HTTP/1.1 200 OK" ]]
 }
 
-@test "drush sql-sync @elf @remote" {
+@test "drush sql-sync @self @demo-drupal.master" {
     cd web
-    run fin drush --local sql-sync @self @demo-drupal.master -y
+    run fin drush sql-sync --local @self @demo-drupal.master -y
     [ $status = 0 ]
 }
 
 @test "deploy: Testing page status" {
-    run 'curl -sL -I https://master.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"'
+    run 'curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"'
     [[ "$output" =~ "HTTP/1.1 200 OK" ]]
 }
 
-@test "drush sql-sync @remote @elf" {
+@test "drush sql-sync @demo-drupal.master @elf" {
     cd web
-    run fin drush --local sql-sync @demo-drupal.master @self -y
+    run fin drush sql-sync --local @demo-drupal.master @self -y
     [ $status = 0 ]
 }
 
 @test "deploy: Testing page status" {
-    run 'curl -sL -I https://master.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"'
+    run 'curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"'
     [[ "$output" =~ "HTTP/1.1 200 OK" ]]
 }
 
