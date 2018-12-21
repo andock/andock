@@ -17,12 +17,12 @@ setup() {
 }
 
 
-@test "build drupal ${ANDOCK_TEST_SUFFIX}" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=master, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
+@test "build drupal" {
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=master random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
 }
 @test "deploy drupal ${ANDOCK_TEST_SUFFIX}" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=master, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=master random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
 }
 
@@ -55,9 +55,9 @@ setup() {
 @test "Setup dev environment" {
     cd web
     git checkout develop
-    run ../../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=develop, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
+    run ../../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=develop random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
-    run ../../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=develop, random_test_suffix=${ANDOCK_TEST_SUFFIX}"
+    run ../../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=develop random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
 }
 
