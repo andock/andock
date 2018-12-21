@@ -2,6 +2,10 @@
 
 # Run server.bats before.
 
+
+export ANDOCK_TEST_SUFFIX=AA
+
+
 setup() {
     cd demo-drupal
     if [ "${ANDOCK_CONNECTION}" = "" ]; then
@@ -10,9 +14,6 @@ setup() {
 
     if [ "${ANDOCK_ROOT_USER}" = "" ]; then
         export ANDOCK_ROOT_USER="root"
-    fi
-    if [ "${ANDOCK_TEST_SUFFIX}" = "" ]; then
-        export ANDOCK_TEST_SUFFIX=$(date +%s);
     fi
 }
 
