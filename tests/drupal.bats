@@ -33,6 +33,7 @@ setup() {
 
 @test "drush sql-sync @self @demo-drupal.master" {
     cd web
+    fin ssh-key add id_rsa
     fin drush sa
     fin drush sql-sync --local @self @demo-drupal.master -y
 }
