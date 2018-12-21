@@ -6,7 +6,7 @@ load setup_helper
 
 
 @test "deploy" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} fin deploy -e "branch=master"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=master"
     [ $status = 0 ]
 }
 
