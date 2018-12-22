@@ -11,12 +11,12 @@ load setup_helper
 }
 
 @test "deploy: Testing page status" {
-    run 'curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"'
+    run curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"
     [[ "$output" =~ "HTTP/1.1 200 OK" ]]
 }
 
 @test "deploy: Testing page content" {
-    run 'curl -sL http://master.demo-project.dev.andock.ci | grep "Hello Andock"'
+    run curl -sL http://master.demo-project.dev.andock.ci | grep "Hello Andock"
     [[ "$output" =~ "Hello Andock" ]]
 }
 
@@ -46,7 +46,7 @@ load setup_helper
 }
 
 @test "rm: Testing page status" {
-    run 'curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"'
+    run curl -sL -I http://master.demo-project.dev.andock.ci | grep "HTTP/1.1 200 OK"
     [[ "$output" =~ "" ]]
 }
 

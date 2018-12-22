@@ -28,7 +28,7 @@ setup() {
 }
 
 @test "deploy: Testing page status" {
-    run 'curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"'
+    run curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"
     [[ "$output" =~ "HTTP/1.1 200 OK" ]]
 }
 
@@ -40,17 +40,19 @@ setup() {
 }
 
 @test "deploy: Testing page status" {
-    run 'curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"'
+    run curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"
     [[ "$output" =~ "HTTP/1.1 200 OK" ]]
 }
 
 @test "drush sql-sync @demo-drupal.master @self" {
     cd web
+    fin ssh-key add id_rsa
+    fin drush sa
     fin drush sql-sync --local @demo-drupal.master @self -y
 }
 
 @test "deploy: Testing page status" {
-    run 'curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"'
+    run curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"
     [[ "$output" =~ "HTTP/1.1 200 OK" ]]
 }
 
