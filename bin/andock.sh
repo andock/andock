@@ -4,7 +4,7 @@ ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=0.1.0
 
 REQUIREMENTS_ANDOCK_BUILD='0.4.1'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.5.1'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.5.2'
 REQUIREMENTS_ANDOCK_SERVER='0.2.2'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
@@ -613,7 +613,7 @@ run_fin ()
 # @param $1 Connection
 run_environment_url ()
 {
-    local url && url=$(get_ansible_info "$connection" "{{(letsencrypt_enable == true) | ternary('https','http')}}://{{virtual_hosts.default.virtual_host}}")
+    local url && url=$(get_ansible_info "$connection" "{{(letsencrypt_enable|default(false) == true) | ternary('https','http')}}://{{virtual_hosts.default.virtual_host}}")
     echo $url
 }
 
@@ -640,7 +640,6 @@ run_environment_ssh ()
 # @param $2 Tag
 run_environment ()
 {
-
     # Check if connection exists
     check_settings_path
 
@@ -680,7 +679,6 @@ run_environment ()
 
     # Run the playbook.
     ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
-
     # Handling playbook results.
     if [[ $? == 0 ]]; then
         case $tag in
