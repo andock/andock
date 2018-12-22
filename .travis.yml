@@ -31,7 +31,6 @@ script:
 
 # Install demo drupal.
 - if [ "${ANDOCK_TEST_TYPE}" = "digitalocean" ]; then cd demo-drupal; fin init; cd ..; bats drupal.bats; fi
-- curl -sL -I "http://master.demo-project.dev.andock.ci"
-- curl -sL http://master.demo-project.dev.andock.ci
+- curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci"
 #after_script:
 #- ./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
