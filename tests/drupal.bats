@@ -3,7 +3,7 @@
 # Run server.bats before.
 
 
-export ANDOCK_TEST_SUFFIX=AA
+export ANDOCK_TEST_SUFFIX="-aa"
 
 
 setup() {
@@ -27,9 +27,9 @@ setup() {
     [ $status = 0 ]
 }
 
-@test "deploy: Testing page status" {
-    run curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"
-    [[ "$output" =~ "HTTP/1.1 200 OK" ]]
+@test "Check fresh installed site" {
+    local output && output=$(curl -sL -I -k "https://www.master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci" | grep "HTTP/2 200")
+    [ ! -z "$output" ]
 }
 
 @test "drush sql-sync @self @demo-drupal.master" {
@@ -39,9 +39,9 @@ setup() {
     fin drush sql-sync --local @self @demo-drupal.master -y
 }
 
-@test "deploy: Testing page status" {
-    run curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"
-    [[ "$output" =~ "HTTP/1.1 200 OK" ]]
+@test "Site still works?" {
+    local output && output=$(curl -sL -I -k "https://www.master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci" | grep "HTTP/2 200")
+    [ ! -z "$output" ]
 }
 
 @test "drush sql-sync @demo-drupal.master @self" {
@@ -51,9 +51,9 @@ setup() {
     fin drush sql-sync --local @demo-drupal.master @self -y
 }
 
-@test "deploy: Testing page status" {
-    run curl -sL -I https://master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci | grep "HTTP/1.1 200 OK"
-    [[ "$output" =~ "HTTP/1.1 200 OK" ]]
+@test "Site still still works?" {
+    local output && output=$(curl -sL -I -k "https://www.master${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci" | grep "HTTP/2 200")
+    [ ! -z "$output" ]
 }
 
 @test "Setup dev environment" {
@@ -63,8 +63,12 @@ setup() {
     [ $status = 0 ]
     run ../../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=develop random_test_suffix=${ANDOCK_TEST_SUFFIX}"
     [ $status = 0 ]
-}
 
+}
+@test "Check dev environment" {
+    local output && output=$(curl -sL -I -k "https://www.develop${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci" | grep "HTTP/2 200")
+    [ ! -z "$output" ]
+}
 teardown() {
     echo "Status: $status"
     echo "Output:"
