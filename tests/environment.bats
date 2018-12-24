@@ -49,8 +49,8 @@ load setup_helper
 }
 
 @test "rm: Testing page status" {
-    run curl -sL -I "http://master.demo-project.dev.andock.ci" | grep "HTTP/1.1 404 Not Found"
-    echo "$output" | grep "HTTP/1.1 200 OK"
+    run curl -sL -I "http://master.demo-project.dev.andock.ci"
+    echo "$output" | grep "HTTP/1.1 404 Not Found"
     unset output
 }
 
