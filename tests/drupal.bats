@@ -39,7 +39,7 @@ setup() {
     [ $status = 0 ]
 
     run curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci"
-    echo "$output" | grep "HTTP/2 200"
+    echo "$output" | grep "HTTP/1.1 200 OK"
     unset output
 
 }
@@ -55,7 +55,7 @@ setup() {
     cd web
     run ../../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=develop"
     [ $status = 0 ]
-    run curl -sL -I -k "https://www.develop$.demo-drupal.dev.andock.ci"
+    run curl -sL -I -k "https://www.develop.demo-drupal.dev.andock.ci"
     echo "$output" | grep "HTTP/1.1 200 OK"
     unset output
 
