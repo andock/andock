@@ -22,12 +22,11 @@ setup() {
 @test "deploy drupal" {
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=master"
     [ $status = 0 ]
+    run curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci"
+    echo "$output" | grep "HTTP/2 200"
+    unset output
 }
 
-@test "Check fresh installed site" {
-    local output && output=$(curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci" | grep "HTTP/2 200")
-    [ ! -z "$output" ]
-}
 
 @test "drush sql-sync test" {
     cd web
@@ -38,26 +37,30 @@ setup() {
     [ $status = 0 ]
     run fin drush sql-sync --local @demo-drupal.master @self -y
     [ $status = 0 ]
+
+    run curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci"
+    echo "$output" | grep "HTTP/2 200"
+    unset output
+
 }
 
-@test "Site still still works?" {
-    local output && output=$(curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci" | grep "HTTP/2 200")
-    [ ! -z "$output" ]
-}
-
-@test "Setup dev environment" {
+@test "Build dev environment" {
     cd web
     git checkout develop
     run ../../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=develop"
     [ $status = 0 ]
+}
+
+@test "Deploy dev environment" {
     run ../../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=develop"
     [ $status = 0 ]
 
+    run curl -sL -I -k "https://www.develop$.demo-drupal.dev.andock.ci"
+    echo "$output" | grep "HTTP/2 200"
+    unset output
+
 }
-@test "Check dev environment" {
-    local output && output=$(curl -sL -I -k "https://www.develop${ANDOCK_TEST_SUFFIX}.demo-drupal.dev.andock.ci" | grep "HTTP/2 200")
-    [ ! -z "$output" ]
-}
+
 teardown() {
     echo "Status: $status"
     echo "Output:"
