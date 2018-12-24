@@ -52,9 +52,9 @@ setup() {
 }
 
 @test "Deploy dev environment" {
+    cd web
     run ../../../bin/andock.sh @${ANDOCK_CONNECTION} deploy -e "branch=develop"
     [ $status = 0 ]
-
     run curl -sL -I -k "https://www.develop$.demo-drupal.dev.andock.ci"
     echo "$output" | grep "HTTP/2 200"
     unset output
