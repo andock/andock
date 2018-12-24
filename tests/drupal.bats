@@ -12,7 +12,11 @@ setup() {
         export ANDOCK_ROOT_USER="root"
     fi
 }
-
+@test "connect" {
+    git checkout master
+    run ../../bin/andock.sh connect "dev.andock.ci"
+    [ $status = 0 ]
+}
 
 @test "build drupal" {
     git checkout master
