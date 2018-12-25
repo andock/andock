@@ -14,7 +14,7 @@ setup() {
 }
 @test "connect" {
     git checkout master
-    run ../../bin/andock.sh connect "dev.andock.ci"
+    run ../../bin/andock.sh connect "default" "dev.andock.ci"
     [ $status = 0 ]
 }
 
