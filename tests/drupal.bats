@@ -14,12 +14,11 @@ setup() {
 }
 @test "connect" {
     git checkout master
-    run ../../bin/andock.sh connect "default" "dev.andock.ci"
+    run ../../bin/andock.sh connect "${ANDOCK_CONNECTION}" "dev.andock.ci"
     [ $status = 0 ]
 }
 
 @test "build drupal" {
-    git checkout master
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=master"
     [ $status = 0 ]
 }
