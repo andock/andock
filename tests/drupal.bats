@@ -3,7 +3,9 @@
 # Run server.bats before.
 
 setup() {
-    cd demo-drupal
+    cd boilerplate-drupal8
+
+
     if [ "${ANDOCK_CONNECTION}" = "" ]; then
         export ANDOCK_CONNECTION="default"
     fi

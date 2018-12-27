@@ -24,7 +24,7 @@ hook_deploy_done_tasks: "{{project_path}}/.andock/hooks/deploy_done_tasks.yml"
 - name: Build failed
   slack:
     token: thetoken/generatedby/slack
-    msg: 'Build {{ project_name }} {{ branc }} failed'
+    msg: 'Build {{ project_name }} {{ branch }} failed'
     channel: '#ansible'
     username: 'Ansible on {{ inventory_hostname }}'
     icon_url: http://www.example.com/some-image-file.png
