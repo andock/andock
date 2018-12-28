@@ -9,6 +9,9 @@ load setup_helper
   ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build -e "branch=master"
 }
 
+@test "build clean" {
+  ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build clean -e "branch=master"
+}
 teardown() {
     echo "Status: $status"
     echo "Output:"

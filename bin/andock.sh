@@ -3,7 +3,7 @@
 ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=1.0.0
 
-REQUIREMENTS_ANDOCK_BUILD='0.4.2'
+REQUIREMENTS_ANDOCK_BUILD='0.4.4'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='0.5.2'
 REQUIREMENTS_ANDOCK_SERVER='0.2.2'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
@@ -355,7 +355,8 @@ show_help ()
     printh "config generate" "Generate andock project configuration."
     echo
     printh "Build:" "" "green"
-    printh "build" "Build the current project."
+    printh "build" "Build project."
+    printh "build clean" "Clean build directory."
     echo
     printh "Environment:" "" "green"
     printh "environment deploy (deploy)" "Deploy environment."
@@ -554,10 +555,31 @@ $host ansible_connection=ssh ansible_user=andock
   echo-green "Connection configuration was created successfully."
 }
 
+run_build_clean ()
+{
+
+    local connection=$1 && shift
+    check_settings_path
+    local settings_path
+    settings_path=$(get_settings_path)
+
+    local branch_name
+    branch_name=$(get_current_branch)
+    echo-green "Build cleanup <${branch_name}>..."
+
+    ansible-playbook --tags "cleanup,setup" --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" -e "{'cache_build': false}" "$@" ${ANDOCK_PLAYBOOK}/build.yml
+    if [[ $? == 0 ]]; then
+        echo-green "Build for branch ${branch_name} cleaned successfully"
+    else
+        echo-error ${DEFAULT_ERROR_MESSAGE}
+        exit 1;
+    fi
+}
 # Ansible playbook wrapper for andock.build role.
 run_build ()
 {
     local connection=$1 && shift
+    local extra_args && extra_args=""
 
     check_settings_path
     local settings_path
@@ -1002,8 +1024,16 @@ case "$command" in
 	    run_connect "$@"
     ;;
     build)
-	    run_build "$connection" "$@"
-    ;;
+        case "$1" in
+            clean)
+                shift
+	            run_build_clean "$connection" "$@"
+            ;;
+            *)
+                run_build "$connection" "$@"
+            ;;
+        esac
+        ;;
     deploy)
 	    run_environment "$connection" "init,update" "$@"
     ;;
