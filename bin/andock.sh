@@ -554,48 +554,46 @@ $host ansible_connection=ssh ansible_user=andock
 
   echo-green "Connection configuration was created successfully."
 }
-
-run_build_clean ()
+build()
 {
-
     local connection=$1 && shift
+    local tags=$1 && shift
+    echo $tags
+    local extra_args=$1 && shift
+
     check_settings_path
     local settings_path
     settings_path=$(get_settings_path)
 
     local branch_name
     branch_name=$(get_current_branch)
-    echo-green "Build cleanup <${branch_name}>..."
+    #echo-green "Building branch <${branch_name}>..."
 
-    ansible-playbook --tags "cleanup,setup" --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" -e "{'cache_build': false}" "$@" ${ANDOCK_PLAYBOOK}/build.yml
-    if [[ $? == 0 ]]; then
-        echo-green "Build for branch ${branch_name} cleaned successfully"
-    else
+    ansible-playbook --tags "$tags" -e "$extra_args" -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
+    if [[ $? != 0 ]]; then
         echo-error ${DEFAULT_ERROR_MESSAGE}
         exit 1;
     fi
 }
+run_build_clean ()
+{
+
+    local branch_name && branch_name=$(get_current_branch)
+    local connection && connection=$1 && shift
+    echo-green "Build cleanup <${branch_name}>..."
+    build $connection "cleanup,setup" "{'cache_build': false}" "$@"
+    echo-green "Build for branch ${branch_name} cleaned successfully"
+
+}
 # Ansible playbook wrapper for andock.build role.
 run_build ()
 {
-    local connection=$1 && shift
-    local extra_args && extra_args=""
-
-    check_settings_path
-    local settings_path
-    settings_path=$(get_settings_path)
-
-    local branch_name
-    branch_name=$(get_current_branch)
+    local branch_name && branch_name=$(get_current_branch)
+    local connection && connection=$1 && shift
     echo-green "Building branch <${branch_name}>..."
+    build ${connection} "all" "" "$@"
+    echo-green "Branch ${branch_name} was build successfully"
 
-    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
-    if [[ $? == 0 ]]; then
-        echo-green "Branch ${branch_name} was builded successfully"
-    else
-        echo-error ${DEFAULT_ERROR_MESSAGE}
-        exit 1;
-    fi
 }
 
 # Ansible playbook wrapper for role andock.fin
@@ -622,7 +620,7 @@ run_fin ()
     local exec_path=$1 && shift
 
     # Run the playbook.
-    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
     if [[ $? == 0 ]]; then
         echo-green "fin exec was finished successfully."
     else
@@ -700,7 +698,7 @@ run_environment ()
     esac
 
     # Run the playbook.
-    ansible-playbook --become --become-user=andock -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
     # Handling playbook results.
     if [[ $? == 0 ]]; then
         case $tag in
@@ -904,7 +902,7 @@ run_server_ssh_add ()
         shift
     fi
 
-    ansible-playbook --become --become-user=andock -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
+    ansible-playbook -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
 
