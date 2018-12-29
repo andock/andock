@@ -21,7 +21,7 @@ setup() {
 }
 
 @test "build drupal" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=master"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} build deploy -e "branch=master"
     [ $status = 0 ]
 }
 @test "deploy drupal" {
@@ -52,7 +52,7 @@ setup() {
 @test "Build dev environment" {
     cd web
     git checkout develop
-    run ../../../bin/andock.sh @${ANDOCK_CONNECTION} build -e "branch=develop"
+    run ../../../bin/andock.sh @${ANDOCK_CONNECTION} build deploy -e "branch=develop"
     [ $status = 0 ]
 }
 

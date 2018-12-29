@@ -355,8 +355,9 @@ show_help ()
     printh "config generate" "Generate andock project configuration."
     echo
     printh "Build:" "" "green"
-    printh "build" "Build project."
-    printh "build clean" "Clean build directory."
+    printh "build" "Build deployment artifact"
+    printh "build deploy" "Build deployment artifact and pushes to artifact repository."
+    printh "build clean" "Clean build caches."
     echo
     printh "Environment:" "" "green"
     printh "environment deploy (deploy)" "Deploy environment."
@@ -557,19 +558,15 @@ $host ansible_connection=ssh ansible_user=andock
 build()
 {
     local connection=$1 && shift
-    local tags=$1 && shift
-    echo $tags
-    local extra_args=$1 && shift
 
     check_settings_path
     local settings_path
     settings_path=$(get_settings_path)
 
-    local branch_name
+    local branch_nameno
     branch_name=$(get_current_branch)
-    #echo-green "Building branch <${branch_name}>..."
 
-    ansible-playbook --tags "$tags" -e "$extra_args" -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
+    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
     if [[ $? != 0 ]]; then
         echo-error ${DEFAULT_ERROR_MESSAGE}
         exit 1;
@@ -580,19 +577,30 @@ run_build_clean ()
 
     local branch_name && branch_name=$(get_current_branch)
     local connection && connection=$1 && shift
-    echo-green "Build cleanup <${branch_name}>..."
-    build $connection "cleanup,setup" "{'cache_build': false}" "$@"
-    echo-green "Build for branch ${branch_name} cleaned successfully"
+    echo-green "Clean build caches for <${branch_name}>..."
+    build $connection --tags "cleanup,setup" -e "{'cache_build': false}" "$@"
+    echo-green "Build caches cleaned successfully"
 
 }
+# Ansible playbook wrapper for andock.build role.
+run_build_deploy ()
+{
+    local branch_name && branch_name=$(get_current_branch)
+    local connection && connection=$1 && shift
+    echo-green "Build and deploy branch <${branch_name}>..."
+    build ${connection} "$@"
+    echo-green "Branch ${branch_name} was built and deployed successfully"
+
+}
+
 # Ansible playbook wrapper for andock.build role.
 run_build ()
 {
     local branch_name && branch_name=$(get_current_branch)
     local connection && connection=$1 && shift
-    echo-green "Building branch <${branch_name}>..."
-    build ${connection} "all" "" "$@"
-    echo-green "Branch ${branch_name} was build successfully"
+    echo-green "Build branch <${branch_name}>..."
+    build ${connection} --skip-tags "prepare_commit,commit,push" -e "{'skip_staging': true}" "$@"
+    echo-green "Branch ${branch_name} was built successfully"
 
 }
 
@@ -896,13 +904,13 @@ run_server_ssh_add ()
     shift
 
     if [ "$1" = "" ]; then
-        local root_user="root"
+        local user="andock"
     else
-        local root_user=$1
+        local user=$1
         shift
     fi
 
-    ansible-playbook -e "ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
+    ansible-playbook -e "ansible_ssh_user=$user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
 
@@ -1026,6 +1034,10 @@ case "$command" in
             clean)
                 shift
 	            run_build_clean "$connection" "$@"
+            ;;
+             deploy)
+                shift
+	            run_build_deploy "$connection" "$@"
             ;;
             *)
                 run_build "$connection" "$@"

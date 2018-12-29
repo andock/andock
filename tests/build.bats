@@ -7,25 +7,29 @@ load setup_helper
 
 @test "build" {
   ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build -e "branch=master"
+
+  if [ "${ANDOCK_TEST_TYPE}" == "travis" ]; then
+    ls /home/andock/andock/projects/v1z2kdj/master/master-v1z2kdj__build/
+  fi
 }
 
-@test "Check build folder" {
-  if [ "${ANDOCK_TEST_TYPE}" != "travis" ]; then
-    skip "Skip test for non local connections"
+@test "build deploy" {
+  ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build deploy -e "branch=master"
+
+  if [ "${ANDOCK_TEST_TYPE}" == "travis" ]; then
+    ls /home/andock/andock/projects/v1z2kdj/master/master-v1z2kdj__build/
+    ls /home/andock/andock/projects/v1z2kdj/master/master-v1z2kdj__build/andock-stage
   fi
-  ls /home/andock/andock/projects/mp4yqom/master/master-mp4yqom__build/
+
 }
 
 @test "build clean" {
   ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build clean -e "branch=master"
-}
-
-@test "Check build folder not exits" {
-  if [ "${ANDOCK_TEST_TYPE}" != "travis" ]; then
-    skip "Skip test for non local connections"
+  if [ "${ANDOCK_TEST_TYPE}" == "travis" ]; then
+    run ls /home/andock/andock/projects/v1z2kdj/master/master-v1z2kdj__build/
+    [[ $status != 0 ]]
   fi
-  run ls /home/andock/andock/projects/mp4yqom/master/master-mp4yqom__build/
-  [[ $status != 0 ]]
+
 }
 
 

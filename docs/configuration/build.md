@@ -1,6 +1,12 @@
 # Build configuration 
 
-Run `andock build` to start the build. 
+
+
+Run `andock build deploy` to build deployment artifact and pushes to the artifact repository.
+
+Run `andock build` to build deployment artifact. This can be useful if you use any other tool (e.g acquia blt) to manage the deployment of the artifact.
+ 
+Run `andock build clean` to cleanup the build caches. 
  
 !!! tip "Run your own builds?"
     If you build the project on your CI? Add the repository including the build artifacts as `git_artifact_repository_path` to the `andock.yml` and just run `andock deploy`.
