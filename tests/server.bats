@@ -42,7 +42,6 @@ load setup_helper
     skip "Skip test for non local connections"
   fi
   fin version
-  [ $status = 0 ]
 }
 
 
