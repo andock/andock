@@ -5,8 +5,8 @@ services:
 - docker
 env:
   matrix:
-  - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis ANDOCK_USER=andock ANDOCK_CONNECTION=local
-  - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_USER=travis ANDOCK_CONNECTION=default
+  - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis ANDOCK_USER=travis ANDOCK_CONNECTION=local
+  - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_USER=andock ANDOCK_CONNECTION=default
   # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=travisssh
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
