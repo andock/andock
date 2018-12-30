@@ -26,6 +26,7 @@ before_install:
 
 script:
 - bats server.bats
+- sudo su andock
 - bats build.bats
 - bats environment.bats
 
