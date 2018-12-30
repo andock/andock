@@ -26,7 +26,7 @@ before_install:
 
 script:
 - bats server.bats
-- if [ "${ANDOCK_TEST_TYPE}" = "travis" ]; sudo su andock; fi
+- if [ "${ANDOCK_TEST_TYPE}" = "travis" ]; su andock; fi
 - bats build.bats
 - bats environment.bats
 
