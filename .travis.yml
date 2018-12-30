@@ -7,7 +7,7 @@ env:
   matrix:
   # lxd is not working on travis.
   # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='lxd' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
-  - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
+  # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_CONNECTION=default
   - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=local
   # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=travisssh
   global:
