@@ -5,8 +5,8 @@ services:
 - docker
 env:
   matrix:
-  - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis ANDOCK_CLIENT_USER=andock ANDOCK_CONNECTION=local
-  - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_CLIENT_USER=travis ANDOCK_CONNECTION=default
+  - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis ANDOCK_USER=andock ANDOCK_CONNECTION=local
+  - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_USER=travis ANDOCK_CONNECTION=default
   # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=travisssh
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
@@ -24,9 +24,8 @@ before_install:
 
 script:
 - bats server.bats
-- sudo chmod -R 777 .
-- sudo su $ANDOCK_CLIENT_USER -c 'bats build.bats'
-- sudo su $ANDOCK_CLIENT_USER -c 'bats environment.bats'
+- bats build.bats
+- bats environment.bats
 
 # Install demo drupal.
 - if [ "${ANDOCK_TEST_TYPE}" = "digitalocean" ]; then cd boilerplate-drupal8; fin init; cd ..; bats drupal.bats; fi
