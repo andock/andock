@@ -911,7 +911,7 @@ run_server_ssh_add ()
         shift
     fi
 
-    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "ansible_ssh_user=$user ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
+    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "ansible_ssh_user='$user' ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
 
