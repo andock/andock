@@ -26,6 +26,7 @@ before_install:
 
 script:
 - bats server.bats
+- sudo chmod 777 .
 - sudo su $ANDOCK_CLIENT_USER -c 'bats build.bats'
 - sudo su $ANDOCK_CLIENT_USER -c 'bats environment.bats'
 
