@@ -41,14 +41,13 @@ load setup_helper
   if [ "${ANDOCK_TEST_TYPE}" != "travis" ]; then
     skip "Skip test for non local connections"
   fi
-  cd /home/andock
-  run sudo su ${ANDOCK_USER} -c 'fin version'
+  fin version
   [ $status = 0 ]
 }
 
 
 @test "server:update" {
-  ../../bin/andock.sh @${ANDOCK_CONNECTION} server update "andock" "${ANDOCK_ROOT_USER}"
+  ../../bin/andock.sh @${ANDOCK_CONNECTION} server update "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}"
 }
 
 @test "server:ssh-add" {
