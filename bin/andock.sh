@@ -900,8 +900,9 @@ run_server_ssh_add ()
         local key=$(cat ~/.ssh/id_rsa.pub)
     else
         local key=$1
+        shift
     fi
-    shift
+
 
     if [ "$1" = "" ]; then
         local user="andock"
@@ -910,7 +911,7 @@ run_server_ssh_add ()
         shift
     fi
 
-    ansible-playbook -e "ansible_ssh_user=$user" -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
+    ansible-playbook -e --become --become-user=$user -i "${ANDOCK_INVENTORY}/${connection}" -e "ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
 
