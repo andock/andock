@@ -38,8 +38,8 @@ setup() {
     fin ssh-key add id_rsa
     fin drush sa
 
-    run fin drush sql-sync --local @self @demo-drupal.master -y
-    [ $status = 0 ]
+   # run fin drush sql-sync --local @self @demo-drupal.master -y
+    #[ $status = 0 ]
     run fin drush sql-sync --local @demo-drupal.master @self -y
     [ $status = 0 ]
 
