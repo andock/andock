@@ -80,5 +80,4 @@ docroot/profiles/contrib
 vendor
 #### END REMOVE ANDOCK ###
 ```
-## 
-    
+
