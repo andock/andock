@@ -30,13 +30,13 @@ This will create some required config files and templates for init, build, test 
 
 #### Build 
 ```
-fin andock build
+fin andock build deploy
 ```
 Here you can find more configuration options for the [build process](../configuration/build.md)
 
-#### Deploy 
+#### Deploy environment
 ```
-fin andock deploy
+fin andock environment deploy
 ```
 
 ### Congratulations, the installation is finished!

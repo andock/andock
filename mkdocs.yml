@@ -12,6 +12,7 @@ pages:
     - System requirements: getting-started/system-requirements.md
     - 5 minutes setup: getting-started/docksal.md
   - Configuration:
+    - connections.yml: configuration/connections.md
     - andock.yml: configuration/andock.md
     - Build: configuration/build.md
     - Environment: configuration/environment.md
@@ -20,4 +21,5 @@ pages:
       - Drupal: configuration/example-drupal-hooks.md
   - Integrations:
     - CI: integrations/ci.md
+    - Drush: integrations/drush.md
     - Notfication: integrations/notifications.md

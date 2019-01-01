@@ -1,6 +1,9 @@
 .idea
 drupal-8-demo
 demo-project
+boilerplate-drupal8
+demo-drupal
 tests/vagrant/.vagrant
 tests/.vagrant
 tests/andock_key
+tests/vagrant/ubuntu-xenial-16.04-cloudimg-console.log
