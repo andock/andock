@@ -14,7 +14,6 @@ pages:
   - Configuration:
     - Basic configuration: configuration/andock.md
     - Hooks: configuration/hooks.md
-      - Drupal examples: configuration/example-drupal-hooks.md
     - Connections: configuration/connections.md
     - Build: configuration/build.md
     - Deploy: configuration/environment.md

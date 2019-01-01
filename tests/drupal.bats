@@ -14,11 +14,6 @@ setup() {
         export ANDOCK_ROOT_USER="root"
     fi
 }
-@test "connect" {
-    git checkout master
-    run ../../bin/andock.sh connect "${ANDOCK_CONNECTION}" "dev.andock.ci"
-    [ $status = 0 ]
-}
 
 @test "build drupal" {
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} build deploy -e "branch=master"
