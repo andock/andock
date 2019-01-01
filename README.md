@@ -5,14 +5,14 @@
 
 ![alt text](docs/images/logo_circle.svg "andock")
 
-# andock cli - docksal and ansible powered hosting.
+# andock cli - develop in docksal, deploy with docksal.
 
 The `andock cli` is a command line interface to andock.    
 
 ## New to andock?
 * [See documentation](https://andock.readthedocs.io/en/latest/)
 * [5 minutes setup](https://andock.readthedocs.io/en/latest/getting-started/docksal/)
-
+* [Drupal boilerplate project](https://github.com/andock/boilerplate-drupal8)
 ## Installation
 Docksal addon (prefered):
 ```

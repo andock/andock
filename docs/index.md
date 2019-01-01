@@ -1,23 +1,24 @@
-# andock - docksal and ansible powered hosting.
+# andock - develop in docksal, deploy with docksal
 
 ## What is andock?
-A docksal hosting solution.<br>
+A docksal based poor man's PaaS.<br>
 
 ## Key features
-* One environment for each branch.
+* Multiple development environments.
 * Code-driven environment configuration.
-* Let's Encrypt support.
-* Easy to integrate in your CI environment.
-* Easy to use command line tool.
 * drush support including drush sql-sync without extra ssh container.
+* Let's Encrypt support.
+* Easy to integrate in your CI environment - but no CI is required.
+* Easy to use command line tool.
+* Ansible universe to configure nearly everything else.
 
 ## For what can you use andock?
-* Host your project including environments support for every branch.
+* Host your project.
 * Host your project on acquia, platform.sh etc. Use andock for unlimited development environment.
 * Use andock to host review environments for qa suites. 
 
 ## How can I use andock
-* As docksal addon
+* As docksal addon.
 * As a docker image inside your CI
 * As a standalone command line tool.
 
@@ -25,3 +26,4 @@ A docksal hosting solution.<br>
 ## Getting started:
 * [New to andock. Get the Big picture](big-picture/introduction.md)
 * [5 minutes setup](getting-started/docksal.md)
+* [Drupal boilerplate project](https://github.com/andock/boilerplate-drupal8)

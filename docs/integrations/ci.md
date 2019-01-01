@@ -31,7 +31,7 @@ before_install:
 - . andock ssh-add "$SSH_PRIVATE_KEY"
 
 script:
-- andock build
+- andock build deploy
 - andock deploy
 
 ```
@@ -51,7 +51,7 @@ build:
   stage: build
   image: andockio/andock:latest
   script:
-    - andock build
+    - andock build deploy
   environment:
     name: andock/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.$CI_PROJECT_NAME.example.com

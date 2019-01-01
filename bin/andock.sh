@@ -811,7 +811,7 @@ virtual_hosts:
 # letsencrypt_enable: true
 
 ## ansible build hooks.
-## The hooks that will be triggered when the environment is builded/initialized/updated.
+## The hooks that will be triggered when the environment is built/initialized/updated.
 hook_build_tasks: \"{{project_path}}/.andock/hooks/build_tasks.yml\"
 hook_init_tasks: \"{{project_path}}/.andock/hooks/init_tasks.yml\"
 hook_update_tasks: \"{{project_path}}/.andock/hooks/update_tasks.yml\"

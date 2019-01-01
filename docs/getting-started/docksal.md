@@ -6,7 +6,7 @@ The easiest way to test andock is to create a cloud box on aws or digital ocean 
 If you want to test on your local maschine you can use any virtual maschine with an ubuntu 16.04 or 18.04 image and add an host entry to your virtual. 
 
 
-[See system requirements](/system-requirements.md) 
+[See system requirements](system-requirements.md) 
 #### Install addon
 ```
 fin addon install andock

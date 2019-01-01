@@ -32,15 +32,13 @@ virtual_hosts:
 ``` 
 
 ### Mounts:
-Mounts describe writeable persistent volumnes in the docker container.
-Mounts are linked via volumnes: into the docker container.
+Mounts describe writeable persistent volumes in the docker container.
+Mounts are linked via volumes into the docker container.
 ``` 
 mounts:
   files
     path: 'docroot/files'
 ```
-* `key: ` The unique name of the mount.
-* `path: ` The folder path under /var/www inside the docker container. 
 
 ### docksal.env environment
 You can pass any variable to `docksal-local.env`
@@ -61,13 +59,6 @@ virtual_hosts:
     container: web
 ```
 
-## Hooks
-Andock supports build and deploy (init_tasks, update_tasks) hooks.
-
-* [Build hooks](build.md)
-* [Deploy hooks](deploy.md)
-
 
 !!! tip Own template generation files?
-    To overwrite the generation templates you can define your own template files.
-    Simple add `docksal_local_yml_path` or `docksal_local_env_path` to your `andock.yml`
+    To overwrite the generation templates you can define your own template files. Simple add `docksal_local_yml_path` or `docksal_local_env_path` to your `andock.yml`

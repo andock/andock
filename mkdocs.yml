@@ -12,8 +12,8 @@ pages:
     - System requirements: getting-started/system-requirements.md
     - 5 minutes setup: getting-started/docksal.md
   - Configuration:
-    - connections.yml: configuration/connections.md
     - andock.yml: configuration/andock.md
+    - connections.yml: configuration/connections.md
     - Build: configuration/build.md
     - Environment: configuration/environment.md
     - Let's Encrypt: configuration/letsencrypt.md

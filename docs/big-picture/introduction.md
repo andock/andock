@@ -17,7 +17,7 @@ You can use andock with or without an CI server.
 Here a short overview of the two main phases.
 
 ### The build phase.
-You can optionally build your project with anodck. It also possible to build it with other tools like Acquia blt.
+You can optionally build your project with `anodck`. It also possible to build it with other tools like Acquia blt.
  
 * Checks out your git repository.
 * Run all task from `hooks/build.yaml`.
@@ -27,7 +27,7 @@ You can optionally build your project with anodck. It also possible to build it 
 [See configuration](../configuration/build.md)
 
 ### The deploy phase.
-* Checks out the builded artifact git repository.
+* Checks out the built artifact git repository.
 * Generates `docksal-local.yml` and `docksal-local.env` configuration files.
 * Run all task from `hooks/init_tasks.yaml` or `hooks/update_tasks.yaml`.
 * Starts or update an docksal environment

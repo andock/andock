@@ -18,7 +18,7 @@ Run `andock build clean` to cleanup the build caches.
 | `cache_build`            | Enable or disable build cache. Default is `true`.
 | `fin_up_during_build`            | Run fin up during build. Default is `false`
 | `target_branch_suffix`            | The suffix of the artifact branch name. Default is `no suffix`
-| `git_artifact_repository_path`            | The builded artifact is pushed to this repository. Andock generate one repository for each project.
+| `git_artifact_repository_path`            | The built artifact is pushed to this repository. `Andock` generate one repository for each project.
 | `remove_gitignore_during_build`            | Remove all .gitignore files before deploy to artifact repository. Default is `true`
 
  
@@ -48,18 +48,16 @@ hook_build_tasks: "{{project_path}}/.andock/hooks/build_tasks.yml"
 ### Sample hooks:
 The build tasks are configured in `.andock/hooks/build_tasks.yml`. 
 ```yaml
-- name: Composer
-  command: "composer install"
+- name: Composer validate
+  command: "fin rc -T composer validate --no-check-all --ansi"
   args:
-    chdir: "{{ buid_path }}"
-- name: npm install
-  command: "npm install"
+    chdir: "{{ build_path }}"
+
+- name: Composer install
+  command: "fin rc -T composer install --ansi --no-dev"
   args:
-    chdir: "{{ buid_path }}/docroot/themes/custom/theme"
-- name: Compile scss
-  command: "npm run compile"
-  args:
-    chdir: "{{ buid_path }}/docroot/themes/custom/theme"
+    chdir: "{{ build_path }}"
+
 ```
 
 ## Advanced build configuration
