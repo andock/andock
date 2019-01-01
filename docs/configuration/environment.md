@@ -1,15 +1,10 @@
-# Environment 
+# Environments 
 
-<b>Andock</b> creates updates and destroy environments. Customizeable through ansible hooks and configuration options inside your `andock.yaml`
+<b>Andock</b> creates an environment for each branch with `fin andock deploy`. Andock checks out the latest artifact from artifact repository and runs all tasks either from the init or update tasks to initialize or update the environment.
+The `init hook` is fired after the environment is created. if `andock deploy` is called a second time the init hook will not be fired again instead the update hook is fired. You can call `andock environment rm` and than `andock environment deploy` to reinitizialize the environment again.
 
-## Path environment variables:
-
-| Path                     | Description |
-|----------------------------|:------------|
-| `environment_path`            | The root directory of the environment.
-| `docroot_path`            | The docroot path.
-
-## Hooks
+ 
+## Hooks overview
 
 Hooks can be registered in your `andock.yml`. 
 
@@ -21,42 +16,28 @@ Hooks can be registered in your `andock.yml`.
 | `hook_deploy_done_tasks`     | Hook fired after `andock deploy`|
 | `hook_deploy_failed_tasks`     | Hook fired after `andock deploy` failed|
 
-### Registration sample:
-andock.yaml
-```
-hook_init_tasks: "{{project_path}}/.andock/hooks/hook_init_tasks.yml"
-```
-
-### Init hook
-The `init hook` is fired after the environment is created. if `andock deploy` is called a second time the init hook will not be fired again. You must call first `andock environment rm` to reinitizialize the environment again.  
-### Update hook:
-The `update hook` is fired after each `anddock deploy`
-### Test hook:
-The `test hook` is fired after each `andock environment test`. This hook should be used to run `behat` or other ui tests.
-
-### Deploy done:
-The `deploy done hook` is fired if the deployment was successfully. 
-
-### Deploy failed:
-The `deploy failed hook` is fired if the deployment failed. 
 
 ## Samples:
+Here are 
 ### init_tasks.yml
 ```
  - name: Init andock environment
-   command: "fin init"
+   command: "fin andock-init"
    args:
      chdir: "{{ docroot_path }}"
 ```
  
 ### update_tasks.yml
 ```
- - name: Composer install
-   command: "fin exec composer install"
-   args:
-     chdir: "{{ environment_path }}"
  - name: Clear cache
    command: "fin drush cr"
    args:
      chdir: "{{ docroot_path }}"
 ```
+
+## Path environment variables:
+
+| Path                     | Description |
+|----------------------------|:------------|
+| `environment_path`            | The root directory of the environment.
+| `docroot_path`            | The docroot path.

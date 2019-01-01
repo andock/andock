@@ -1,24 +1,28 @@
 # Configuration  
-The following configuration files are added to the project by running `fin acp generate:config`
+The andock configuration file `.andock/andock.yml` contains provides a number of variables to configure the build and the deploy process. 
+With [hooks](hooks.md) you can setup the build and deploy process.
+You can generate basic configuration files with `fin andock config generate`
 
-Andock generates `docksal-local.env` and `docksal-local.yml` files based on ansible templates and configuration parameters.
-
-Here is a short overview of the used configuration files:
+Configuration files overview:
 
 | File name                  | Description |
 |----------------------------|:------------|
 | `andock.yml`            | Main configuration file.
 | `andock.${branch}.yml`            | Branch specific configuration file. (optional)
-| `hooks/build_tasks.yml`    | Build hook fired while `fin andock build`. |
-| `hooks/init_tasks.yml`     | Build hook fired while `fin andock fin init, fin andock deploy` |
-| `hooks/update_tasks.yml`   | Build hook fired while `fin andock fin update, fin andock deploy`|
-| `hooks/test_tasks.yml`     | Build hook fired while `fin andock fin test`|
 
-## The andock configuration file `.andock/andock.yml`:
+To overwrite configuration for a specific environment you can add an branch specific andock.{{branch]].yml.
+
+For example configure your production domain to the master environment `.andock/andock.master.yml`.
+```
+virtual_hosts:
+  default: 
+    virtual_host: "www.domain.com"
+    container: web
+```
 
 ### Base configuration:
  * ` project_name: ` The display name of this project. 
- * ` project_id:` The id of this project, which must be unique within an andock server. This id used for folder names etc.  
+ * ` project_id:` The id of this project, which must be unique within an andock server.   
  * ` git_repository_path:` The git checkout repository.
 
 ### Virtual hosts:
@@ -40,24 +44,14 @@ mounts:
     path: 'docroot/files'
 ```
 
-### docksal.env environment
-You can pass any variable to `docksal-local.env`
+### Additional docksal-local.env variables
+You can pass any variable to the generated `docksal-local.env`
 
 #### Samples:
 ```
 docksal_env:
   DOCKSAL_STACK: acquia
 ``` 
-## Environment/branch specific overwrites `.andock/andock.{{ branch }}.yml`:
-To overwrite configuration for a specific environment you can add an branch specific setting.
-
-For example configure your production domain to the master environment `.andock/andock.master.yml`.
-```
-virtual_hosts:
-  default: 
-    virtual_host: "www.domain.com"
-    container: web
-```
 
 
 !!! tip "Own template generation files?"

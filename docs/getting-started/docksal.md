@@ -1,44 +1,50 @@
 # 5 minutes setup instruction
 
 ## Preperation
-The easiest way to test andock is to create a cloud box on aws or digital ocean etc. with ubuntu 16.04 or 18.04 and point an wildcard dns like *.dev.yourdomain.com to the server.
+The easiest way to test andock is to create a cloud box any cloud like aws or digital ocean etc. with ubuntu 16.04 or 18.04 installed.
 
-If you want to test on your local maschine you can use any virtual maschine with an ubuntu 16.04 or 18.04 image and add an host entry to your virtual. 
+After that point an wildcard domain to this server.
 
+Please check [system requirements](system-requirements.md) before setup the server.
 
-[See system requirements](system-requirements.md) 
-#### Install addon
+## Let's go
+### Install addon
 ```
 fin addon install andock
 ```
-#### Enable andock in your project
+### Enable andock in your project
 ```
 fin andock enable
 ```
-#### Setup the andock server
-
+#### Connect
+First you must connect your project to the andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
+As connection name just hit enter. `default` will than be used as connection name. [Here](../configuration/connections.md) you find more details about connections.
 ```
 fin andock connect
+```
+### Install andock server
+Andock needs docksal installed on the server. You can easily install docksal with: 
+```
 fin andock server install
 ```
-
-#### Generate project configuration
+### Generate project configuration
 ```
 fin andock config generate
 ```
 This will create some required config files and templates for init, build, test and update hooks. 
+Here you will find an overview of andock [configuration](../configuration/andock.md). And here you will find more details about the [hook configuration](../configuration/hooks.md) 
 
-#### Build 
+### Build 
 ```
 fin andock build deploy
 ```
-Here you can find more configuration options for the [build process](../configuration/build.md)
+Here you find more details about the [build process](../configuration/build.md)
 
-#### Deploy environment
+### Deploy environment
 ```
 fin andock environment deploy
 ```
-
+Here you find more details about [deploy process](../configuration/environment.md)
 ### Congratulations, the installation is finished!
 
 ### Read more:

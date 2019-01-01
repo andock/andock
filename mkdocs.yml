@@ -12,13 +12,14 @@ pages:
     - System requirements: getting-started/system-requirements.md
     - 5 minutes setup: getting-started/docksal.md
   - Configuration:
-    - andock.yml: configuration/andock.md
-    - connections.yml: configuration/connections.md
+    - Basic configuration: configuration/andock.md
+    - Hooks: configuration/hooks.md
+      - Drupal examples: configuration/example-drupal-hooks.md
+    - Connections: configuration/connections.md
     - Build: configuration/build.md
-    - Environment: configuration/environment.md
+    - Deploy: configuration/environment.md
     - Let's Encrypt: configuration/letsencrypt.md
-    - Hook configurations:
-      - Drupal: configuration/example-drupal-hooks.md
+
   - Integrations:
     - CI: integrations/ci.md
     - Drush: integrations/drush.md
