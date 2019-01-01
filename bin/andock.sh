@@ -372,7 +372,7 @@ show_help ()
 
     echo
     printh "Drush:" "" "green"
-    printh "drush generate-alias" "Generate drush alias."
+    printh "drush generate-alias <version>" "Generate drush alias (Default: Version 9."
 
     echo
     printh "version (v, -v)" "Print andock version. [v, -v] - prints short version"
@@ -513,7 +513,7 @@ get_ansible_info ()
 
     # Source .docksal.env for docroot
     source .docksal/docksal.env
-
+    #echo "COMMAND: $command"
     local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
 
     local command && command=$(echo ${ansible_output} | grep -o -P '(?<=AN__).*(?=__AN)')
@@ -857,7 +857,7 @@ run_alias ()
     echo "${env}"
 }
 
-run_drush_generate ()
+run_drush_generate_8 ()
 {
     local drush_file && drush_file=$(get_ansible_info "$1" "drush/{{project_name}}.aliases.drushrc.php")
 
@@ -886,6 +886,26 @@ run_drush_generate ()
     echo-green  "See ${drush_file}"
 }
 
+run_drush_generate_9 ()
+{
+    local drush_file && drush_file=$(get_ansible_info "$1" "drush/sites/{{project_name}}.site.yml")
+
+    local branch_name && branch_name=$(get_current_branch)
+
+    local alias && alias=$(get_ansible_info "$1" "{{branch}}:
+__root: \'/var/www/{{docroot|default('docroot')}}\'
+__uri:  \'http://{{virtual_hosts.default.virtual_host}}\'
+__user: \'{{branch}}-{{project_id|default(project_name)|lower}}\'
+__host: \'{{inventory_hostname}}\'
+__ssh:
+____options: \'-p 2222\'")
+
+    # Generate drush folder if not exists
+    mkdir -p drush/sites
+    echo $alias | sed 's/\\n/\n/g; s/__/  /g' >> $drush_file
+    echo-green  "Drush alias for branch \"${branch_name}\" was generated successfully."
+    echo-green  "See ${drush_file}"
+}
 
 #----------------------------------- SERVER -----------------------------------
 
@@ -1099,7 +1119,17 @@ case "$command" in
         case "$1" in
             generate-alias)
                 shift
-                run_drush_generate "$connection"
+
+                if [[ $1 == "" ]] || [[ "$1" == "9" ]]; then
+                    run_drush_generate_9 "$connection"
+                    exit 0
+                fi
+                if [[ "$1" == "8" ]]; then
+                    run_drush_generate_8 "$connection"
+                    exit 0
+                fi
+                echo-yellow "Invalid drush version '$1'. See 'andock help' for list of available commands" && \
+                exit 1
             ;;
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
