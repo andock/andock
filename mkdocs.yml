@@ -16,7 +16,7 @@ pages:
     - Hooks: configuration/hooks.md
     - Connections: configuration/connections.md
     - Build: configuration/build.md
-    - Deploy: configuration/environment.md
+    - Environments: configuration/environment.md
     - Let's Encrypt: configuration/letsencrypt.md
 
   - Integrations:

@@ -1,41 +1,33 @@
 # Big picture.
 
-<b>Andock</b> is designed with two scenarios in mind:
+<b>Andock</b> is designed having two scenarios in mind:
 
-1. Host small to medium sized docksal projects in the cloud or on any bare metal server with minimal configuration effort and no need of any other server infrastructure. 
-2. Host your project on Acquia, platform.sh etc and use <b>andock</b> for feature branch based review apps.
+1. You can use andock to host small to medium-sized docksal projects in the cloud or on any Bare Metal Server with minimum configuration effort and without any other necessary server infrastructure. 
+2. If you host your project on Acquia, platform.sh or others, you can use <b>Andock</b> for unlimited staging environments.
 
-Your code must be managed by GIT. Andock will built and generate one environment for each git branch. The configuration is driven by a small number of YAML files in your Git repository
+Your code must be managed by GIT. <b>Andock</b> will build one environment for each git branch. The configuration is driven by a small number of YAML files in your Git repository
 
-<b>Andock</b> is a set of ansible roles to manage the complete build and deploy life cycle of your docksal project. With the power of ansible you can also easily extend the workflow. 
+<b>Andock</b> uses a set of ansible roles to manage the complete build and deploy life cycle of your docksal project. Ansible offers an extensive kit, which allows you to extend the workflow according to your requirements. 
 
-The <b>andock cli</b> is a simple command line tool to execute the roles. You can use the command line tool as docksal addon inside your porject, as standalone for non dockerized CIs, or as a docker image for dockerized CIs. 
+The <b>Andock cli</b> is a simple command line tool. You can use it as docksal add-on in your project, as stand-alone for non-dockerized CIs, or as a docker image for dockerized CIs. 
 
-You can use andock with or without an CI server.
+You can use andock with or without a CI server.
 
 ## "build &amp; deploy"
 Here a short overview of the two main phases.
 
 ### The build phase.
-You can optionally build your project with `anodck`. It also possible to build it with other tools like Acquia blt.
+You can build your project with <b>Andock</b>. It is also possible to build it with other tools like Acquia blt.
  
-* Checks out your git repository.
-* Run all task from `hooks/build.yaml`.
-* Optionally `fin up` a build environment to run unit tests like you would do it .
-* Push the result to an artifact repository.
-
+[DIAGRAM]
 [See configuration](../configuration/build.md)
 
 ### The deploy phase.
-* Checks out the built artifact git repository.
-* Generates `docksal-local.yml` and `docksal-local.env` configuration files.
-* Run all task from `hooks/init_tasks.yaml` or `hooks/update_tasks.yaml`.
-* Starts or update an docksal environment
-* Generate Let's encrypt certificates.
-
+[DIAGRAM]
+ 
 [See configuration](../configuration/environment.md)
 ### Getting started?
-If you are new to andock and want to give it a try: 
+If you are new to <b>Andock</b> and want to give it a try: 
 [5 minutes setup](../getting-started/docksal.md)
 
 To get an overview about the configuration check out: 

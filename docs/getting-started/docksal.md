@@ -16,7 +16,7 @@ fin addon install andock
 ```
 fin andock enable
 ```
-#### Connect
+### Connect
 First you must connect your project to the andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
 As connection name just hit enter. `default` will than be used as connection name. [Here](../configuration/connections.md) you find more details about connections.
 ```
@@ -40,12 +40,12 @@ fin andock build deploy
 ```
 Here you find more details about the [build process](../configuration/build.md)
 
-### Deploy environment
+### Create environment
 ```
 fin andock environment deploy
 ```
 Here you find more details about [deploy process](../configuration/environment.md)
-### Congratulations, the installation is finished!
+## Congratulations, the installation is finished!
 
 ### Read more:
 * [CI server automation](../integrations/ci.md)
