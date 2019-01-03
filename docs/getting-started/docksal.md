@@ -1,21 +1,27 @@
 # 5 minutes setup instruction
 
 ## Preperation
-The easiest way to test andock is to create a cloud box any cloud like aws or digital ocean etc. with ubuntu 16.04 or 18.04 installed.
+The easiest way to test Andock is to create a cloud box any cloud like aws or digital ocean etc. with ubuntu 16.04 or 18.04 installed.
 
 After that point an wildcard domain to this server.
 
 Please check [system requirements](system-requirements.md) before setup the server.
 
-## Let's go
-### Install addon
+If can also test <b>Andock</b> with vagrant:
+
+```
+ curl -sS https://raw.githubusercontent.com/andock/andock/master/tests/vagrant-test | sh
+```
+This will not install vagrant or virtualbox. So please install this first.
+
+## Let's start.
+### Install the and enable the addon.
 ```
 fin addon install andock
-```
-### Enable andock in your project
-```
 fin andock enable
 ```
+This will add the andock container to your `docksal-local.yml`.
+
 ### Connect
 First you must connect your project to the andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
 As connection name just hit enter. `default` will than be used as connection name. [Here](../configuration/connections.md) you find more details about connections.

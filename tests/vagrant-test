@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+mkdir andock-vagrant-test
+cd andock-vagrant-test
+# Download vagrant file.
+wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/Vagrantfile
+# Download dummy keys.
+wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/id_rsa
+wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/id_rsa.pub
+# Set keys.
+chmod 600 id_rsa
+chmod 600 id_rsa
+ssh-add id_rsa
+
+# Add entries to your host.
+sudo sed -i '/dev.andock.ci/d' /etc/hosts
+
+    # Update local hosts file.
+    echo "
+192.168.33.10    dev.andock.local" | sudo tee --append /etc/hosts
+
+    echo "
+192.168.33.10   master.demo-project.dev.andock.local" | sudo tee --append /etc/hosts
+
+
+vagrant up
+echo ""
+echo "#####################################"
+echo "Vagrant is up"
+echo "Use 'dev.andock.local' as connection domain and"
+echo "'{{branch}}.demo-project.dev.andock.local' as virtual host name."
+echo "#####################################"
+echo ""
