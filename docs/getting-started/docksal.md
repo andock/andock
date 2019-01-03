@@ -7,7 +7,7 @@ After that point an wildcard domain to this server.
 
 Please check [system requirements](system-requirements.md) before setup the server.
 
-If can also test <b>Andock</b> with vagrant:
+If can also test <b>Andock</b> with vagrant (works on linux and macss):
 
 ```
  curl -sS https://raw.githubusercontent.com/andock/andock/master/tests/vagrant-test | sh
