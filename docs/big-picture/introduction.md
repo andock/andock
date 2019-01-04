@@ -14,24 +14,25 @@ The <b>Andock cli</b> is a simple command line tool. You can use it as docksal a
 You can use andock with or without a CI server.
 
 ## "build &amp; deploy"
-Here a short overview of the two main phases.
+<b>Andock</b> has two main phases.
 
 ### The build phase.
-You can build your project with <b>Andock</b>. It is also possible to build it with other tools like Acquia blt.
- 
-[DIAGRAM]
-[See configuration](../configuration/build.md)
+After you run `andock build deploy` andock checks out the last commit of your branch, run all build hooks to include dependencies and run tests, and pushes the built artifact to the git artifact repository.
+
+While build you can use all docksal tools and spin up all docksal services to run phpunit, behat or any other test tool.
+
+The build phase is optional. You can build your project on your CI server with other tools like acquia blt to manage your own build and specify the remote artifact repository.
+
+For more infos [see build configuration](../configuration/build.md)
 
 ### The deploy phase.
-[DIAGRAM]
+After you run `andock environment deploy` andock checks out the last commit from the artifact repository, generates all necessary configuration files, mounts the filesystem, generates Let's encrypt certificates and start all services.
  
-[See configuration](../configuration/environment.md)
+For more infos [see build configuration](../configuration/environment.md)
 ### Getting started?
-If you are new to <b>Andock</b> and want to give it a try: 
-[5 minutes setup](../getting-started/docksal.md)
+* New to andock see the [5 minutes setup](../getting-started/docksal.md)
 
-To get an overview about the configuration check out: 
-[Configure your project](../configuration/andock.md) 
-
+* To get an overview about the configuration check out the 
+[configure configuration](../configuration/andock.md) 
 
 
