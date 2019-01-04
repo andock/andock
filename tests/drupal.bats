@@ -26,7 +26,13 @@ setup() {
     echo "$output" | grep "HTTP/1.1 200 OK"
     unset output
 }
-
+@test "update letsencrypt certificate" {
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} letsencrypt -e "branch=master"
+    [ $status = 0 ]
+    run curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci"
+    echo "$output" | grep "HTTP/1.1 200 OK"
+    unset output
+}
 
 @test "drush sql-sync test" {
     skip "Timeout problems. Skip for now"

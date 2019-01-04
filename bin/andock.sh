@@ -4,7 +4,7 @@ ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=1.0.0
 
 REQUIREMENTS_ANDOCK_BUILD='0.4.4'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.5.2'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.5.3'
 REQUIREMENTS_ANDOCK_SERVER='0.2.5   '
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
@@ -365,6 +365,8 @@ show_help ()
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
     printh "environment rm" "Remove environment."
+    printh "environment letsencrypt" "Update Let's Encrypt certificate."
+
     printh "environment url" "Print environment urls."
     printh "environment ssh [--container] <command>" "SSH into environment. Specify a differnt container than cli with --container <SERVICE>"
     echo
@@ -696,7 +698,7 @@ run_environment ()
 
     # Validate tag name. Show help if needed.
     case $tag in
-        init|up|update|test|stop|rm|exec|"init,update")
+        init|up|update|test|stop|rm|exec|"init,update"|"up,letsencrypt")
             echo-green "Start environment ${tag}..."
         ;;
         *)
@@ -1089,6 +1091,10 @@ case "$command" in
             test)
                 shift
                 run_environment "$connection" "test" "$@"
+            ;;
+            letsencrypt)
+                shift
+                run_environment "$connection" "up,letsencrypt" "$@"
             ;;
             url)
                 shift

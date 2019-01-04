@@ -18,6 +18,7 @@ pages:
     - Build: configuration/build.md
     - Environments: configuration/environment.md
     - Let's Encrypt: configuration/letsencrypt.md
+    - Redirects: configuration/redirects.md
 
   - Integrations:
     - CI: integrations/ci.md
