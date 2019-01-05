@@ -6,9 +6,8 @@ markdown_extensions:
   - markdown.extensions.admonition
 pages:
   - Home: index.md
-  - Big Picture:
-    - Introduction: big-picture/introduction.md
   - Getting started:
+    - Introduction: getting-started/introduction.md
     - System requirements: getting-started/system-requirements.md
     - 5 minutes setup: getting-started/docksal.md
   - Configuration:
