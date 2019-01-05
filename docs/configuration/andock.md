@@ -1,9 +1,11 @@
 # Configuration  
-The andock configuration file `.andock/andock.yml` contains provides a number of variables to configure the build and the deploy process. 
-With [hooks](hooks.md) you can setup the build and deploy process.
+The Andock configuration file `.andock/andock.yml` provides a number of variables to configure the build and the deploy process. 
+
+With [hooks](hooks.md) you can define whats happen while build and deploy.
+
 You can generate basic configuration files with `fin andock config generate`
 
-Configuration files overview:
+Configuration files:
 
 | File name                  | Description |
 |----------------------------|:------------|

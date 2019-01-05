@@ -19,7 +19,7 @@ You can use andock with or without a CI server.
 ### The build phase.
 After you run `andock build deploy` andock checks out the last commit of your branch, run all build hooks to include dependencies and run tests, and pushes the built artifact to the git artifact repository.
 
-While build you can use all docksal tools and spin up all docksal services to run phpunit, behat or any other test tool.
+While build, you can use all docksal tools and spin up all docksal services to run phpunit, behat or any other test tool.
 
 The build phase is optional. You can build your project on your CI server with other tools like acquia blt to manage your own build and specify the remote artifact repository.
 
@@ -30,7 +30,7 @@ After you run `andock environment deploy` andock checks out the last commit from
  
 For more infos [see build configuration](../configuration/environment.md)
 ### Getting started?
-* New to andock see the [5 minutes setup](../getting-started/docksal.md)
+* New to <b>Andock</b>   see the [5 minutes setup](../getting-started/docksal.md)
 
 * To get an overview about the configuration check out the 
 [configure configuration](../configuration/andock.md) 
