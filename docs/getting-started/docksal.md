@@ -26,13 +26,13 @@ fin andock enable
 This will add an <b>Andock</b> container to your `docksal-local.yml`.
 
 ### Connect
-You must connect your project to the andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
+You must connect your project to the Andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
 As connection name just hit enter. `default` will than be used as connection name. [Here](../configuration/connections.md) you find more details about connections.
 ```
 fin andock connect
 ```
-### Install andock server
-Andock needs docksal installed on the server. You can easily install docksal with: 
+### Install Andock server
+Andock needs Docksal installed on the server. You can easily install docksal with: 
 ```
 fin andock server install
 ```
@@ -41,7 +41,7 @@ fin andock server install
 fin andock config generate
 ```
 This will create some required config files and templates for init, build, test and update hooks. 
-Here you will find an overview of andock [configuration](../configuration/andock.md). And here you will find more details about the [hook configuration](../configuration/hooks.md) 
+Here you will find an overview of Andock [configuration](../configuration/andock.md). And here you will find more details about the [hook configuration](../configuration/hooks.md) 
 
 ### Build 
 ```

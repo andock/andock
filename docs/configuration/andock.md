@@ -12,7 +12,7 @@ Configuration files:
 | `andock.yml`            | Main configuration file.
 | `andock.${branch}.yml`            | Branch specific configuration file. (optional)
 
-To overwrite configuration for a specific environment you can add an branch specific andock.{{branch]].yml.
+To overwrite configuration for a specific environment you can add an branch specific Andock.{{branch]].yml.
 
 For example configure your production domain to the master environment `.andock/andock.master.yml`.
 ```
@@ -24,7 +24,7 @@ virtual_hosts:
 
 ### Base configuration:
  * ` project_name: ` The display name of this project. 
- * ` project_id:` The id of this project, which must be unique within an andock server.   
+ * ` project_id:` The id of this project, which must be unique within an Andock server.   
  * ` git_repository_path:` The git checkout repository.
 
 ### Virtual hosts:

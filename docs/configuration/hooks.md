@@ -1,5 +1,5 @@
 # Hooks  
-With hooks you can define what happens while build or deploy. Hooks are [ansible tasks](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#tasks-list) which are exectued by andock while the build or deploy phase and after the build and deploy phase.
+With hooks you can define what happens while build or deploy. Hooks are [ansible tasks](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#tasks-list) which are exectued by Andock while the build or deploy phase and after the build and deploy phase.
 
 ## Hooks overview:
 
