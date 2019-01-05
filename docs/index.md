@@ -1,6 +1,6 @@
-# andock - hosting with Docksal
+# Andock - Hosting with Docksal
 
-Hosting with Docksal.<br>
+Develop your project with Docksal, Host your project with Docksal.
 
 ## Key features
 * Unlimited staging environments.
