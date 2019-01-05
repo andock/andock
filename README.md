@@ -5,11 +5,11 @@
 
 ![alt text](docs/images/logo_circle.svg "andock")
 
-# andock cli - develop in docksal, deploy with docksal.
+# Andock CLI
 
-The `andock cli` is a command line interface to andock.    
+The Andock command line toool is the heart of Andock.    
 
-## New to andock?
+## New to Andock?
 * [See documentation](https://andock.readthedocs.io/en/latest/)
 * [5 minutes setup](https://andock.readthedocs.io/en/latest/getting-started/docksal/)
 * [Drupal boilerplate project](https://github.com/andock/boilerplate-drupal8)
@@ -23,9 +23,9 @@ Standalone:
 ```
     curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock | sh
 ```
-Andock inside docksal:
+Andock inside Docksal:
 
-Thin command line tool which install andock and execute andock inside the cli container.  
+Thin command line tool which install Andock and execute Andock inside the CLI container.  
 ```
     curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock-docksal | sh
 ```
