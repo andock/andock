@@ -14,7 +14,7 @@ Andock creates an certificate for each vitual_host and stores them into .docksal
 | Option                     | Description |
 |----------------------------|:------------|
 | `letsencrypt_enable`            | Enable or disable Let's Encrypt. Default is `false`.
-| `letsencrypt_acme_directory`            | Switch between lets encrypt staging and production. For staging use `letsencrypt_acme_directory_staging` for production: `letsencrypt_acme_directory_production`.   
+| `letsencrypt_directory`            | Switch between lets encrypt staging and production. For staging use `letsencrypt_directory_staging` for production: `letsencrypt_directory_production`.   
 | `letsencrypt_challenge_type`            | The Let's encrypt challange type. Default is `http-01`
 | `letsencrypt_domains`            | A ansible dictonary for all Let's Encrypt domains for one environment. Default is `virtual_hosts`.
 
