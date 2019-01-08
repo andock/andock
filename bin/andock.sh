@@ -516,7 +516,7 @@ get_ansible_info ()
     # Source .docksal.env for docroot
     source .docksal/docksal.env
     #echo "COMMAND: $command"
-    local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
+    local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} --connection=local -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
 
     local command && command=$(echo ${ansible_output} | grep -o -P '(?<=AN__).*(?=__AN)')
     echo $command
