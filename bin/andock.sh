@@ -3,9 +3,9 @@
 ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=1.0.0
 
-REQUIREMENTS_ANDOCK_BUILD='0.4.4'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.5.4'
-REQUIREMENTS_ANDOCK_SERVER='0.2.5   '
+REQUIREMENTS_ANDOCK_BUILD='0.5.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.6.0'
+REQUIREMENTS_ANDOCK_SERVER='0.3.0'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -23,7 +23,7 @@ ANDOCK_PLAYBOOK="$ANDOCK_HOME/playbooks"
 URL_REPO="https://raw.githubusercontent.com/andock/andock"
 BASHIDS_URL="https://raw.githubusercontent.com/benwilber/bashids/master/bashids"
 URL_ANDOCK="${URL_REPO}/master/bin/andock.sh"
-DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
+DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Is Andock Server installed? Check the logs."
 
 export ANSIBLE_ROLES_PATH="${ANDOCK_HOME}/roles"
 
@@ -341,23 +341,25 @@ show_help ()
     echo
     printh "andock command reference" "${ANDOCK_VERSION}" "green"
     echo
-    printh "connect" "Connect andock to andock server"
+    printh "connect" "Connect andock to Andock server"
     printh "(.) ssh-add <ssh-key>" "Add private SSH key <ssh-key> variable to the agent store."
 
     echo
     printh "Server:" "" "green"
-    printh "server install" "Install andock server."
-    printh "server update" "Update andock server."
-    printh "server ssh-add" "Add public ssh key to andock server."
+    printh "server install" "Install Andock server."
+    printh "server update" "Update Andock server."
+    printh "server ssh-add" "Add public ssh key to Andock server."
 
     echo
     printh "Project:" "" "green"
-    printh "config generate" "Generate andock project configuration."
+    printh "config generate" "Generate project configuration."
     echo
     printh "Build:" "" "green"
     printh "build" "Build deployment artifact"
-    printh "build deploy" "Build deployment artifact and pushes to artifact repository."
+    printh "build push" "Build deployment artifact and pushes to artifact repository."
     printh "build clean" "Clean build caches."
+    echo
+    printh "build deploy" "Build deployment artifact, pushes to artifact repository and deploy it."
     echo
     printh "Environment:" "" "green"
     printh "environment deploy (deploy)" "Deploy environment."
@@ -374,13 +376,13 @@ show_help ()
 
     echo
     printh "Drush:" "" "green"
-    printh "drush generate-alias <version>" "Generate drush alias (Default: Version 9."
+    printh "drush generate-alias <version>" "Generate drush alias (Default: 9)"
 
     echo
-    printh "version (v, -v)" "Print andock version. [v, -v] - prints short version"
-    printh "alias" "Print andock alias."
+    printh "version (v, -v)" "Print Andock version. [v, -v] - prints short version"
+    printh "alias" "Print Andock alias."
     echo
-    printh "self-update" "${yellow}Update andock${NC}" "yellow"
+    printh "self-update" "${yellow}Update Andock${NC}" "yellow"
 }
 
 # Display andock version
@@ -539,7 +541,7 @@ run_connect ()
 
   if [ "$1" = "" ]; then
     local host=
-    host=$(_ask "Please enter andock server domain or ip")
+    host=$(_ask "Please enter Andock server domain or ip")
   else
     local host=$1
     shift
@@ -585,13 +587,13 @@ run_build_clean ()
 
 }
 # Ansible playbook wrapper for andock.build role.
-run_build_deploy ()
+run_build_push ()
 {
     local branch_name && branch_name=$(get_current_branch)
     local connection && connection=$1 && shift
-    echo-green "Build and deploy branch <${branch_name}>..."
+    echo-green "Build and push branch <${branch_name}>..."
     build ${connection} "$@"
-    echo-green "Branch ${branch_name} was built and deployed successfully"
+    echo-green "Branch ${branch_name} was built and pushed successfully"
 
 }
 
@@ -734,13 +736,13 @@ run_environment ()
 
 # Generate fin hooks.
 # @param $1 The hook name.
-config_generate_fin_hook()
+config_generate_fin_init_hook()
 {
     echo "- name: Init andock environment
-  command: \"fin ${1}-andock\"
+  command: \"echo 'Hello Andock'\"
   args:
     chdir: \"{{ docroot_path }}\"
-" > ".andock/hooks/$1_tasks.yml"
+" > ".andock/hooks/init_tasks.yml"
 }
 
 # Generate composer hook.
@@ -823,7 +825,7 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
 
     config_generate_composer_hook "build"
 
-    config_generate_fin_hook "init"
+    config_generate_fin_init_hook
 
     config_generate_empty_hook "update"
 
@@ -974,11 +976,11 @@ run_server_install ()
     if [ "${tag}" = "install" ]; then
         ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
         ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
-        echo-green "andock password is: ${andock_pw}"
-        echo-green "andock server was installed successfully."
+        echo-green "Andock password is: ${andock_pw}"
+        echo-green "Andock server was installed successfully."
     else
         ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
-        echo-green "andock server was updated successfully."
+        echo-green "Andock server was updated successfully."
     fi
 }
 
@@ -1058,9 +1060,14 @@ case "$command" in
                 shift
 	            run_build_clean "$connection" "$@"
             ;;
+             push)
+                shift
+	            run_build_push "$connection" "$@"
+            ;;
              deploy)
                 shift
-	            run_build_deploy "$connection" "$@"
+	            run_build_push "$connection" "$@"
+	            run_environment "$connection" "init,update" "$@"
             ;;
             *)
                 run_build "$connection" "$@"

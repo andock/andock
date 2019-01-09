@@ -17,7 +17,7 @@ You can use Andock with or without a CI server.
 Andock has two main phases.
 
 ### The build phase.
-After you run `andock build deploy` Andock checks out the last commit of your branch, run all build hooks to include dependencies, run tests and pushes the built artifact to the git artifact repository.
+After you run `andock build push` Andock checks out the last commit of your branch, run all build hooks to include dependencies, run tests and pushes the built artifact to the git artifact repository.
 
 While build, you can use all Docksal tools and spin up Docksal services to run phpunit, behat or any other test tool.
 

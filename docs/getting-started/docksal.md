@@ -45,7 +45,7 @@ Look [here for an overview of Andock configuration](../configuration/andock.md) 
 
 ### Build 
 ```
-fin andock build deploy
+fin andock build push
 ```
 [Here you can find more details about the build process](../configuration/build.md)
 
