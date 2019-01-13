@@ -3,9 +3,9 @@
 ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=1.0.0
 
-REQUIREMENTS_ANDOCK_BUILD='0.5.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.6.0'
-REQUIREMENTS_ANDOCK_SERVER='0.3.0'
+REQUIREMENTS_ANDOCK_BUILD='0.6.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.7.0'
+REQUIREMENTS_ANDOCK_SERVER='0.4.0'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -19,26 +19,41 @@ ANDOCK_HOME="$HOME/.andock"
 ANDOCK_INVENTORY="./.andock/connections"
 ANDOCK_INVENTORY_GLOBAL="$ANDOCK_HOME/connections"
 ANDOCK_PLAYBOOK="$ANDOCK_HOME/playbooks"
+ANDOCK_CONFIG_ENV="$ANDOCK_HOME/andock.env"
 
 URL_REPO="https://raw.githubusercontent.com/andock/andock"
 BASHIDS_URL="https://raw.githubusercontent.com/benwilber/bashids/master/bashids"
 URL_ANDOCK="${URL_REPO}/master/bin/andock.sh"
-DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Is Andock Server installed? Check the logs."
+DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 
-export ANSIBLE_ROLES_PATH="${ANDOCK_HOME}/roles"
 
-export ANSIBLE_HOST_KEY_CHECKING=False
+# Load environment variables overrides, use to permanently override some variables
+# Source and allexport variables in the .env file
+if [[ -f "$ANDOCK_CONFIG_ENV" ]]; then
+	set -a
+	source "$ANDOCK_CONFIG_ENV"
+	set +a
+else
+	touch "$ANDOCK_CONFIG_ENV"
+fi
+
+export ANSIBLE_ROLES_PATH="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
+
+export ANSIBLE_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_ROLES}/andock.server/callback}"
+
+export ANSIBLE_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-False}"
 
 export ANSIBLE_SSH_PIPELINING=True
 
-export ANSIBLE_STDOUT_CALLBACK=yaml
+export ANSIBLE_STDOUT_CALLBACK="${ANDOCK_STDOUT_CALLBACK:-andock_stdout}"
 
-#export ANSIBLE_DEBUG=1
+export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
 
-config_git_target_repository_path=""
-config_virtual_hosts=""
-config_project_name=""
-config_git_repository_path=""
+#export DISPLAY_SKIPPED_HOSTS=True
+
+#export ANSIBLE_ACTION_WARNINGS=False
+
+#export ANSIBLE_SYSTEM_WARNINGS=False
 
 # @author Leonid Makarov
 # Console colors
@@ -48,26 +63,6 @@ green='\033[0;32m'
 yellow='\033[1;33m'
 NC='\033[0m'
 
-#------------------------------ Help functions --------------------------------
-# parse yml file:
-# See https://gist.github.com/pkuczynski/8665367
-_parse_yaml() {
-   local prefix=$2
-   local s='[[:space:]]*' w='[a-zA-Z0-9_]*'
-   local fs
-   fs=$(echo @|tr @ '\034')
-   sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
-   awk -F"$fs" '{
-      indent = length($1)/2;
-      vname[indent] = $2;
-      for (i in vname) {if (i > indent) {delete vname[i]}}
-      if (length($3) > 0) {
-         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
-      }
-   }'
-}
 
 # Yes/no confirmation dialog with an optional message
 # @param $1 confirmation message
@@ -127,7 +122,7 @@ printh ()
         printf "  ${green}%-${COMMAND_COLUMN_WIDTH}s${NC}" "$1"
         echo -e "  $2"
     ;;
-    *)
+    *)##################################
         printf "  %-${COMMAND_COLUMN_WIDTH}s" "$1"
         echo -e "  $2"
     ;;
@@ -249,10 +244,10 @@ generate_playbooks()
 install_andock()
 {
     echo-green ""
-    echo-green "Installing andock version: ${ANDOCK_VERSION} ..."
+    echo-green "Installing Andock version: ${ANDOCK_VERSION} ..."
 
     echo-green ""
-    echo-green "Installing ansible:"
+    echo-green "Installing Ansible:"
 
     sudo apt-get update
     sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev -y
@@ -278,7 +273,8 @@ install_andock()
 
     install_configuration
     echo-green ""
-    echo-green "andock was installed successfully"
+    echo-green "Andock was installed successfully"
+
 }
 
 # Install ansible galaxy roles.
@@ -286,7 +282,7 @@ install_configuration ()
 {
     mkdir -p $ANDOCK_INVENTORY_GLOBAL
     generate_playbooks
-    echo-green "Installing roles:"
+    echo-green "Installing Roles:"
     ansible-galaxy install andock.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
     ansible-galaxy install andock.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
     ansible-galaxy install andock.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
@@ -299,10 +295,10 @@ install_configuration ()
 # @author Leonid Makarov
 self_update()
 {
-    echo-green "Updating andock..."
+    echo-green "Updating Andock..."
     local new_andock
     new_andock=$(curl -kfsSL "$URL_ANDOCK?r=$RANDOM")
-    if_failed_error "andock download failed."
+    if_failed_error "Andock download failed."
 
     # Check if fin update is required and whether it is a major version
     local new_version
@@ -322,14 +318,14 @@ self_update()
         echo "$new_andock" | sudo tee "$ANDOCK_PATH_UPDATED" > /dev/null
         if_failed_error "Could not write $ANDOCK_PATH_UPDATED"
         sudo chmod +x "$ANDOCK_PATH_UPDATED"
-        echo-green "andock $new_version downloaded..."
+        echo-green "Andock $new_version downloaded..."
 
         # overwrite old fin
         sudo mv "$ANDOCK_PATH_UPDATED" "$ANDOCK_PATH"
         andock cup
         exit
     else
-        echo-rewrite "Updating andock ... $ANDOCK_VERSION ${green}[OK]${NC}"
+        echo-rewrite "Updating Andock ... $ANDOCK_VERSION ${green}[OK]${NC}"
     fi
 }
 
@@ -339,8 +335,20 @@ self_update()
 show_help ()
 {
     echo
-    printh "andock command reference" "${ANDOCK_VERSION}" "green"
+    printh "Andock command reference" "${ANDOCK_VERSION}" "green"
     echo
+    printh "Options: "
+    printh "Andock supports all ansible-playbook options"
+    echo
+    printh "Samples: "
+    printh "-v, --verbose         verbose mode (-vvv for more, -vvvv to enable
+                        connection debugging)"
+    printh "-e EXTRA_VARS, --extra-vars=EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @"
+
+    echo
+    printh "Connection" "" "green"
     printh "connect" "Connect andock to Andock server"
     printh "(.) ssh-add <ssh-key>" "Add private SSH key <ssh-key> variable to the agent store."
 
@@ -380,7 +388,6 @@ show_help ()
 
     echo
     printh "version (v, -v)" "Print Andock version. [v, -v] - prints short version"
-    printh "alias" "Print Andock alias."
     echo
     printh "self-update" "${yellow}Update Andock${NC}" "yellow"
 }
@@ -465,16 +472,6 @@ get_branch_settings_path ()
         echo $path
     fi
 }
-
-# Parse the .andock.yaml and
-# make all variables accessable.
-get_settings()
-{
-    local settings_path
-    settings_path=$(get_settings_path)
-    eval "$(_parse_yaml $settings_path 'config_')"
-}
-
 
 # Returns the git branch name
 # of the current working directory
@@ -572,7 +569,7 @@ build()
 
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
     if [[ $? != 0 ]]; then
-        echo-error ${DEFAULT_ERROR_MESSAGE}
+        echo-error "${DEFAULT_ERROR_MESSAGE}"
         exit 1;
     fi
 }
@@ -593,8 +590,9 @@ run_build_push ()
     local connection && connection=$1 && shift
     echo-green "Build and push branch <${branch_name}>..."
     build ${connection} "$@"
+    echo
     echo-green "Branch ${branch_name} was built and pushed successfully"
-
+    echo
 }
 
 # Ansible playbook wrapper for andock.build role.
@@ -604,7 +602,9 @@ run_build ()
     local connection && connection=$1 && shift
     echo-green "Build branch <${branch_name}>..."
     build ${connection} --skip-tags "prepare_commit,commit,push" -e "{'skip_staging': true}" "$@"
+    echo
     echo-green "Branch ${branch_name} was built successfully"
+    echo
 
 }
 
@@ -634,8 +634,11 @@ run_fin ()
     # Run the playbook.
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
     if [[ $? == 0 ]]; then
+        echo
         echo-green "fin exec was finished successfully."
+        echo
     else
+        echo
         echo-error $DEFAULT_ERROR_MESSAGE
         exit 1;
     fi
@@ -677,7 +680,6 @@ run_environment ()
 
     # Load settings.
     local settings_path && settings_path="$(get_settings_path)"
-    get_settings
 
     # Source .docksal.env
     source .docksal/docksal.env
@@ -700,8 +702,11 @@ run_environment ()
 
     # Validate tag name. Show help if needed.
     case $tag in
-        init|up|update|test|stop|rm|exec|"init,update"|"up,letsencrypt")
-            echo-green "Start environment ${tag}..."
+        "init,update")
+            echo-green "Deploy branch <${branch_name}>..."
+        ;;
+        init|up|update|test|stop|rm|exec|"up,letsencrypt")
+            echo-green "Environment $tag branch <${branch_name}>..."
         ;;
         *)
             echo-yellow "Unknown tag '$tag'. See 'andock help' for list of available commands" && \
@@ -716,8 +721,8 @@ run_environment ()
         case $tag in
             "init,update")
                 local vhost && vhost=$(run_environment_url ${connection})
-                echo-green "Environment deploy was finished successfully."
                 echo
+                echo-green "Deployment was finished successfully."
                 echo-green "Visit: ${vhost}"
                 echo
             ;;
@@ -726,7 +731,9 @@ run_environment ()
             ;;
         esac
     else
-        echo-error $DEFAULT_ERROR_MESSAGE
+        echo
+        echo-error "$DEFAULT_ERROR_MESSAGE"
+        echo
         exit 1;
     fi
 }
@@ -848,19 +855,6 @@ ssh_add ()
     echo-green "SSH key was added to keystore."
 }
 
-#----------------------------------- DRUSH  -----------------------------------
-run_alias ()
-{
-    set -e
-    check_settings_path
-    get_settings
-    local branch_name
-    branch_name=$(get_current_branch)
-    local env
-    env="${config_project_name}.${branch_name}"
-    echo "${env}"
-}
-
 run_drush_generate_8 ()
 {
     local drush_file && drush_file=$(get_ansible_info "$1" "drush/{{project_name}}.aliases.drushrc.php")
@@ -974,12 +968,21 @@ run_server_install ()
     fi
 
     if [ "${tag}" = "install" ]; then
+        echo-green "Installing Docksal on host"
+        echo-green "This takes some minutes..."
+        echo
         ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
         ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        echo
         echo-green "Andock password is: ${andock_pw}"
+        echo
         echo-green "Andock server was installed successfully."
     else
+        echo-green "Updating Docksal on host"
+        echo-green "This takes some minutes..."
+        echo
         ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        echo
         echo-green "Andock server was updated successfully."
     fi
 }
@@ -1011,7 +1014,11 @@ cd "$root_path"
 case "$1" in
     server|environment|build|deploy)
     check_connect $connection
+    echo
+    echo-green "#############################"
     echo-green "Use connection: $connection"
+    echo-green "#############################"
+    echo
     ;;
 esac
 
@@ -1124,9 +1131,6 @@ case "$command" in
             fin_sub_path=$(echo ${org_path#${root_path}"/"})
         fi
 	    run_fin "$connection" "$1" "$fin_sub_path"
-    ;;
-    alias)
-	    run_alias
     ;;
     drush)
         case "$1" in
