@@ -26,6 +26,9 @@ BASHIDS_URL="https://raw.githubusercontent.com/benwilber/bashids/master/bashids"
 URL_ANDOCK="${URL_REPO}/master/bin/andock.sh"
 DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 
+ANDOCK_ROLES="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
+ANDOCK_CALLBACK_PLUGINS="{ANDOCK_CALLBACK_PLUGINS:-{ANDOCK_ROLES}/andock.server/callback}"
+ANDOCK_HOST_KEY_CHECKING="{ANDOCK_HOST_KEY_CHECKING:-False}"
 
 # Load environment variables overrides, use to permanently override some variables
 # Source and allexport variables in the .env file
@@ -37,11 +40,12 @@ else
 	touch "$ANDOCK_CONFIG_ENV"
 fi
 
-export ANSIBLE_ROLES_PATH="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
 
-export ANSIBLE_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_ROLES}/andock.server/callback}"
+export ANSIBLE_ROLES_PATH="${ANDOCK_ROLES}"
 
-export ANSIBLE_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-False}"
+export ANSIBLE_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS}"
+
+export ANSIBLE_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING}"
 
 export ANSIBLE_SSH_PIPELINING=True
 
