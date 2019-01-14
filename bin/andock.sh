@@ -730,7 +730,9 @@ run_environment ()
                 echo
             ;;
             *)
+                echo
                 echo-green "Environment ${tag} was finished successfully."
+                echo
             ;;
         esac
     else
