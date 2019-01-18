@@ -35,15 +35,17 @@ setup() {
 }
 
 @test "drush sql-sync test" {
-    skip "Timeout problems. Skip for now"
+    #skip "Timeout problems. Skip for now"
     cd web
     fin ssh-key add id_rsa
     fin drush sa
+    ssh andock@dev.andock.ci docker logs andock-ssh2docksal
 
-    run fin drush sql-sync --local @self @demo-drupal.master -y
-    [ $status = 0 ]
-    run fin drush sql-sync --local @demo-drupal.master @self -y
-    [ $status = 0 ]
+    fin drush sql-sync --local @self @demo-drupal.master -y
+    ssh andock@dev.andock.ci docker logs andock-ssh2docksal
+
+    fin drush sql-sync --local @demo-drupal.master @self -y
+    ssh andock@dev.andock.ci docker logs andock-ssh2docksal
 
     run curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci"
     echo "$output" | grep "HTTP/1.1 200 OK"
