@@ -1,4 +1,4 @@
-# Introduction.
+# Introduction
 
 <b>Andock</b> is designed having two scenarios in mind:
 

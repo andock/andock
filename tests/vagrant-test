@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
+
+
+
+
+if ! [ -x "$(command -v vagrant)" ]; then
+  echo 'Error: vagrant is not installed.' >&2
+  exit 1
+fi
+
+
 mkdir andock-vagrant-test
 cd andock-vagrant-test
 # Download vagrant file.
 wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/Vagrantfile
-# Download dummy keys.
-wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/id_rsa
-wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/id_rsa.pub
-# Set keys.
-chmod 600 id_rsa
-chmod 600 id_rsa
-ssh-add id_rsa
 
+read -e -p "Which SSH key should be used?: " -i "~/.ssh/id_rsa.pub" KEY
+eval KEY=$KEY
+sed -i -e "s,id_rsa.pub,$KEY,g" "Vagrantfile"
 # Add entries to your host.
 sudo sed -i '/dev.andock.local/d' /etc/hosts
 

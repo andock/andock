@@ -2,7 +2,7 @@
 
 ## Preperation
 ### Cloud installation
-The easiest way to test <b>Andock</b> is to create a cloud box on any cloud provider wich supports Ubuntu and docker.
+The easiest way to test <b>Andock</b> is to create a cloud box on any cloud provider which supports Ubuntu and docker.
 
 After that point a wildcard domain to your new server.
 

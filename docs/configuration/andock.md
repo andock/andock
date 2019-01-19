@@ -1,7 +1,7 @@
 # Configuration  
-The Andock configuration file `.andock/andock.yml` provides a number of variables to configure the build and the deploy process. 
+The Andock configuration file `.andock/andock.yml` provides a number of variables to configure the build and deploy processes. 
 
-With [hooks](hooks.md) you can define whats happen while build and deploy.
+With [hooks](hooks.md) you can define what happens during build and deploy.
 
 You can generate basic configuration files with `fin andock config generate`
 
@@ -9,10 +9,10 @@ Configuration files:
 
 | File name                  | Description |
 |----------------------------|:------------|
-| `andock.yml`            | Main configuration file.
-| `andock.${branch}.yml`            | Branch specific configuration file. (optional)
+| `andock.yml`            | Main configuration file
+| `andock.${branch}.yml`            | Branch specific configuration file (optional)
 
-To overwrite configuration for a specific environment you can add an branch specific Andock.{{branch]].yml.
+To overwrite configuration for a specific environment you can add an branch specific `andock.{branch}.yml`.
 
 For example configure your production domain to the master environment `.andock/andock.master.yml`.
 ```
@@ -22,14 +22,14 @@ virtual_hosts:
     container: web
 ```
 
-### Base configuration:
+### Base configuration
  * ` project_name: ` The display name of this project. 
  * ` project_id:` The id of this project, which must be unique within an Andock server.   
  * ` git_repository_path:` The git checkout repository.
 
-### Virtual hosts:
-A virtual host pattern describes how HTTP requests forwarded to container.
-The `default` 
+### Virtual hosts
+A virtual host pattern describes how HTTP requests are forwarded to the container.
+
 ``` 
 virtual_hosts:
   default: 
@@ -37,7 +37,7 @@ virtual_hosts:
     container: web
 ``` 
 
-### Mounts:
+### Mounts
 Mounts describe writeable persistent volumes in the docker container.
 Mounts are linked via volumes into the docker container.
 ``` 
@@ -49,7 +49,7 @@ mounts:
 ### Additional docksal-local.env variables
 You can pass any variable to the generated `docksal-local.env`
 
-#### Samples:
+#### Samples
 ```
 docksal_env:
   DOCKSAL_STACK: acquia
