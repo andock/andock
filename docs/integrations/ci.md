@@ -32,7 +32,6 @@ before_script:
 
 script:
 - andock build deploy
-- andock environment deploy
 
 ```
 
@@ -51,7 +50,7 @@ build:
   stage: build
   image: andockio/andock:latest
   script:
-    - andock build deploy
+    - andock build push
   environment:
     name: andock/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.$CI_PROJECT_NAME.example.com
@@ -95,6 +94,5 @@ pipelines:
     - step:
         script:
           - andock build deploy
-          - andock deploy
  
 ```

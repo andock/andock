@@ -1,6 +1,6 @@
 # Build configuration 
 
-Run `andock build deploy` to build the deployment artifact and push it to the artifact repository.
+Run `andock build push` to build deployment artifact and pushe it to the artifact repository.
 
 Run `andock build` to build the deployment artifact without pushing it to the artifact repository. This can be useful if you use any other tool (e.g. acquia blt) to manage the deployment of the artifact.
  
