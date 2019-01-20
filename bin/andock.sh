@@ -4,7 +4,7 @@ ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=1.0.0
 
 REQUIREMENTS_ANDOCK_BUILD='0.6.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.7.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='0.7.1'
 REQUIREMENTS_ANDOCK_SERVER='0.4.1'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
@@ -253,7 +253,7 @@ install_andock()
     echo-green "Installing Ansible:"
 
     sudo apt-get update
-    sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev -y
+    sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev figlet -y
 
     set -e
 
@@ -357,7 +357,7 @@ show_help ()
 
     echo
     printh "Server:" "" "green"
-    printh "server install" "Install Andock server."
+    printh "server install <password|default(auto)> <root suer>" "Install Andock server."
     printh "server update" "Update Andock server."
     printh "server ssh-add" "Add public ssh key to Andock server."
 
@@ -1020,9 +1020,8 @@ case "$1" in
     server|environment|build|deploy)
     check_connect $connection
     echo
-    echo-green "#############################"
-    echo-green "Use connection: $connection"
-    echo-green "#############################"
+    figlet "Andock"
+    echo "Connection: $connection"
     echo
     ;;
 esac
