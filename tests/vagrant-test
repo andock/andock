@@ -30,12 +30,10 @@ echo "Please copy following lines to your /etc/hosts"
 echo "192.168.33.10    andock.local"
 echo "192.168.33.10    master.demo-project.andock.local"
 echo
-echo "Update virtual host pattern in your andock.yml:"
-echo "'{{branch}}.demo-project.dev.andock.local' as virtual host name."
 echo ""
 echo "You should now connect to the vagrant box with ssh root@dev.andock.local"
 echo ""
-echo "Go to now demo-project and run andock server install"
+echo "Go to now demo-project and follow the 5 minutes guide"
 echo
 echo "##########################################################################"
 echo ""

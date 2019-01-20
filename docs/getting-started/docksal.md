@@ -14,16 +14,19 @@ You can test <b>Andock</b> with vagrant (works on linux and OSX):
 ```
  curl -sS https://raw.githubusercontent.com/andock/andock/master/tests/vagrant-test | sh
 ```
-This will download and start a Vagrant file with ubuntu 18.04, and updates your /etc/hosts to point to the Virtualserver. 
-You need to install Vagrant and Virtualbox first.
+This will download and start a Vagrant file with ubuntu 18.04. 
 
 ## Let's start.
+Check out [Andock demo project](https://github.com/andock/demo-project)
+```
+git clone git clone https://github.com/andock/demo-project.git
+```
 ### Install and enable the addon.
 ```
 fin addon install andock
 fin andock enable
 ```
-This will add an <b>Andock</b> container to your `docksal-local.yml`.
+This will add an <b>Andock</b> container to your `docksal.yml`.
 
 ### Connect
 You must connect your project to the Andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
@@ -40,23 +43,20 @@ fin andock server install
 ```
 fin andock config generate
 ```
+If you use vagrant use `{{branch}}.demo-project.dev.andock.local` as virtual host pattern.
+ 
 This will create some required config files and templates for init, build, test and update hooks. 
-Look [here for an overview of Andock configuration](../configuration/andock.md) and [here for more details about the hook configuration](../configuration/hooks.md) 
 
-### Build 
+### Build and deploy
 ```
-fin andock build push
+fin andock build deploy
 ```
-[Here you can find more details about the build process](../configuration/build.md)
 
-### Create environment
-```
-fin andock environment deploy
-```
-[Here you can find more details about the deploy process](../configuration/environment.md)
 ## Congratulations, the installation is finished!
 
 ### Read more:
+* [Andock configuration overview](../configuration/andock.md) 
+* [Hooks overview](../configuration/hooks.md)
+* [The build process](../configuration/build.md)
+* [The deploy process](../configuration/environment.md)
 * [CI server automation](../integrations/ci.md)
-### Example hook configurations:
-1. [Drupal](../configuration/example-drupal-hooks.md)
