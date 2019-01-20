@@ -10,8 +10,6 @@ fi
 mkdir andock-vagrant-test
 cd andock-vagrant-test
 
-git clone https://github.com/andock/demo-project.git
-
 # Download vagrant file.
 curl --output Vagrantfile https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/Vagrantfile
 
