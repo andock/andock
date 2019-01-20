@@ -19,14 +19,8 @@ This will download and start a Vagrant file with ubuntu 18.04.
 ## Let's start.
 Check out [Andock demo project](https://github.com/andock/demo-project)
 ```
-git clone git clone https://github.com/andock/demo-project.git
+git clone https://github.com/andock/demo-project.git
 ```
-### Install and enable the addon.
-```
-fin addon install andock
-fin andock enable
-```
-This will add an <b>Andock</b> container to your `docksal.yml`.
 
 ### Connect
 You must connect your project to the Andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
@@ -43,7 +37,7 @@ fin andock server install
 ```
 fin andock config generate
 ```
-If you use vagrant use `{{branch}}.demo-project.dev.andock.local` as virtual host pattern.
+If you use vagrant use `{{branch}}.demo-project.andock.local` as virtual host pattern.
  
 This will create some required config files and templates for init, build, test and update hooks. 
 
@@ -53,6 +47,14 @@ fin andock build deploy
 ```
 
 ## Congratulations, the installation is finished!
+
+!!! tip "Install and enable Andock addon"
+    The Andock addon is already installed in the demo project. Run `fin addon install andock` to install the addon and enable it with `fin andock enable` 
+    
+    
+
+
+
 
 ### Read more:
 * [Andock configuration overview](../configuration/andock.md) 
