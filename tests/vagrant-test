@@ -14,9 +14,11 @@ if [ -e "andock-vagrant-test" ]; then
 fi
 # Ask for ssh key
 read -e -p "Which SSH key should be used?: [~/.ssh/id_rsa.pub]" KEY
-if [ "$KEY" = "" ]; then
+
+if [ "$KEY" == "" ]; then
     KEY="~/.ssh/id_rsa.pub"
 fi
+
 eval KEY=$KEY
 if [ ! -e "$KEY" ]; then
     echo "SSH key not found"
