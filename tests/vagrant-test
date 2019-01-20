@@ -13,7 +13,7 @@ cd andock-vagrant-test
 git clone https://github.com/andock/demo-project.git
 
 # Download vagrant file.
-wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/Vagrantfile
+curl --output Vagrantfile https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/Vagrantfile
 
 # Ask for ssh key
 read -e -p "Which SSH key should be used?: " -i "~/.ssh/id_rsa.pub" KEY
