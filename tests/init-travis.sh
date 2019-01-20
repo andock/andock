@@ -5,7 +5,7 @@ test_method=$1
 image=$2
 
 if [ "${test_method}" = "" ]; then
-    test_method="lxd"
+    test_method="vagrant"
 fi
 
 cd ${test_method}

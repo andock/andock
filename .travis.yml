@@ -18,7 +18,7 @@ before_install:
   - cd ..
   - ./bin/andock.sh _install-andock
   - cd tests
-  - git clone https://github.com/andock/demo-project.git
+  - git clone https://github.com/andock/test-project.git
   - git clone https://github.com/andock/boilerplate-drupal8.git
   - sudo curl -fsSL get.docksal.io | sh
 
