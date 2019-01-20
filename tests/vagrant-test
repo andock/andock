@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-
-
-
 if ! [ -x "$(command -v vagrant)" ]; then
   echo 'Error: vagrant is not installed.' >&2
   exit 1
@@ -11,31 +8,34 @@ fi
 
 mkdir andock-vagrant-test
 cd andock-vagrant-test
+
+git clone https://github.com/andock/demo-project.git
+
 # Download vagrant file.
 wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/Vagrantfile
 
+# Ask for ssh key
 read -e -p "Which SSH key should be used?: " -i "~/.ssh/id_rsa.pub" KEY
 eval KEY=$KEY
 sed -i -e "s,id_rsa.pub,$KEY,g" "Vagrantfile"
-# Add entries to your host.
-sudo sed -i '/dev.andock.local/d' /etc/hosts
 
-    # Update local hosts file.
-    echo "
-192.168.33.10    dev.andock.local" | sudo tee --append /etc/hosts
-
-    echo "
-192.168.33.10   master.demo-project.dev.andock.local" | sudo tee --append /etc/hosts
-
-
+# Start vagrant
 vagrant up
 echo ""
 echo "##########################################################################"
 echo "Vagrant is up"
-echo "Use 'dev.andock.local' as connection domain and"
+echo
+echo "Please copy following lines to your /etc/hosts"
+echo "192.168.33.10    andock.local"
+echo "192.168.33.10    master.demo-project.andock.local"
+ec
+echo "Update virtual host pattern in your andock.yml:"
 echo "'{{branch}}.demo-project.dev.andock.local' as virtual host name."
 echo ""
-echo "You should now connect to the vagrant box with root@dev.andock.local"
+echo "You should now connect to the vagrant box with ssh root@dev.andock.local"
 echo ""
+echo "Go to now demo-project and run andock server install"
+echo
 echo "##########################################################################"
 echo ""
+
