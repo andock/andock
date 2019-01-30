@@ -1,9 +1,9 @@
 # Configuration  
-The Andock configuration file `.andock/andock.yml` provides a number of variables to configure the build and deploy processes. 
+The Andock configuration file `.andock/andock.yml` provides some variables to configure the build and deploy processes. 
 
 With [hooks](hooks.md) you can define what happens during a build and deployment.
 
-You can generate basic configuration files with `fin andock config generate`
+You can generate essential configuration files with `fin andock config generate`
 
 Configuration files:
 
@@ -12,9 +12,9 @@ Configuration files:
 | `andock.yml`            | Main configuration file
 | `andock.${branch}.yml`            | Branch specific configuration file (optional)
 
-To overwrite configuration for a specific environment you can add an branch specific `andock.{branch}.yml`.
+To overwrite configuration for a specific environment, you can add a branch specific `andock.{branch}.yml`.
 
-For example configure your production domain to the master environment `.andock/andock.master.yml`.
+For example, configure your production domain to the master environment `.andock/andock.master.yml`.
 ```
 virtual_hosts:
   default: 
@@ -57,5 +57,5 @@ docksal_env:
 
 
 !!! tip "Own template generation files?"
-    To overwrite the generation templates you can define your own template files. Simple add `docksal_local_yml_path` or `docksal_local_env_path` to your `andock.yml`
+    To overwrite the generation templates, you can define your template files. Simple add `docksal_local_yml_path` or `docksal_local_env_path` to your `andock.yml`
 

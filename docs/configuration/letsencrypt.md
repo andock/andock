@@ -6,7 +6,7 @@ Enable Let's Encrypt in your andock.yml
 letsencrypt_enable: true
 ```
 
-Andock creates an certificate for each vitual_host and stores them into .docksal/certs. Docksal loads all certificates in this folder.
+Andock creates a certificate for each vitual_host and stores them into .docksal/certs. 
 
 
 ## Configuration options overview:

@@ -1,8 +1,12 @@
 # Environments 
 
-<b>Andock</b> creates an environment for each branch with `fin andock deploy`. Andock checks out the latest artifact from artifact repository and runs all tasks either from the init or update tasks to initialize or update the environment.
-The `init hook` is fired after the environment is created. if `andock deploy` is called a second time the init hook will not be fired again instead the update hook is fired. You can call `andock environment rm` and than `andock environment deploy` to reinitizialize the environment again.
+<b>Andock</b> creates an environment for each branch with `fin andock deploy`. 
 
+Andock checks out the latest artifact from artifact repository and runs all tasks either from the init or update tasks to initialize or update the environment.
+
+The `init hook` is fired after the environment is created. if `andock deploy` is called a second time the init hook will not be fired again instead the update hook is fired. 
+
+You can call `andock environment rm` and then `andock environment deploy` to reinitialize the environment again.
  
 ## Hooks overview
 

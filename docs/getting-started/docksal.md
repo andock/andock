@@ -23,8 +23,15 @@ git clone https://github.com/andock/demo-project.git
 ```
 
 ### Connect
-You must connect your project to the Andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
-If you leave the connection name empty, `default` will be used. [Here](../configuration/connections.md) you can find more details about connections.
+You must connect your project to the Andock server by running 
+
+`fin andock connect`. 
+
+Andock will ask for the connection name and the domain of the new server.
+If you leave the connection name empty, `default` will be used. 
+
+[Here](../configuration/connections.md) you can find more details about connections.
+
 ```
 fin andock connect
 ```
