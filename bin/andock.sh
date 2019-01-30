@@ -5,7 +5,7 @@ ANDOCK_VERSION=1.0.0
 
 REQUIREMENTS_ANDOCK_BUILD='0.6.0'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='0.7.1'
-REQUIREMENTS_ANDOCK_SERVER='0.4.1'
+REQUIREMENTS_ANDOCK_SERVER='0.4.2'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -360,6 +360,7 @@ show_help ()
     printh "server install <password|default(auto)> <root suer>" "Install Andock server."
     printh "server update" "Update Andock server."
     printh "server ssh-add" "Add public ssh key to Andock server."
+    printh "server show-pub-key" "Show Andock server public key."
 
     echo
     printh "Project:" "" "green"
@@ -911,6 +912,14 @@ ____options: \'-p 2222\'")
 }
 
 #----------------------------------- SERVER -----------------------------------
+# Show Andock server public key.
+run_server_show_key ()
+{
+    set -e
+    local connection=$1
+    shift
+
+}
 
 # Add ssh key to andock user.
 run_server_ssh_add ()
@@ -938,8 +947,8 @@ run_server_ssh_add ()
     echo-green "SSH key was added."
 }
 
-# Install andock.
-run_server_install ()
+# Run ansible role andock.server.
+run_server ()
 {
     local connection=$1
     shift
@@ -982,13 +991,21 @@ run_server_install ()
         echo-green "Andock password is: ${andock_pw}"
         echo
         echo-green "Andock server was installed successfully."
-    else
+    fi
+    if [ "${tag}" = "update" ]; then
         echo-green "Updating Docksal on host"
         echo-green "This takes some minutes..."
         echo
         ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
         echo-green "Andock server was updated successfully."
+    fi
+    if [ "${tag}" = "show_key" ]; then
+        echo-green "Show Andock public key"
+        echo
+        ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "show_key" -i "${ANDOCK_INVENTORY}/${connection}" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        echo
+        #echo-green "Andock server was updated successfully."
     fi
 }
 
@@ -1162,15 +1179,19 @@ case "$command" in
         case "$1" in
             install)
                 shift
-                run_server_install "$connection" "install" "$@"
+                run_server "$connection" "install" "$@"
             ;;
             update)
                 shift
-                run_server_install "$connection" "update" "$@"
+                run_server "$connection" "update" "$@"
             ;;
             ssh-add)
                 shift
                 run_server_ssh_add "$connection" "$1" "$2"
+             ;;
+            show-pub-key)
+                shift
+                run_server  "$connection" "show_key"
              ;;
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
