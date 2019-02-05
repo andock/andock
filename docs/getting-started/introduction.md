@@ -28,11 +28,10 @@ For more infos [see build configuration](../configuration/build.md)
 ### The deploy phase.
 After you run `andock environment deploy` Andock checks out the last commit from the artifact repository, generates all necessary configuration files, mounts the filesystem, generates Let's encrypt certificates and start all services.
  
-For more infos [see build configuration](../configuration/environment.md)
+For more infos [see environment configuration](../configuration/environment.md)
 ### Getting started?
 * New to <b>Andock</b>   see the [5 minutes setup](../getting-started/docksal.md)
 
-* To get an overview about the configuration check out the 
-[configure configuration](../configuration/andock.md) 
+* Check out the [configuration overview](../configuration/andock.md) 
 
 
