@@ -5,7 +5,7 @@ ANDOCK_VERSION=1.0.0
 
 REQUIREMENTS_ANDOCK_BUILD='0.6.0'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='0.7.1'
-REQUIREMENTS_ANDOCK_SERVER='0.4.2'
+REQUIREMENTS_ANDOCK_SERVER='0.4.3'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -985,7 +985,7 @@ run_server ()
         echo-green "Installing Docksal on host"
         echo-green "This takes some minutes..."
         echo
-        ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)"
+        ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal) || (yum -y update && yum install -y python)"
         ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
         echo-green "Andock password is: ${andock_pw}"
