@@ -5,7 +5,7 @@ ANDOCK_VERSION=1.0.0
 
 REQUIREMENTS_ANDOCK_BUILD='0.6.0'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='0.7.1'
-REQUIREMENTS_ANDOCK_SERVER='0.4.3'
+REQUIREMENTS_ANDOCK_SERVER='0.4.4'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.2'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -29,6 +29,7 @@ DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 ANDOCK_ROLES="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
 ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_ROLES}/andock.server/callback}"
 ANDOCK_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-False}"
+
 # Load environment variables overrides, use to permanently override some variables
 # Source and allexport variables in the .env file
 if [[ -f "$ANDOCK_CONFIG_ENV" ]]; then
