@@ -53,7 +53,14 @@ setup() {
     cd web
     fin ssh-key add id_rsa
 
-    fin drush sql-sync --local @demo-drupal.master @self -y --debug
+    # The second sql-sync is not working sometimes.
+    # All other sql-syncs are working as expected.
+    # @TODO: Check out.
+    run fin drush sql-sync --local @demo-drupal.master @self -y --debug
+    run fin drush sql-sync --local @demo-drupal.master @self -y --debug
+
+    run fin drush sql-sync --local @demo-drupal.master @self -y --debug
+    [ $status = 0 ]
     ssh andock@dev.andock.ci docker logs andock-ssh2docksal
 
     run curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci"
