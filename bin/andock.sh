@@ -57,7 +57,7 @@ export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
 
 #export ANSIBLE_ACTION_WARNINGS=False
 
-#export ANSIBLE_SYSTEM_WARNINGS=False
+export ANSIBLE_SYSTEM_WARNINGS=False
 
 # @author Leonid Makarov
 # Console colors
@@ -615,8 +615,8 @@ run_build ()
 
 # Ansible playbook wrapper for role andock.fin
 # @param $1 The Connection.
-# @param $2 The fin command.
-# @param $3 The exec path.
+# @param $2 The exec path.
+# @param $* The fin command.
 run_fin ()
 {
 
@@ -633,8 +633,9 @@ run_fin ()
 
     # Set parameters.
     local connection=$1 && shift
-    local exec_command=$1 && shift
     local exec_path=$1 && shift
+    local exec_command=$*
+
 
     # Run the playbook.
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
@@ -819,7 +820,6 @@ virtual_hosts:
     container: web
 
 ## Mounts describe writeable persistent volumes in the docker container.
-## Mounts are linked via volumes: into the docker container.
 # mounts:
 #   files:
 #     path: 'docroot/files'
@@ -1152,7 +1152,7 @@ case "$command" in
         if [[ "$org_path" != "$root_path" ]]; then
             fin_sub_path=$(echo ${org_path#${root_path}"/"})
         fi
-	    run_fin "$connection" "$1" "$fin_sub_path"
+	    run_fin "$connection" "$fin_sub_path" "$*"
     ;;
     drush)
         case "$1" in
