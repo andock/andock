@@ -56,10 +56,10 @@ setup() {
     # The second sql-sync is not working sometimes.
     # All other sql-syncs are working as expected.
     # @TODO: Check out.
-    run fin drush sql-sync --local @demo-drupal.master @self -y --debug
-    run fin drush sql-sync --local @demo-drupal.master @self -y --debug
+    run fin drush sql-sync @demo-drupal.master @self -y
+    run fin drush sql-sync @demo-drupal.master @self -y
 
-    run fin drush sql-sync --local @demo-drupal.master @self -y --debug
+    run fin drush sql-sync @demo-drupal.master @self -y
     [ $status = 0 ]
     ssh andock@dev.andock.ci docker logs andock-ssh2docksal
 
