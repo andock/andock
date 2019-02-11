@@ -49,7 +49,7 @@ setup() {
 }
 
 @test "drush sql-sync @target @self" {
-    skip "Timeout problems. Skip for now"
+    #skip "Timeout problems. Skip for now"
     cd web
     fin ssh-key add id_rsa
 
