@@ -54,23 +54,36 @@ Andock inside docksal:
 
 # Commands:
 ```bash
-  andock command reference   1.0.0
+  Andock command reference   1.0.0
 
-  connect                    Connect andock to andock server
+  Options:                   
+  Andock supports all ansible-playbook options  
+
+  Samples:                   
+  -v, --verbose         verbose mode (-vvv for more, -vvvv to enable
+                        connection debugging)  
+  -e EXTRA_VARS, --extra-vars=EXTRA_VARS
+                        set additional variables as key=value or YAML/JSON, if
+                        filename prepend with @  
+
+  Connection                 
+  connect                    Connect andock to Andock server
   (.) ssh-add <ssh-key>      Add private SSH key <ssh-key> variable to the agent store.
 
   Server:                    
-  server install             Install andock server.
-  server update              Update andock server.
-  server ssh-add             Add public ssh key to andock server.
+  server install             Install Andock server.
+  server update              Update Andock server.
+  server ssh-add             Add public ssh key to Andock server.
 
   Project:                   
-  config generate            Generate andock project configuration.
+  config generate            Generate project configuration.
 
   Build:                     
   build                      Build deployment artifact
-  build deploy               Build deployment artifact and pushes to artifact repository.
+  build push                 Build deployment artifact and pushes to artifact repository.
   build clean                Clean build caches.
+
+  build deploy               Build deployment artifact, pushes to artifact repository and deploy it.
 
   Environment:               
   environment deploy (deploy)  Deploy environment.
@@ -78,18 +91,18 @@ Andock inside docksal:
   environment test           Run UI tests. (Like behat, phantomjs etc.)
   environment stop           Stop services.
   environment rm             Remove environment.
+  environment letsencrypt    Update Let's Encrypt certificate.
   environment url            Print environment urls.
   environment ssh [--container] <command>  SSH into environment. Specify a differnt container than cli with --container <SERVICE>
 
   fin <command>              Fin remote control.
 
   Drush:                     
-  drush generate-alias <version>  Generate drush alias (Default: Version 9.
+  drush generate-alias <version>  Generate drush alias (Default: 9)
 
-  version (v, -v)            Print andock version. [v, -v] - prints short version
-  alias                      Print andock alias.
+  version (v, -v)            Print Andock version. [v, -v] - prints short version
 
-  self-update                Update andock
+  self-update                Update Andock
 
 ```
 

@@ -1,5 +1,5 @@
 setup() {
-    cd demo-project
+    cd test-project
 
     if [ "${ANDOCK_CONNECTION}" = "" ]; then
         export ANDOCK_CONNECTION="default"

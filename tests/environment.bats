@@ -54,6 +54,21 @@ load setup_helper
     unset output
 }
 
+@test "build deploy" {
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} build deploy -e "branch=master"
+    [[ $status == 0 ]]
+    run curl -sL http://master.demo-project.dev.andock.ci
+    echo $output | grep "Hello Andock"
+    unset output
+}
+
+
+@test "rm" {
+  run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment rm -e "branch=master"
+  fin rm -f
+  [[ $status == 0 ]]
+}
+
 teardown() {
     echo "Status: $status"
     echo "Output:"

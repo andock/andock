@@ -2,7 +2,7 @@
 
 ## Preperation
 ### Cloud installation
-The easiest way to test <b>Andock</b> is to create a cloud box on any cloud provider wich supports Ubuntu and docker.
+The easiest way to test <b>Andock</b> is to create a cloud box on any cloud provider which supports Ubuntu and docker.
 
 After that point a wildcard domain to your new server.
 
@@ -14,20 +14,24 @@ You can test <b>Andock</b> with vagrant (works on linux and OSX):
 ```
  curl -sS https://raw.githubusercontent.com/andock/andock/master/tests/vagrant-test | sh
 ```
-This will download and start a Vagrant file with ubuntu 18.04, and updates your /etc/hosts to point to the Virtualserver. 
-You need to install Vagrant and Virtualbox first.
+This will download and start a Vagrant file with ubuntu 18.04. 
 
 ## Let's start.
-### Install and enable the addon.
+Check out [Andock demo project](https://github.com/andock/demo-project)
 ```
-fin addon install andock
-fin andock enable
+git clone https://github.com/andock/demo-project.git
 ```
-This will add an <b>Andock</b> container to your `docksal-local.yml`.
 
 ### Connect
-You must connect your project to the Andock server by running `fin andock connect`. You will be asked for the connection name and the domain of the new server.
-If you leave the connection name empty, `default` will be used. [Here](../configuration/connections.md) you can find more details about connections.
+You must connect your project to the Andock server by running 
+
+`fin andock connect`. 
+
+Andock will ask for the connection name and the domain of the new server.
+If you leave the connection name empty, `default` will be used. 
+
+[Here](../configuration/connections.md) you can find more details about connections.
+
 ```
 fin andock connect
 ```
@@ -40,23 +44,28 @@ fin andock server install
 ```
 fin andock config generate
 ```
+If you use vagrant use `{{branch}}.demo-project.andock.local` as virtual host pattern.
+ 
 This will create some required config files and templates for init, build, test and update hooks. 
-Look [here for an overview of Andock configuration](../configuration/andock.md) and [here for more details about the hook configuration](../configuration/hooks.md) 
 
-### Build 
+### Build and deploy
 ```
 fin andock build deploy
 ```
-[Here you can find more details about the build process](../configuration/build.md)
 
-### Create environment
-```
-fin andock environment deploy
-```
-[Here you can find more details about the deploy process](../configuration/environment.md)
 ## Congratulations, the installation is finished!
 
+!!! tip "Install and enable Andock addon"
+    The Andock addon is already installed in the demo project. Run `fin addon install andock` to install the addon and enable it with `fin andock enable` 
+    
+    
+
+
+
+
 ### Read more:
+* [Andock configuration overview](../configuration/andock.md) 
+* [Hooks overview](../configuration/hooks.md)
+* [The build process](../configuration/build.md)
+* [The deploy process](../configuration/environment.md)
 * [CI server automation](../integrations/ci.md)
-### Example hook configurations:
-1. [Drupal](../configuration/example-drupal-hooks.md)

@@ -14,7 +14,7 @@ load setup_helper
 }
 
 @test "build deploy" {
-  ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build deploy -e "branch=master"
+  ../../bin/andock.sh "@${ANDOCK_CONNECTION}" build push -e "branch=master"
 
   if [ "${ANDOCK_TEST_TYPE}" == "travis" ]; then
     ls /home/${ANDOCK_USER}/andock/projects/v1z2kdj/master/master-v1z2kdj__build/

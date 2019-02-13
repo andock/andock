@@ -1,35 +1,53 @@
 #!/usr/bin/env bash
+set -e
+
+# Check if vagrant is installed.
+if ! [ -x "$(command -v vagrant)" ]; then
+  echo 'Error: vagrant is not installed.' >&2
+  exit 1
+fi
+
+# Check if the test run before.
+if [ -e "andock-vagrant-test" ]; then
+    echo "Folder andock-vagrant-test already exists. Run vagrant destroy and rm -r andock-vagrant-test"
+    exit 1
+fi
+# Ask for ssh key
+read -e -p "Which SSH key should be used?: [~/.ssh/id_rsa.pub]" KEY
+
+if [ "$KEY" == "" ]; then
+    KEY="~/.ssh/id_rsa.pub"
+fi
+
+eval KEY=$KEY
+if [ ! -e "$KEY" ]; then
+    echo "SSH key not found"
+    exit 1
+fi
+
 mkdir andock-vagrant-test
 cd andock-vagrant-test
+
 # Download vagrant file.
-wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/Vagrantfile
-# Download dummy keys.
-wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/id_rsa
-wget -q https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/id_rsa.pub
-# Set keys.
-chmod 600 id_rsa
-chmod 600 id_rsa
-ssh-add id_rsa
+curl --output Vagrantfile https://raw.githubusercontent.com/andock/andock/master/tests/vagrant/Vagrantfile
 
-# Add entries to your host.
-sudo sed -i '/dev.andock.local/d' /etc/hosts
+sed -i -e "s,id_rsa.pub,$KEY,g" "Vagrantfile"
 
-    # Update local hosts file.
-    echo "
-192.168.33.10    dev.andock.local" | sudo tee --append /etc/hosts
-
-    echo "
-192.168.33.10   master.demo-project.dev.andock.local" | sudo tee --append /etc/hosts
-
-
+# Start vagrant
 vagrant up
 echo ""
 echo "##########################################################################"
 echo "Vagrant is up"
-echo "Use 'dev.andock.local' as connection domain and"
-echo "'{{branch}}.demo-project.dev.andock.local' as virtual host name."
+echo
+echo "Please copy following lines to your /etc/hosts"
+echo "192.168.33.10    andock.local"
+echo "192.168.33.10    master.demo-project.andock.local"
+echo
 echo ""
-echo "You should now connect to the vagrant box with root@dev.andock.local"
+echo "You should now connect to the vagrant box with ssh root@andock.local"
 echo ""
+echo "Go to now demo-project and follow the 5 minutes guide"
+echo
 echo "##########################################################################"
 echo ""
+
