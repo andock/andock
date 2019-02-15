@@ -10,8 +10,8 @@ pages:
     - Introduction: getting-started/introduction.md
     - System requirements: getting-started/system-requirements.md
     - 5 minutes setup: getting-started/docksal.md
-      - Test with Vagrant:  getting-started/vagrant.md
-      - Test Andock on a Cloud Box:  getting-started/cloud.md
+      - Test with Vagrant: getting-started/vagrant.md
+      - Test Andock on a Cloud Box: getting-started/cloud.md
   - Configuration:
     - Basic configuration: configuration/andock.md
     - Hooks: configuration/hooks.md
