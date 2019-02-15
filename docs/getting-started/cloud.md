@@ -58,10 +58,6 @@ If you want to create an new environment for branch `develop` simple run `git ch
 !!! tip "Install and enable Andock addon"
     The Andock addon is already installed in the demo project. Run `fin addon install andock` to install the addon and enable it with `fin andock enable` 
     
-    
-
-
-
 
 ### Read more:
 * [Andock configuration overview](../configuration/andock.md) 
