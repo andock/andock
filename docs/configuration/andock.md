@@ -38,7 +38,7 @@ virtual_hosts:
 ``` 
 
 ### Mounts
-Mounts describe writeable persistent volumes in the docker container.
+Mounts describe writable persistent volumes in the docker container.
 Mounts are linked via volumes into the docker container.
 ``` 
 mounts:
@@ -46,8 +46,15 @@ mounts:
     path: 'docroot/files'
 ```
 
+### Protected branches
+Environments on protected branches failing to 
+``` 
+prototected_branches:
+  - master
+  - test
+```
 ### Additional docksal-local.env variables
-You can pass any variable to the generated `docksal-local.env`
+You can pass any variable to the generated `docksal-local.env`.
 
 #### Samples
 ```

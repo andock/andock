@@ -9,7 +9,7 @@ The easiest setup to start with is to install Virtualbox via your system’s pac
 ### Install Ubuntu 18.04 with Vagrant
 To easily setup an Vagrant box run:
 ```
- curl -sS https://raw.githubusercontent.com/andock/andock/master/tests/vagrant-test | sh
+ curl -sS https://raw.githubusercontent.com/andock/andock/master/tests/vagrant-test | bash
 ```
 This starts an Ubunutu 18.04 and adds your private key file and don't forget to copy the host entries to your host file.
 

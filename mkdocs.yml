@@ -12,7 +12,7 @@ pages:
     - 5 minutes setup:
       - 5 minutes setup: getting-started/docksal.md
       - Test with Vagrant: getting-started/vagrant.md
-      - Test Andock on a Cloud Box: getting-started/cloud.md
+      - Test on a Cloud Box: getting-started/cloud.md
   - Configuration:
     - Basic configuration: configuration/andock.md
     - Hooks: configuration/hooks.md

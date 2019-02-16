@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+
 
 # Check if vagrant is installed.
 if ! [ -x "$(command -v vagrant)" ]; then
@@ -12,8 +12,12 @@ if [ -e "andock-vagrant-test" ]; then
     echo "Folder andock-vagrant-test already exists. Run vagrant destroy and rm -r andock-vagrant-test"
     exit 1
 fi
+
+exec 3<>/dev/tty
+read_cmd="read -u 3"
+
 # Ask for ssh key
-read -e -p "Which SSH key should be used?: [~/.ssh/id_rsa.pub]" KEY
+$read_cmd -p "Which SSH key should be used?: [~/.ssh/id_rsa.pub]" KEY
 
 if [ "$KEY" == "" ]; then
     KEY="~/.ssh/id_rsa.pub"
