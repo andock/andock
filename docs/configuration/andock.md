@@ -47,12 +47,13 @@ mounts:
 ```
 
 ### Protected branches
-Environments on protected branches failing to 
+To protect an environment from deletion add it as protected branch. 
 ``` 
 prototected_branches:
   - master
   - test
 ```
+ Default protected branches are master and test.
 ### Additional docksal-local.env variables
 You can pass any variable to the generated `docksal-local.env`.
 

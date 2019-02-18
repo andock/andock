@@ -24,7 +24,7 @@ The Andock addon is already part of the demo project. To get an overview of all 
 ### Connect
 You must connect your project to the Andock server by running 
 
-`fin andock connect default YOUR_DOMAIN`. 
+`fin andock connect default YOUR-DOMAIN.com`. 
 
 Andock will create a connection with name default which points to your cloud box.
 
@@ -42,18 +42,32 @@ fin andock config generate
 ```
 Use `{{branch}}.YOUR-DOMAIN.com` as virtual host pattern.
  
-This will create some required config files and templates for init, build, test and update hooks. 
+This will create all required config files and templates for init, build, test and update hooks. 
 
 ### Build and deploy
 ```
 fin andock build deploy
 ```
-Now you can open `master.YOUR-DOMAIN.com` to check the deployed demo site.
-
-If you want to create an new environment for branch `develop` simple run `git checkout -b develop` and than `fin andock build deploy` and check the site 
-`develop.YOUR-DOMAIN.com`
 
 ## Congratulations, the installation is finished!
+
+Now you can open `http://master.YOUR-DOMAIN.com` to check the deployed demo site.
+
+To access the environment (cli) via ssh run:
+```
+fin andock environment ssh
+```
+### Build another branch
+Checkout a new branch:
+
+```
+git checkout -b develop
+```
+and run: 
+
+``` 
+fin andock build deploy
+```  
 
 !!! tip "Install and enable Andock addon"
     The Andock addon is already installed in the demo project. Run `fin addon install andock` to install the addon and enable it with `fin andock enable` 
