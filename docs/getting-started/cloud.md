@@ -17,7 +17,6 @@ fin init
 ```
 Now you should see Hello Andock when you open: `http://demo-project.docksal/`.
 
-The Andock addon is already part of the demo project. To get an overview of all commands run `fin andock`
 
 ## Let's start with Andock.
 
@@ -49,7 +48,7 @@ This will create all required config files and templates for init, build, test a
 fin andock build deploy
 ```
 
-## Congratulations, the installation is finished!
+## Congratulations, the deployment has finished!
 
 Now you can open `http://master.YOUR-DOMAIN.com` to check the deployed demo site.
 
@@ -57,11 +56,13 @@ To access the environment (cli) via ssh run:
 ```
 fin andock environment ssh
 ```
-### Build another branch
-Checkout a new branch:
+### Build the dev branch
+Now create your first a dev branch and build the dev environment:
 
 ```
+git fetch origin develop
 git checkout -b develop
+
 ```
 and run: 
 
