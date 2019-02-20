@@ -17,6 +17,9 @@ exec 3<>/dev/tty
 read_cmd="read -u 3"
 
 # Ask for ssh key
+echo "This script starts Ubuntu with Vagrant."
+echo "For easy setup it will add your public key to the authorized_key file of the vagrant box."
+echo ""
 $read_cmd -p "Which SSH key should be used?: [~/.ssh/id_rsa.pub]" KEY
 
 if [ "$KEY" == "" ]; then
@@ -41,6 +44,7 @@ sed -i -e "s,id_rsa.pub,$KEY,g" "Vagrantfile"
 vagrant up
 echo ""
 echo "##########################################################################"
+echo ""
 echo "Vagrant is up"
 echo
 echo "Please copy following lines to your /etc/hosts"

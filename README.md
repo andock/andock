@@ -7,7 +7,7 @@
 
 # Andock CLI
 
-The Andock command line toool is the heart of Andock.    
+The Andock command line tool is the heart of Andock.    
 
 ## New to Andock?
 * [See documentation](https://andock.readthedocs.io/en/latest/)

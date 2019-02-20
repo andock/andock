@@ -7,11 +7,13 @@ The easiest setup to start with is to install Virtualbox via your system’s pac
 
 
 ### Install Ubuntu 18.04 with Vagrant
-To easily setup an Vagrant box run:
+To quickly set up a Vagrant box run:
 ```
  curl -sS https://raw.githubusercontent.com/andock/andock/master/tests/vagrant-test | bash
 ```
-This starts an Ubunutu 18.04 and adds your private key file and don't forget to copy the host entries to your host file.
+The test script will ask you for your public key file. It adds your "public key file" to the authorized_keys file on the Ubuntu Server.
+
+After the installation, the script will ask you to copy the three domains to your /etc/hosts. With these domains you access the deployed page. 
 
 ### Check out and initialize the demo project
 Check out [Andock demo project](https://github.com/andock/demo-project)
@@ -24,7 +26,7 @@ cd demo-project
 fin init
 ```
 Now you should see Hello Andock when you open: `http://demo-project.docksal/`
-and you shoud connect to the Vagrant machine with `root@192.168.33.10` 
+and you should connect to the Vagrant machine with `root@192.168.33.10` 
 
 The Andock addon is already part of the demo project. To get an overview of all commands run `fin andock`
 #### The setup of the test environment is done!
@@ -32,17 +34,16 @@ The Andock addon is already part of the demo project. To get an overview of all 
 ## Let's start with Andock.
   
 ### Connect
-You must connect your project to the Andock server by running 
+Connect your project to the Andock server by running: 
 
-`fin andock connect default andock.vagrant`. 
+```
+fin andock connect default andock.vagrant
+```
 
 Andock will create a connection with name default which points to your vagrant box.
 
 [Here](../configuration/connections.md) you can find more details about connections.
 
-```
-fin andock connect
-```
 ### Install Andock server
 Andock needs Docksal installed on the server. You can easily install Docksal with: 
 ```
@@ -54,25 +55,38 @@ fin andock config generate
 ```
 Use `{{branch}}.demo-project.andock.vagrant` as virtual host pattern.
  
-This will create some required config files and templates for init, build, test and update hooks. 
+This will create all required config files and templates for init, build, test and update hooks. 
 
 ### Build and deploy
 ```
 fin andock build deploy
 ```
-Now you can open `master.demo-project.andock.vagrant` to check the deployed demo site.
 
-If you want to create an new environment for branch `develop` simple run `git checkout -b develop` and than `fin andock build deploy`  
+## Congratulations, the deployment has finished!
 
-## Congratulations, the installation is finished!
+Open now [http://master.demo-project.andock.vagrant](http://master.demo-project.andock.vagrant) to check the deployed demo site.
+
+To access the environment (cli) container via ssh run:
+```
+fin andock environment ssh
+```
+### Build the dev branch
+Now create your first a dev branch and build the dev environment:
+
+```
+git fetch origin develop
+git checkout -b develop
+
+```
+and run: 
+
+``` 
+fin andock build deploy
+```  
 
 !!! tip "Install and enable Andock addon"
-    The Andock addon is already installed in the demo project. Run `fin addon install andock` to install the addon and enable it with `fin andock enable` 
+    The Andock addon is part of the demo project. Run `fin addon install andock` to install the addon and enable it with `fin andock enable` 
     
-    
-
-
-
 
 ### Read more:
 * [Andock configuration overview](../configuration/andock.md) 
