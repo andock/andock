@@ -50,7 +50,7 @@ load setup_helper
 
 @test "rm --force" {
   run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment rm --force -e "branch=master"
-  [[ $status == 1 ]]
+  [[ $status == 0 ]]
 }
 
 @test "rm: Testing page status" {
@@ -70,6 +70,7 @@ load setup_helper
 
 @test "rm" {
   run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment rm --force -e "branch=master"
+  [[ $status == 0 ]]
   fin rm -f
   [[ $status == 0 ]]
 }
