@@ -379,7 +379,7 @@ show_help ()
     printh "environment up"  "Start services."
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
-    printh "environment rm" "Remove environment."
+    printh "environment rm [--force]" "Remove environment."
     printh "environment letsencrypt" "Update Let's Encrypt certificate."
 
     printh "environment url" "Print environment urls."
@@ -706,6 +706,12 @@ run_environment ()
     local connection=$1 && shift
     local tag=$1 && shift
 
+    local force_rm="{'force_rm': false}"
+    if [[ "$1" = "--force" ]]; then
+        force_rm="{'force_rm': true}"
+        shift
+    fi
+
     # Validate tag name. Show help if needed.
     case $tag in
         "init,update")
@@ -721,7 +727,7 @@ run_environment ()
     esac
 
     # Run the playbook.
-    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "${force_rm}" -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
     # Handling playbook results.
     if [[ $? == 0 ]]; then
         case $tag in
