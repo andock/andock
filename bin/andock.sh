@@ -383,7 +383,7 @@ show_help ()
     printh "environment letsencrypt" "Update Let's Encrypt certificate."
 
     printh "environment url" "Print environment urls."
-    printh "environment ssh [--container] <command>" "SSH into environment. Specify a differnt container than cli with --container <SERVICE>"
+    printh "environment ssh [--container] <command>" "SSH into environment. Specify a different container than cli with --container <SERVICE>"
     echo
     printh "fin <command>" "Fin remote control."
 
@@ -404,7 +404,7 @@ version ()
 	if [[ $1 == '--short' ]]; then
 		echo "$ANDOCK_VERSION"
 	else
-		echo-green "andock version: $ANDOCK_VERSION"
+		echo-green "Andock client: $ANDOCK_VERSION"
 		echo ""
 		echo-green "Roles:"
 		echo "andock.build: $REQUIREMENTS_ANDOCK_BUILD"
