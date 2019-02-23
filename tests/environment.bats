@@ -45,6 +45,11 @@ load setup_helper
 
 @test "rm" {
   run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment rm -e "branch=master"
+  [[ $status == 1 ]]
+}
+
+@test "rm --force" {
+  run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment rm --force -e "branch=master"
   [[ $status == 0 ]]
 }
 
@@ -64,7 +69,8 @@ load setup_helper
 
 
 @test "rm" {
-  run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment rm -e "branch=master"
+  run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment rm --force -e "branch=master"
+  [[ $status == 0 ]]
   fin rm -f
   [[ $status == 0 ]]
 }

@@ -3,9 +3,9 @@
 ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=1.0.0
 
-REQUIREMENTS_ANDOCK_BUILD='0.6.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='0.7.1'
-REQUIREMENTS_ANDOCK_SERVER='0.5.3'
+REQUIREMENTS_ANDOCK_BUILD='1.0.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.0'
+REQUIREMENTS_ANDOCK_SERVER='1.0.0'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -379,11 +379,11 @@ show_help ()
     printh "environment up"  "Start services."
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
-    printh "environment rm" "Remove environment."
+    printh "environment rm [--force]" "Remove environment."
     printh "environment letsencrypt" "Update Let's Encrypt certificate."
 
     printh "environment url" "Print environment urls."
-    printh "environment ssh [--container] <command>" "SSH into environment. Specify a differnt container than cli with --container <SERVICE>"
+    printh "environment ssh [--container] <command>" "SSH into environment. Specify a different container than cli with --container <SERVICE>"
     echo
     printh "fin <command>" "Fin remote control."
 
@@ -404,7 +404,7 @@ version ()
 	if [[ $1 == '--short' ]]; then
 		echo "$ANDOCK_VERSION"
 	else
-		echo-green "andock version: $ANDOCK_VERSION"
+		echo-green "Andock client: $ANDOCK_VERSION"
 		echo ""
 		echo-green "Roles:"
 		echo "andock.build: $REQUIREMENTS_ANDOCK_BUILD"
@@ -706,6 +706,12 @@ run_environment ()
     local connection=$1 && shift
     local tag=$1 && shift
 
+    local force_rm="{'force_rm': false}"
+    if [[ "$1" = "--force" ]]; then
+        force_rm="{'force_rm': true}"
+        shift
+    fi
+
     # Validate tag name. Show help if needed.
     case $tag in
         "init,update")
@@ -721,7 +727,7 @@ run_environment ()
     esac
 
     # Run the playbook.
-    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
+    ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags $tag -e "@${settings_path}" ${branch_settings_config} -e "${force_rm}" -e "docroot=${DOCROOT} project_path=$PWD branch=${branch_name}" "$@" ${ANDOCK_PLAYBOOK}/fin.yml
     # Handling playbook results.
     if [[ $? == 0 ]]; then
         case $tag in
