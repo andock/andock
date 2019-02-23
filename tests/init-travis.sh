@@ -10,7 +10,8 @@ fi
 
 cd ${test_method}
 
-
+mkdir -p ~/.andock
+cp andock.env ~/.andock/andock.env
 echo "Install $test_method components..."
 ./install.sh
 echo "Initialize ssh configuration..."
