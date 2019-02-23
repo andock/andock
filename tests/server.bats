@@ -7,7 +7,7 @@ load setup_helper
 }
 
 @test "server:install" {
-  ../../bin/andock.sh @${ANDOCK_CONNECTION} server install "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}"
+  ../../bin/andock.sh @${ANDOCK_CONNECTION} server install "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}" -e "{'enable_swap_limit': false}"
 }
 
 @test "Check docksal.env file " {
@@ -46,7 +46,7 @@ load setup_helper
 
 
 @test "server:update" {
-  ../../bin/andock.sh @${ANDOCK_CONNECTION} server update "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}"
+  ../../bin/andock.sh @${ANDOCK_CONNECTION} server update "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}" -e "{'enable_swap_limit': false}"
 }
 
 @test "server:ssh-add" {
