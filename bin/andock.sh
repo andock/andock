@@ -28,7 +28,7 @@ DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 
 ANDOCK_ROLES="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
 ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_ROLES}/andock.server/callback}"
-ANDOCK_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-False}"
+ANDOCK_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-True}"
 
 # Load environment variables overrides, use to permanently override some variables
 # Source and allexport variables in the .env file

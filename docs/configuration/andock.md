@@ -46,6 +46,13 @@ mounts:
     path: 'docroot/files'
 ```
 
+### Let's encrypt
+You can enable Let's encrypt certificate generation with:
+```
+letsencrypt_enable: true 
+``` 
+
+
 ### Protected branches
 To protect an environment from deletion add it as protected branch. 
 ``` 
@@ -54,15 +61,15 @@ prototected_branches:
   - test
 ```
  Default protected branches are master and test.
-### Additional docksal-local.env variables
-You can pass any variable to the generated `docksal-local.env`.
 
-#### Samples
+### Docksal configuration variables
+You can pass any variable to the generated `docksal-local.env`.
+This can be useful if you want to replace an docker image or any other container configuration.
+
 ```
 docksal_env:
-  DOCKSAL_STACK: acquia
+  CLI_IMAGE: bitnami/php-fpm:7.3 
 ``` 
-
 
 !!! tip "Own template generation files?"
     To overwrite the generation templates, you can define your template files. Simple add `docksal_local_yml_path` or `docksal_local_env_path` to your `andock.yml`
