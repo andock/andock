@@ -1,13 +1,10 @@
 # Environments 
 
-<b>Andock</b> creates an environment for each branch with `fin andock deploy`. 
+<b>Andock</b> creates an environment for each branch. 
 
 Andock checks out the latest artifact from artifact repository and runs all tasks either from the init or update tasks to initialize or update the environment.
 
-The `init hook` is fired after the environment is created. if `andock deploy` is called a second time the init hook will not be fired again instead the update hook is fired. 
-
-You can call `andock environment rm` and then `andock environment deploy` to reinitialize the environment again.
- 
+To deploy an environment run `andock deploy`.
 ## Hooks overview
 
 Hooks can be registered in your `andock.yml`. 
@@ -22,10 +19,10 @@ Hooks can be registered in your `andock.yml`.
 
 
 ## Samples:
-Here are 
+
 ### init_tasks.yml
 ```
- - name: Init andock environment
+ - name: Init Andock environment
    command: "fin andock-init"
    args:
      chdir: "{{ docroot_path }}"
@@ -33,7 +30,7 @@ Here are
  
 ### update_tasks.yml
 ```
- - name: Clear cache
+ - name: Clear Drupal cache
    command: "fin drush cr"
    args:
      chdir: "{{ docroot_path }}"
