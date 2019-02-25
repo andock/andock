@@ -1,12 +1,8 @@
-# Test Andock on a Cloud Box
+# Test Andock on a cloud box
 ## Cloud installation
-The easiest way to test <b>Andock</b> is to create a cloud box on any cloud provider which supports Ubuntu and docker.
+The easiest way to test <b>Andock</b> is to create a cloud box on any cloud provider which fulfills the [system requirements](system-requirements.md).
 
-After that point a wildcard domain to your new server.
-
-Please check [system requirements](system-requirements.md) before you setup the server.
-
-After that check out [Andock demo project](https://github.com/andock/demo-project)
+Point a wildcard domain to your new server and check out the [Andock demo project](https://github.com/andock/demo-project) on your local machine.
 ```
 git clone https://github.com/andock/demo-project.git
 ```
@@ -15,13 +11,13 @@ git clone https://github.com/andock/demo-project.git
 cd demo-project
 fin init
 ```
-Now you should see Hello Andock when you open: `http://demo-project.docksal/`.
+Now you should see 'Welcome to *Andock* when you open: `http://demo-project.docksal/`.
 
 
 ## Let's start with Andock.
 
 ### Connect
-You must connect your project to the Andock server by running 
+Now you have to connect your project to the Andock server by running 
 
 `fin andock connect default YOUR-DOMAIN.com`. 
 
