@@ -1,6 +1,6 @@
 # Test Andock with Vagrant (works on linux and OSX):
 
-## Preperation
+## Preparation
 To use vagrant, a supported hypervisor needs to be installed as well as vagrant itself. 
 
 The easiest setup to start with is to install Virtualbox via your system’s package manager. 
