@@ -5,7 +5,7 @@ ANDOCK_VERSION=1.0.0
 
 REQUIREMENTS_ANDOCK_BUILD='1.0.0'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.0'
-REQUIREMENTS_ANDOCK_SERVER='1.0.0'
+REQUIREMENTS_ANDOCK_SERVER='1.0.1'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -990,7 +990,7 @@ run_server ()
 
     if [ "${tag}" = "install" ]; then
         echo-green "Installing Docksal on host"
-        echo-green "This takes some minutes..."
+        echo-green "This will take some minutes..."
         echo
         ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal) || (yum -y update && yum install -y python)"
         ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
@@ -1001,7 +1001,7 @@ run_server ()
     fi
     if [ "${tag}" = "update" ]; then
         echo-green "Updating Docksal on host"
-        echo-green "This takes some minutes..."
+        echo-green "This will take some minutes..."
         echo
         ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
