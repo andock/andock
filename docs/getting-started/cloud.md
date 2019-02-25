@@ -11,7 +11,7 @@ git clone https://github.com/andock/demo-project.git
 cd demo-project
 fin init
 ```
-Now you should see 'Welcome to *Andock* when you open: `http://demo-project.docksal/`.
+Now you should see __Welcome to Andock__ when you open: `http://demo-project.docksal/`.
 
 
 ## Let's start with Andock.
