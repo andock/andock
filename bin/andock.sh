@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=1.0.0
+ANDOCK_VERSION=1.0.1
 
 REQUIREMENTS_ANDOCK_BUILD='1.0.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.0'
-REQUIREMENTS_ANDOCK_SERVER='1.0.1'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.1'
+REQUIREMENTS_ANDOCK_SERVER='1.0.2'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -362,6 +362,7 @@ show_help ()
     printh "server update" "Update Andock server."
     printh "server ssh-add" "Add public ssh key to Andock server."
     printh "server show-pub-key" "Show Andock server public key."
+    printh "server version" "Show Andock server version."
 
     echo
     printh "Project:" "" "green"
@@ -716,6 +717,9 @@ run_environment ()
     case $tag in
         "init,update")
             echo-green "Deploy branch <${branch_name}>..."
+        ;;
+        "version")
+            echo-green ""
         ;;
         init|up|update|test|stop|rm|exec|"up,letsencrypt")
             echo-green "Environment $tag branch <${branch_name}>..."
@@ -1199,6 +1203,10 @@ case "$command" in
             show-pub-key)
                 shift
                 run_server  "$connection" "show_key"
+             ;;
+            version)
+                shift
+                run_environment  "$connection" "version"
              ;;
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
