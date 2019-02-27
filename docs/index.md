@@ -1,6 +1,6 @@
-# Andock - Hosting with Docksal
+# Andock - A poor man's PasS
 
-Develop your project with Docksal, build and deploy with Andock.
+Andock makes it dead simple to get Docksal environments up on your server. 
 
 ## Key features
 * Unlimited staging environments

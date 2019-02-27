@@ -1,5 +1,7 @@
 # Andock - A poor man's PasS
 
+Andock makes it dead simple to get Docksal environments up on your server. 
+
 __Andock__ is designed having two scenarios in mind:
 
 1. You can use Andock to host small to medium-sized Docksal projects in the cloud or on any Bare Metal Server with minimum configuration effort and without any other necessary server infrastructure or know how. 
