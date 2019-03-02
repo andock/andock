@@ -51,9 +51,9 @@ load setup_helper
 
 @test "server:update" {
   if [ "${ANDOCK_TEST_TYPE}" != "travis" ]; then
-    ../../bin/andock.sh @${ANDOCK_CONNECTION} server update "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}"
+    ../../bin/andock.sh @${ANDOCK_CONNECTION} server install "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}"
   else
-    ../../bin/andock.sh @${ANDOCK_CONNECTION} server update "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}" -e "{'enable_swap_limit': false}"
+    ../../bin/andock.sh @${ANDOCK_CONNECTION} server install "andock" "${ANDOCK_ROOT_USER}" -e "andock_user=${ANDOCK_USER}" -e "{'enable_swap_limit': false}"
   fi
 
 }
