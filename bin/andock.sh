@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=1.0.0
+ANDOCK_VERSION=1.0.1
 
 REQUIREMENTS_ANDOCK_BUILD='1.0.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.0'
-REQUIREMENTS_ANDOCK_SERVER='1.0.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.1'
+REQUIREMENTS_ANDOCK_SERVER='1.0.4'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -358,10 +358,10 @@ show_help ()
 
     echo
     printh "Server:" "" "green"
-    printh "server install <password|default(auto)> <root suer>" "Install Andock server."
-    printh "server update" "Update Andock server."
+    printh "server install <password|default(auto)> <root user|default(root)>" "Install/update Andock server."
     printh "server ssh-add" "Add public ssh key to Andock server."
     printh "server show-pub-key" "Show Andock server public key."
+    printh "server version" "Show Andock server version."
 
     echo
     printh "Project:" "" "green"
@@ -494,6 +494,16 @@ get_current_branch ()
     fi
 }
 
+# Returns "pong" if andock is installed.
+ping ()
+{
+    local connection && connection=$1
+    local ansible_output && ansible_output=$(ansible -i "${ANDOCK_INVENTORY}/${connection}" all -m ping | grep pong)
+
+    if [[ $ansible_output == *"pong"* ]]; then
+        echo "pong"
+    fi
+}
 
 # Returns the git branch name
 # of the current working directory
@@ -717,6 +727,9 @@ run_environment ()
         "init,update")
             echo-green "Deploy branch <${branch_name}>..."
         ;;
+        "version")
+            echo-green ""
+        ;;
         init|up|update|test|stop|rm|exec|"up,letsencrypt")
             echo-green "Environment $tag branch <${branch_name}>..."
         ;;
@@ -919,6 +932,8 @@ ____options: \'-p 2222\'")
 }
 
 #----------------------------------- SERVER -----------------------------------
+
+
 # Show Andock server public key.
 run_server_show_key ()
 {
@@ -961,7 +976,12 @@ run_server ()
     shift
     local tag=$1
     shift
-
+    local ping && ping=$(ping "$connection")
+    if [ "$tag" = "install" ]; then
+        if [[ "$ping" == "pong" ]]; then
+            tag="update"
+        fi
+    fi
     set -e
     local andock_pw_option
     local andock_pw
@@ -990,10 +1010,10 @@ run_server ()
 
     if [ "${tag}" = "install" ]; then
         echo-green "Installing Docksal on host"
-        echo-green "This takes some minutes..."
+        echo-green "This will take some minutes..."
         echo
         ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal) || (yum -y update && yum install -y python)"
-        ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" --tags $tag -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
         echo-green "Andock password is: ${andock_pw}"
         echo
@@ -1001,9 +1021,9 @@ run_server ()
     fi
     if [ "${tag}" = "update" ]; then
         echo-green "Updating Docksal on host"
-        echo-green "This takes some minutes..."
+        echo-green "This will take some minutes..."
         echo
-        ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "update" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
+        ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
         echo-green "Andock server was updated successfully."
     fi
@@ -1063,6 +1083,9 @@ case "$command" in
     ;;
     cup)
         install_configuration "$@"
+    ;;
+    ping)
+        ping "$connection"
     ;;
     self-update)
         self_update "$@"
@@ -1188,10 +1211,6 @@ case "$command" in
                 shift
                 run_server "$connection" "install" "$@"
             ;;
-            update)
-                shift
-                run_server "$connection" "update" "$@"
-            ;;
             ssh-add)
                 shift
                 run_server_ssh_add "$connection" "$1" "$2"
@@ -1199,6 +1218,10 @@ case "$command" in
             show-pub-key)
                 shift
                 run_server  "$connection" "show_key"
+             ;;
+            version)
+                shift
+                run_environment  "$connection" "version"
              ;;
             *)
                 echo-yellow "Unknown command '$command $1'. See 'andock help' for list of available commands" && \
