@@ -1,4 +1,4 @@
-# 5 minutes setup instruction
+# 15 minutes setup instruction
 
 You have tow options to test Andock:
 
