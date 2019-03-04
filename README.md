@@ -11,7 +11,7 @@ The Andock command line tool is the heart of Andock.
 
 ## New to Andock?
 * [See documentation](https://andock.readthedocs.io/en/latest/)
-* [5 minutes setup](https://andock.readthedocs.io/en/latest/getting-started/docksal/)
+* [15 minutes setup](https://andock.readthedocs.io/en/latest/getting-started/docksal/)
 * [Drupal boilerplate project](https://github.com/andock/boilerplate-drupal8)
 
 ## Installation
