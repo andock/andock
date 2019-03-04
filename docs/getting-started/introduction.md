@@ -35,7 +35,7 @@ After you run `andock environment deploy` Andock checks out the last commit from
  
 For more infos [see environment configuration](../configuration/environment.md)
 ### Getting started?
-* New to __Andock__ see the [5 minutes setup](../getting-started/docksal.md)
+* New to __Andock__ see the [15 minutes setup](../getting-started/docksal.md)
 
 * Check out the [configuration overview](../configuration/andock.md) 
 
