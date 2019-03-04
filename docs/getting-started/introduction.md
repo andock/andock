@@ -1,4 +1,4 @@
-# Andock - A poor man's PasS
+# Andock - A poor man's PaaS
 
 Andock makes it dead simple to get Docksal environments up on your server. 
 
