@@ -1,4 +1,4 @@
-# Andock - A poor man's PasS
+# Andock - A poor man's PaaS
 
 Andock makes it dead simple to get Docksal environments up on your server. 
 
@@ -20,5 +20,5 @@ Andock makes it dead simple to get Docksal environments up on your server.
 
 ## Getting started
 * [New to Andock? Introduction](getting-started/introduction.md)
-* [5 minute setup](getting-started/docksal.md)
+* [15 minute setup](getting-started/docksal.md)
 * [Drupal boilerplate project](https://github.com/andock/boilerplate-drupal8)
