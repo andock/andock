@@ -13,39 +13,44 @@ To quickly set up a Vagrant box run:
 ```
 The test script will ask you for your public key file to add it to the authorized_keys file on the vagrant box.
 
-After the installation, the script will ask you to copy the three domains to your /etc/hosts. With these domains you can access the deployed page. 
+To access the virtual box and to leave your /etc/hosts untouched the setup sample uses the wildcard DNS Service [sslip.io](sslip.io).
 
-### Check out and initialize the demo project
+With sslip.io you can ping the virtual box with `ping demo-project.192-168-33-10.sslip.io`.
+
+You should also be able to connect to the Vagrant machine with `ssh root@demo-project.192-168-33-10.sslip.io`.
+
+### Prepare the demo project
 Check out [Andock demo project](https://github.com/andock/demo-project)
 ```
 git clone https://github.com/andock/demo-project.git
 ```
-... and fin init
+... and run fin init
 ```
 cd demo-project
 fin init
 ```
-Now you should see 'Welcome to Andock' when you open: `http://demo-project.docksal/`
-and you should be able to connect to the Vagrant machine with `ssh root@192.168.33.10` 
+Now you should see __Welcome to Andock__ when you open: `http://demo-project.docksal/`
 
-The Andock addon is already part of the demo project. To get an overview of all commands run `fin andock`
-#### The setup of the test environment is done!
+#### The setup of the local Docksal environment is done!
 
 ## Let's start with Andock.
-  
+### First install and activate the Andock addon
+```
+fin addon install andock
+```
 ### Connect
 Connect your project to the Andock server by running: 
 
 ```
-fin andock connect default andock.vagrant
+fin andock connect default demo-project.192-168-33-10.sslip.io
 ```
 
 Andock will create a connection with name default which points to your vagrant box.
 
 [Here](../configuration/connections.md) you can find more details about connections.
 
-### Install Andock server
-Andock needs Docksal installed on the server. You can easily install Docksal with: 
+### Prepare Andock server
+Andock needs Docksal installed on the server. Simple run: 
 ```
 fin andock server install
 ```
@@ -53,17 +58,18 @@ fin andock server install
 ```
 fin andock config generate
 ```
-Use `{{branch}}.demo-project.andock.vagrant` as virtual host pattern.
+Use `{{branch}}.demo-project.192-168-33-10.sslip.io` as virtual host pattern.
  
 This will create all required config files and templates for init, build, test and update hooks. 
 
 ### Build and deploy
+The last step ist build and deploy the demo application. Run:
 ```
 fin andock build deploy
 ```
 
 ## Congratulations, the deployment has finished!
-Now open [http://master.demo-project.andock.vagrant](http://master.demo-project.andock.vagrant) to check the deployed demo site.
+Now open [http://master.demo-project.192-168-33-10.sslip.io](http://master.demo-project.192-168-33-10.sslip.io) to check the deployed demo site.
 
 To access the environment (cli) container via ssh run:
 ```
@@ -75,18 +81,13 @@ Now create your first dev branch and build the dev environment:
 ```
 git fetch origin develop
 git checkout -b develop
-
 ```
 and run: 
 
 ``` 
 fin andock build deploy
 ```  
-
-!!! tip "Install and enable Andock addon"
-    The Andock addon is part of the demo project. Run `fin addon install andock` to install the addon and enable it with `fin andock enable` 
-    
-
+Now open [http://develop.demo-project.192-168-33-10.sslip.io](http://develop.demo-project.192-168-33-10.sslip.io) to access the environment of the develop branch.
 ### Read more:
 * [Andock configuration overview](../configuration/andock.md) 
 * [Hooks overview](../configuration/hooks.md)

@@ -48,14 +48,12 @@ echo ""
 echo "Vagrant is up"
 echo
 echo "Please copy following lines to your /etc/hosts"
-echo "192.168.33.10    andock.vagrant"
-echo "192.168.33.10    master.demo-project.andock.vagrant"
-echo "192.168.33.10    develop.demo-project.andock.vagrant"
-echo
+echo ""
+echo "Use nip.io to use "
 echo ""
 echo "You should now connect to the vagrant box with ssh root@andock.vagrant"
 echo ""
-echo "Go to now demo-project and follow the 5 minutes guide"
+echo "Go to now demo-project and follow the 15 minutes guide"
 echo
 echo "##########################################################################"
 echo ""
