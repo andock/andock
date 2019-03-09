@@ -529,6 +529,10 @@ get_ansible_info ()
 
     # Source .docksal.env for docroot
     source .docksal/docksal.env
+
+    if [ "${DOCROOT}" = "" ]; then
+        DOCROOT="docroot"
+    fi
     #echo "COMMAND: $command"
     local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} --connection=local -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
 
@@ -700,6 +704,9 @@ run_environment ()
     # Source .docksal.env
     source .docksal/docksal.env
 
+    if [ "${DOCROOT}" = "" ]; then
+        DOCROOT="docroot"
+    fi
     # Load branch specific {branch}.andock.yml file if exist.
     local branch_settings_path
     branch_settings_path="$(get_branch_settings_path)"
