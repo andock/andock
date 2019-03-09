@@ -17,6 +17,7 @@ exec 3<>/dev/tty
 read_cmd="read -u 3"
 
 # Ask for ssh key
+echo ""
 echo "This script starts Ubuntu with Vagrant."
 echo "For easy setup it will add your public key to the authorized_key file of the vagrant box."
 echo ""
@@ -46,16 +47,10 @@ echo ""
 echo "##########################################################################"
 echo ""
 echo "Vagrant is up"
-echo
-echo "Please copy following lines to your /etc/hosts"
-echo "192.168.33.10    andock.vagrant"
-echo "192.168.33.10    master.demo-project.andock.vagrant"
-echo "192.168.33.10    develop.demo-project.andock.vagrant"
-echo
 echo ""
-echo "You should now connect to the vagrant box with ssh root@andock.vagrant"
+echo "You should now connect to the vagrant box with ssh root@demo-project.192-168-33-10.sslip.io"
 echo ""
-echo "Go to now demo-project and follow the 5 minutes guide"
+echo "Now continue with the 15 minutes guide"
 echo
 echo "##########################################################################"
 echo ""

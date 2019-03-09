@@ -2,24 +2,35 @@
 ## Cloud installation
 The easiest way to test <b>Andock</b> is to create a cloud box on any cloud provider which fulfills the [system requirements](system-requirements.md).
 
-Point a wildcard domain to your new server and check out the [Andock demo project](https://github.com/andock/demo-project) on your local machine.
+After starting the cloud box point a wildcard domain to the server or use a wildcard DNS Service like [sslip.io](https://sslip.io) to access the server.   
+
+This setup instruction uses `demo-project.YOUR-IP.sslip.io` to access the server.
+### Prepare the demo project
+Check out [Andock demo project](https://github.com/andock/demo-project)
 ```
 git clone https://github.com/andock/demo-project.git
 ```
-... and fin init
+... and run fin init
 ```
 cd demo-project
 fin init
 ```
-Now you should see __Welcome to Andock__ when you open: `http://demo-project.docksal/`.
+Now you should see __Welcome to Andock__ when you open: `http://demo-project.docksal/`
+
+#### The setup of the local Docksal environment is done!
 
 
 ## Let's start with Andock.
 
+### First install and activate the Andock addon
+```
+fin addon install andock
+```
+
 ### Connect
 Now you have to connect your project to the Andock server by running 
 
-`fin andock connect default YOUR-DOMAIN.com`. 
+`fin andock connect default demo-project.YOUR-IP.sslip.io`. 
 
 Andock will create a connection with name default which points to your cloud box.
 
@@ -35,7 +46,7 @@ fin andock server install
 ```
 fin andock config generate
 ```
-Use `{{branch}}.YOUR-DOMAIN.com` as virtual host pattern.
+Use `{{branch}}.demo-project.YOUR-IP.sslip.io` as virtual host pattern.
  
 This will create all required config files and templates for init, build, test and update hooks. 
 
@@ -46,7 +57,7 @@ fin andock build deploy
 
 ## Congratulations, the deployment has finished!
 
-Now you can open `http://master.YOUR-DOMAIN.com` to check the deployed demo site.
+Now you can open `http://master.demo-project.YOUR-IP.sslip.io` to check the deployed demo site.
 
 To access the environment (cli) via ssh run:
 ```
@@ -66,9 +77,8 @@ and run:
 fin andock build deploy
 ```  
 
-!!! tip "Install and enable Andock addon"
-    The Andock addon is already installed in the demo project. Run `fin addon install andock` to install the addon and enable it with `fin andock enable` 
-    
+Now open http://develop.demo-project.YOUR-IP.sslip.io to access the environment of the develop branch.
+
 
 ### Read more:
 * [Andock configuration overview](../configuration/andock.md) 
