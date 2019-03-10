@@ -2,7 +2,7 @@
 ## Cloud installation
 The easiest way to test <b>Andock</b> is to create a cloud box on any cloud provider which fulfills the [system requirements](system-requirements.md).
 
-After starting the cloud box point a wildcard domain to the server or use a wildcard DNS Service like [sslip.io](https://sslip.io) to access the server.   
+After starting the cloud box, point a wildcard domain to the server or use a wildcard DNS service like [sslip.io](https://sslip.io) to access the server.   
 
 This setup instruction uses `demo-project.YOUR-IP.sslip.io` to access the server.
 ### Prepare the demo project
@@ -20,7 +20,7 @@ Now you should see __Welcome to Andock__ when you open: `http://demo-project.doc
 #### The setup of the local Docksal environment is done!
 
 
-## Let's start with Andock.
+## Let's start with Andock! 
 
 ### First install and activate the Andock addon
 ```
@@ -55,7 +55,7 @@ This will create all required config files and templates for init, build, test a
 fin andock build deploy
 ```
 
-## Congratulations, the deployment has finished!
+## Congratulations, the deployment is finished!
 
 Now you can open `http://master.demo-project.YOUR-IP.sslip.io` to check the deployed demo site.
 
@@ -64,7 +64,7 @@ To access the environment (cli) via ssh run:
 fin andock environment ssh
 ```
 ### Build the dev branch
-Now create your first a dev branch and build the dev environment:
+Now create a dev branch and build the dev environment:
 
 ```
 git fetch origin develop
