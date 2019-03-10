@@ -32,7 +32,7 @@ Now you have to connect your project to the Andock server by running
 
 `fin andock connect default demo-project.YOUR-IP.sslip.io`. 
 
-Andock will create a connection with name default which points to your cloud box.
+Andock will create a connection named `default` which points to your cloud box.
 
 [Here](../configuration/connections.md) you can find more details about connections.
 
