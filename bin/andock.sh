@@ -1,12 +1,12 @@
 #!/bin/bash
 
 ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=1.0.1
+ANDOCK_VERSION=1.0.2
 
-REQUIREMENTS_ANDOCK_BUILD='1.0.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.1'
+REQUIREMENTS_ANDOCK_BUILD='1.0.2'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.2'
 REQUIREMENTS_ANDOCK_SERVER='1.0.4'
-REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
+REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.12.3'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
 SSH2DOCKSAL_COMMAND=""
@@ -375,7 +375,9 @@ show_help ()
     printh "build deploy" "Build deployment artifact, pushes to artifact repository and deploy it."
     echo
     printh "Environment:" "" "green"
-    printh "environment deploy (deploy)" "Deploy environment."
+    printh "environment deploy (deploy)" "Initialize or update environment."
+    printh "environment init" "Initialize a new environment."
+    printh "environment update" "Update environment."
     printh "environment up"  "Start services."
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
@@ -482,7 +484,9 @@ get_branch_settings_path ()
 # of the current working directory
 get_current_branch ()
 {
-    if [ "${TRAVIS}" = "true" ]; then
+    if [[ "${BRANCH}" != "" ]]; then
+        echo ${BRANCH}
+    elif [ "${TRAVIS}" = "true" ]; then
         echo $TRAVIS_BRANCH
     elif [ "${GITLAB_CI}" = "true" ]; then
         echo $CI_COMMIT_REF_NAME
@@ -857,6 +861,7 @@ virtual_hosts:
 ## ansible build hooks.
 ## The hooks that will be triggered when the environment is built/initialized/updated.
 hook_build_tasks: \"{{project_path}}/.andock/hooks/build_tasks.yml\"
+hook_build_test_tasks: \"{{project_path}}/.andock/hooks/build_test_tasks.yml\"
 hook_init_tasks: \"{{project_path}}/.andock/hooks/init_tasks.yml\"
 hook_update_tasks: \"{{project_path}}/.andock/hooks/update_tasks.yml\"
 hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
@@ -864,6 +869,8 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
 " > .andock/andock.yml
 
     config_generate_composer_hook "build"
+
+    config_generate_empty_hook "build_test"
 
     config_generate_fin_init_hook
 
@@ -1059,6 +1066,15 @@ else
     connection=${DEFAULT_CONNECTION_NAME}
 fi
 
+int_branch="$1"
+add="${int_branch:0:1}"
+
+if [ "$add" = ":" ]; then
+    # Connection alias found.
+    BRANCH="${int_branch:1}"
+    shift
+fi
+
 org_path=${PWD}
 # ansible playbooks needs to be called from project_root.
 # So cd to root path
@@ -1122,11 +1138,11 @@ case "$command" in
     build)
         case "$1" in
             clean)
-                shift
+              shift
 	            run_build_clean "$connection" "$@"
             ;;
              push)
-                shift
+              shift
 	            run_build_push "$connection" "$@"
             ;;
              deploy)
@@ -1146,7 +1162,15 @@ case "$command" in
         case "$1" in
             deploy)
                 shift
-	            run_environment "$connection" "init,update" "$@"
+	              run_environment "$connection" "init,update" "$@"
+            ;;
+            init)
+                shift
+	              run_environment "$connection" "init" "$@"
+            ;;
+            update)
+                shift
+	              run_environment "$connection" "update" "$@"
             ;;
             rm)
                 shift
