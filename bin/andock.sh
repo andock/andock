@@ -4,7 +4,7 @@ ANSIBLE_VERSION="2.6.2"
 ANDOCK_VERSION=1.1.0
 
 REQUIREMENTS_ANDOCK_BUILD='1.1.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.1'
 REQUIREMENTS_ANDOCK_SERVER='1.0.4'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.12.3'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
@@ -387,6 +387,8 @@ show_help ()
     printh "environment url" "Print environment urls."
     printh "environment ssh [--container] <command>" "SSH into environment. Specify a different container than cli with --container <SERVICE>"
     echo
+    printh "clean" "Cleans build and environment."
+    echo
     printh "fin <command>" "Fin remote control."
 
     echo
@@ -511,13 +513,13 @@ ping ()
 
 # Returns the git branch name
 # of the current working directory
-get_ansible_info ()
+execute_ansible ()
 {
     local connection && connection=$1
     shift
-    local command && command=$1
-    shift
     local arg && arg=$1
+    shift
+
     local settings_path && settings_path="$(get_settings_path)"
     # Load branch specific {branch}.andock.yml file if exist.
     local branch_settings_path
@@ -537,9 +539,21 @@ get_ansible_info ()
     if [ "${DOCROOT}" = "" ]; then
         DOCROOT="docroot"
     fi
-    #echo "COMMAND: $command"
-    local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} --connection=local -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
+    # echo "COMMAND: " $*
+    local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' environment_home='~/andock/projects/{{project_id}}/{{branch}}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} --connection=local -i "${ANDOCK_INVENTORY}/${connection}" all "$@")
+    echo ${ansible_output}
+}
 
+# Returns the git branch name
+# of the current working directory
+get_ansible_info ()
+{
+    local connection && connection=$1
+    shift
+    local command && command=$1
+    shift
+    local arg && arg=$1
+    ansible_output=$(execute_ansible "$connection" "$arg" -m debug -a "msg='AN__${command}__AN'")
     local command && command=$(echo ${ansible_output} | grep -o -P '(?<=AN__).*(?=__AN)')
     echo $command
 }
@@ -596,14 +610,15 @@ build()
         exit 1;
     fi
 }
+# Clean
 run_build_clean ()
 {
 
     local branch_name && branch_name=$(get_current_branch)
     local connection && connection=$1 && shift
-    echo-green "Clean build caches for <${branch_name}>..."
+    echo-green "Clean build for <${branch_name}>..."
     build $connection --tags "cleanup,setup" -e "{'cache_build': false}" "$@"
-    echo-green "Build caches cleaned successfully"
+    echo-green "Build was cleaned successfully"
 
 }
 # Ansible playbook wrapper for andock.build role.
@@ -654,7 +669,7 @@ run_fin ()
     local exec_path=$1 && shift
     local exec_command=$*
 
-
+    echo-green "Run fin for <${branch_name}>..."
     # Run the playbook.
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
     if [[ $? == 0 ]]; then
@@ -1157,6 +1172,12 @@ case "$command" in
         ;;
     deploy)
 	    run_environment "$connection" "init,update" "$@"
+    ;;
+    clean)
+      set -e
+      run_build_clean "$connection" "$@"
+	    run_environment "$connection" "rm" "$@"
+	    echo $(execute_ansible "$connection" "" -m file -a 'path=\"{{ environment_home }}\" state=absent')
     ;;
     environment)
         case "$1" in
