@@ -1,11 +1,11 @@
 #!/bin/bash
 
-ANSIBLE_VERSION="2.6.2"
+ANSIBLE_VERSION="2.8.6"
 ANDOCK_VERSION=1.1.0
 
 REQUIREMENTS_ANDOCK_BUILD='1.1.0'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.1'
-REQUIREMENTS_ANDOCK_SERVER='1.0.4'
+REQUIREMENTS_ANDOCK_SERVER='1.1.0'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.12.3'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -52,6 +52,8 @@ export ANSIBLE_SSH_PIPELINING=True
 export ANSIBLE_STDOUT_CALLBACK="${ANDOCK_STDOUT_CALLBACK:-andock_stdout}"
 
 export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
+
+export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=TRUE
 
 #export DISPLAY_SKIPPED_HOSTS=True
 
@@ -201,20 +203,20 @@ generate_playbooks()
 {
     mkdir -p ${ANDOCK_PLAYBOOK}
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   roles:
     - { role: andock.build }
 " > "${ANDOCK_PLAYBOOK}/build.yml"
 
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   gather_facts: true
   roles:
     - { role: andock.environment }
 " > "${ANDOCK_PLAYBOOK}/fin.yml"
 
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   gather_facts: false
   tasks:
     - include_role:
@@ -226,7 +228,7 @@ generate_playbooks()
 
 
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   roles:
     - role: andock-ci.ansible_role_ssh_keys
       ssh_keys_clean: False
@@ -236,7 +238,7 @@ generate_playbooks()
 " > "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
 
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   roles:
     - { role: andock.server }
 " > "${ANDOCK_PLAYBOOK}/server_install.yml"
@@ -309,7 +311,7 @@ self_update()
     new_version=$(echo "$new_andock" | grep "^ANDOCK_VERSION=" | cut -f 2 -d "=")
     if [[ "$new_version" != "$ANDOCK_VERSION" ]]; then
         local current_major_version
-        current_major_version=$(echo "$ANDOCK_VERSION" | cut -d "." -f 1)
+        current_major_version=$(echo "$ANDOCK_VERSION" |install_configuration cut -d "." -f 1)
         local new_major_version
         new_major_version=$(echo "$new_version" | cut -d "." -f 1)
         if [[ "$current_major_version" != "$new_major_version" ]]; then
@@ -587,7 +589,7 @@ run_connect ()
   mkdir -p ".andock/connections"
 
   echo "
-[andock-docksal-server]
+[andock_docksal_server]
 $host ansible_connection=ssh ansible_user=andock
 " > "${ANDOCK_INVENTORY}/${connection_name}"
 
@@ -1041,7 +1043,7 @@ run_server ()
         echo-green "Installing Docksal on host"
         echo-green "This will take some minutes..."
         echo
-        ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal) || (yum -y update && yum install -y python)"
+        ansible andock_docksal_server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal) || (yum -y update && yum install -y python)"
         ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
         echo-green "Andock password is: ${andock_pw}"
