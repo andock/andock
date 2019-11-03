@@ -53,8 +53,11 @@ export ANSIBLE_STDOUT_CALLBACK="${ANDOCK_STDOUT_CALLBACK:-andock_stdout}"
 
 export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
 
-export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=TRUE
+export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=True
 
+export ANSIBLE_CONDITIONAL_BARE_VARS=True
+
+#export ANSIBLE_DEPRECATION_WARNINGS=False
 #export DISPLAY_SKIPPED_HOSTS=True
 
 #export ANSIBLE_ACTION_WARNINGS=False
@@ -1040,6 +1043,7 @@ run_server ()
     fi
 
     if [ "${tag}" = "install" ]; then
+        #export ANSIBLE_PYTHON_INTERPRETER=auto_silent
         echo-green "Installing Docksal on host"
         echo-green "This will take some minutes..."
         echo
@@ -1050,6 +1054,7 @@ run_server ()
         echo
         echo-green "Andock server was installed successfully."
     fi
+
     if [ "${tag}" = "update" ]; then
         echo-green "Updating Docksal on host"
         echo-green "This will take some minutes..."
@@ -1058,6 +1063,7 @@ run_server ()
         echo
         echo-green "Andock server was updated successfully."
     fi
+
     if [ "${tag}" = "show_key" ]; then
         echo-green "Show Andock public key"
         echo
