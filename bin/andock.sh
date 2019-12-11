@@ -259,7 +259,7 @@ install_andock()
     echo-green "Installing Ansible:"
 
     sudo apt-get update
-    sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev figlet python3-pip -y
+    sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev figlet python3-pip python3-setuptools -y
 
     set -e
 
