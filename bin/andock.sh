@@ -1,12 +1,12 @@
 #!/bin/bash
 
-ANSIBLE_VERSION="2.6.2"
-ANDOCK_VERSION=1.0.1
+ANSIBLE_VERSION="2.8.6"
+ANDOCK_VERSION=1.1.0
 
-REQUIREMENTS_ANDOCK_BUILD='1.0.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='1.0.1'
-REQUIREMENTS_ANDOCK_SERVER='1.0.4'
-REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.11.1'
+REQUIREMENTS_ANDOCK_BUILD='1.1.0'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.1'
+REQUIREMENTS_ANDOCK_SERVER='1.1.0'
+REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.12.3'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
 SSH2DOCKSAL_COMMAND=""
@@ -53,6 +53,11 @@ export ANSIBLE_STDOUT_CALLBACK="${ANDOCK_STDOUT_CALLBACK:-andock_stdout}"
 
 export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
 
+export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=True
+
+export ANSIBLE_CONDITIONAL_BARE_VARS=True
+
+#export ANSIBLE_DEPRECATION_WARNINGS=False
 #export DISPLAY_SKIPPED_HOSTS=True
 
 #export ANSIBLE_ACTION_WARNINGS=False
@@ -201,20 +206,20 @@ generate_playbooks()
 {
     mkdir -p ${ANDOCK_PLAYBOOK}
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   roles:
     - { role: andock.build }
 " > "${ANDOCK_PLAYBOOK}/build.yml"
 
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   gather_facts: true
   roles:
     - { role: andock.environment }
 " > "${ANDOCK_PLAYBOOK}/fin.yml"
 
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   gather_facts: false
   tasks:
     - include_role:
@@ -226,7 +231,7 @@ generate_playbooks()
 
 
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   roles:
     - role: andock-ci.ansible_role_ssh_keys
       ssh_keys_clean: False
@@ -236,7 +241,7 @@ generate_playbooks()
 " > "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
 
     echo "---
-- hosts: andock-docksal-server
+- hosts: andock_docksal_server
   roles:
     - { role: andock.server }
 " > "${ANDOCK_PLAYBOOK}/server_install.yml"
@@ -309,7 +314,7 @@ self_update()
     new_version=$(echo "$new_andock" | grep "^ANDOCK_VERSION=" | cut -f 2 -d "=")
     if [[ "$new_version" != "$ANDOCK_VERSION" ]]; then
         local current_major_version
-        current_major_version=$(echo "$ANDOCK_VERSION" | cut -d "." -f 1)
+        current_major_version=$(echo "$ANDOCK_VERSION" |install_configuration cut -d "." -f 1)
         local new_major_version
         new_major_version=$(echo "$new_version" | cut -d "." -f 1)
         if [[ "$current_major_version" != "$new_major_version" ]]; then
@@ -375,7 +380,9 @@ show_help ()
     printh "build deploy" "Build deployment artifact, pushes to artifact repository and deploy it."
     echo
     printh "Environment:" "" "green"
-    printh "environment deploy (deploy)" "Deploy environment."
+    printh "environment deploy (deploy)" "Initialize or update environment."
+    printh "environment init" "Initialize a new environment."
+    printh "environment update" "Update environment."
     printh "environment up"  "Start services."
     printh "environment test"  "Run UI tests. (Like behat, phantomjs etc.)"
     printh "environment stop" "Stop services."
@@ -384,6 +391,8 @@ show_help ()
 
     printh "environment url" "Print environment urls."
     printh "environment ssh [--container] <command>" "SSH into environment. Specify a different container than cli with --container <SERVICE>"
+    echo
+    printh "clean" "Cleans build and environment."
     echo
     printh "fin <command>" "Fin remote control."
 
@@ -482,7 +491,9 @@ get_branch_settings_path ()
 # of the current working directory
 get_current_branch ()
 {
-    if [ "${TRAVIS}" = "true" ]; then
+    if [[ "${BRANCH}" != "" ]]; then
+        echo ${BRANCH}
+    elif [ "${TRAVIS}" = "true" ]; then
         echo $TRAVIS_BRANCH
     elif [ "${GITLAB_CI}" = "true" ]; then
         echo $CI_COMMIT_REF_NAME
@@ -507,13 +518,13 @@ ping ()
 
 # Returns the git branch name
 # of the current working directory
-get_ansible_info ()
+execute_ansible ()
 {
     local connection && connection=$1
     shift
-    local command && command=$1
-    shift
     local arg && arg=$1
+    shift
+
     local settings_path && settings_path="$(get_settings_path)"
     # Load branch specific {branch}.andock.yml file if exist.
     local branch_settings_path
@@ -533,9 +544,21 @@ get_ansible_info ()
     if [ "${DOCROOT}" = "" ]; then
         DOCROOT="docroot"
     fi
-    #echo "COMMAND: $command"
-    local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} --connection=local -i "${ANDOCK_INVENTORY}/${connection}" all -m debug -a "msg='AN__${command}__AN'")
+    # echo "COMMAND: " $*
+    local ansible_output && ansible_output=$(ansible -o -e "arg='${arg}' environment_home='~/andock/projects/{{project_id}}/{{branch}}' docroot='${DOCROOT}' branch='${branch_name}'" -e "@${settings_path}" ${branch_settings_config} --connection=local -i "${ANDOCK_INVENTORY}/${connection}" all "$@")
+    echo ${ansible_output}
+}
 
+# Returns the git branch name
+# of the current working directory
+get_ansible_info ()
+{
+    local connection && connection=$1
+    shift
+    local command && command=$1
+    shift
+    local arg && arg=$1
+    ansible_output=$(execute_ansible "$connection" "$arg" -m debug -a "msg='AN__${command}__AN'")
     local command && command=$(echo ${ansible_output} | grep -o -P '(?<=AN__).*(?=__AN)')
     echo $command
 }
@@ -569,7 +592,7 @@ run_connect ()
   mkdir -p ".andock/connections"
 
   echo "
-[andock-docksal-server]
+[andock_docksal_server]
 $host ansible_connection=ssh ansible_user=andock
 " > "${ANDOCK_INVENTORY}/${connection_name}"
 
@@ -592,14 +615,15 @@ build()
         exit 1;
     fi
 }
+# Clean
 run_build_clean ()
 {
 
     local branch_name && branch_name=$(get_current_branch)
     local connection && connection=$1 && shift
-    echo-green "Clean build caches for <${branch_name}>..."
+    echo-green "Clean build for <${branch_name}>..."
     build $connection --tags "cleanup,setup" -e "{'cache_build': false}" "$@"
-    echo-green "Build caches cleaned successfully"
+    echo-green "Build was cleaned successfully"
 
 }
 # Ansible playbook wrapper for andock.build role.
@@ -650,7 +674,7 @@ run_fin ()
     local exec_path=$1 && shift
     local exec_command=$*
 
-
+    echo-green "Run fin for <${branch_name}>..."
     # Run the playbook.
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" --tags "exec" -e "@${settings_path}" ${branch_settings_config} -e "exec_command='$exec_command' exec_path='$exec_path' project_path=$PWD branch=${branch_name}" ${ANDOCK_PLAYBOOK}/fin.yml
     if [[ $? == 0 ]]; then
@@ -857,6 +881,7 @@ virtual_hosts:
 ## ansible build hooks.
 ## The hooks that will be triggered when the environment is built/initialized/updated.
 hook_build_tasks: \"{{project_path}}/.andock/hooks/build_tasks.yml\"
+hook_build_test_tasks: \"{{project_path}}/.andock/hooks/build_test_tasks.yml\"
 hook_init_tasks: \"{{project_path}}/.andock/hooks/init_tasks.yml\"
 hook_update_tasks: \"{{project_path}}/.andock/hooks/update_tasks.yml\"
 hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
@@ -864,6 +889,8 @@ hook_test_tasks: \"{{project_path}}/.andock/hooks/test_tasks.yml\"
 " > .andock/andock.yml
 
     config_generate_composer_hook "build"
+
+    config_generate_empty_hook "build_test"
 
     config_generate_fin_init_hook
 
@@ -1016,16 +1043,18 @@ run_server ()
     fi
 
     if [ "${tag}" = "install" ]; then
+        #export ANSIBLE_PYTHON_INTERPRETER=auto_silent
         echo-green "Installing Docksal on host"
         echo-green "This will take some minutes..."
         echo
-        ansible andock-docksal-server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal) || (yum -y update && yum install -y python)"
+        ansible andock_docksal_server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal) || (yum -y update && yum install -y python)"
         ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
         echo-green "Andock password is: ${andock_pw}"
         echo
         echo-green "Andock server was installed successfully."
     fi
+
     if [ "${tag}" = "update" ]; then
         echo-green "Updating Docksal on host"
         echo-green "This will take some minutes..."
@@ -1034,6 +1063,7 @@ run_server ()
         echo
         echo-green "Andock server was updated successfully."
     fi
+
     if [ "${tag}" = "show_key" ]; then
         echo-green "Show Andock public key"
         echo
@@ -1057,6 +1087,15 @@ if [ "$add" = "@" ]; then
 else
     # No alias found. Use the "default"
     connection=${DEFAULT_CONNECTION_NAME}
+fi
+
+int_branch="$1"
+add="${int_branch:0:1}"
+
+if [ "$add" = ":" ]; then
+    # Connection alias found.
+    BRANCH="${int_branch:1}"
+    shift
 fi
 
 org_path=${PWD}
@@ -1122,11 +1161,11 @@ case "$command" in
     build)
         case "$1" in
             clean)
-                shift
+              shift
 	            run_build_clean "$connection" "$@"
             ;;
              push)
-                shift
+              shift
 	            run_build_push "$connection" "$@"
             ;;
              deploy)
@@ -1142,11 +1181,25 @@ case "$command" in
     deploy)
 	    run_environment "$connection" "init,update" "$@"
     ;;
+    clean)
+      set -e
+      run_build_clean "$connection" "$@"
+	    run_environment "$connection" "rm" "$@"
+	    echo $(execute_ansible "$connection" "" -m file -a 'path=\"{{ environment_home }}\" state=absent')
+    ;;
     environment)
         case "$1" in
             deploy)
                 shift
-	            run_environment "$connection" "init,update" "$@"
+	              run_environment "$connection" "init,update" "$@"
+            ;;
+            init)
+                shift
+	              run_environment "$connection" "init" "$@"
+            ;;
+            update)
+                shift
+	              run_environment "$connection" "update" "$@"
             ;;
             rm)
                 shift

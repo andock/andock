@@ -17,3 +17,19 @@ Deploy on the production host. (connection name is `production`):
     fin andock @production deploy
 ```
 
+# Different environments
+You can execute an command on an different environment with `:environment`:
+
+## Example 1:
+
+Execute deploy on master environment on production
+```
+    fin andock @production :master deploy
+```
+
+## Example 2:
+
+Execute deploy on master environment on local environment
+```
+    fin andock :master deploy
+```
