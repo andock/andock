@@ -259,7 +259,7 @@ install_andock()
     echo-green "Installing Ansible:"
 
     sudo apt-get update
-    sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev figlet -y
+    sudo apt-get install whois sudo build-essential libssl-dev libffi-dev python-dev figlet python3-pip -y
 
     set -e
 
@@ -267,16 +267,10 @@ install_andock()
     sudo curl -fsSL ${BASHIDS_URL} -o /usr/local/bin/bashids &&
     sudo chmod +x /usr/local/bin/bashids
 
+    sudo pip3 install ansible=="${ANSIBLE_VERSION}"
     # Don't install own pip inside travis.
-    if [ "${TRAVIS}" = "true" ]; then
-        sudo pip install ansible=="${ANSIBLE_VERSION}"
-    else
-        wget https://bootstrap.pypa.io/get-pip.py
-        sudo python get-pip.py
-        sudo pip install ansible=="${ANSIBLE_VERSION}"
-        rm get-pip.py
-    fi
-    sudo pip install urllib3 pyOpenSSL ndg-httpsclient pyasn1 jmespath
+
+    sudo pip3 install urllib3 pyOpenSSL ndg-httpsclient pyasn1 jmespath
 
     which ssh-agent || ( sudo apt-get update -y && sudo apt-get install openssh-client -y )
 
