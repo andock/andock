@@ -5,7 +5,7 @@ ANDOCK_VERSION=1.1.0
 
 REQUIREMENTS_ANDOCK_BUILD='1.1.0'
 REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.1'
-REQUIREMENTS_ANDOCK_SERVER='1.1.1'
+REQUIREMENTS_ANDOCK_SERVER='1.1.3'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.13.0'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -40,6 +40,7 @@ else
 	touch "$ANDOCK_CONFIG_ENV"
 fi
 
+export ANSIBLE_PYTHON_INTERPRETER=auto
 
 export ANSIBLE_ROLES_PATH="${ANDOCK_ROLES}"
 
@@ -1037,7 +1038,6 @@ run_server ()
     fi
 
     if [ "${tag}" = "install" ]; then
-        #export ANSIBLE_PYTHON_INTERPRETER=auto_silent
         echo-green "Installing Docksal on host"
         echo-green "This will take some minutes..."
         echo
