@@ -1,2 +1,0 @@
-[andock-server]
-dev.andock.ci ansible_connection=ssh ansible_ssh_user=andock ansible_ssh_pass=andock ansible_ssh_extra_args='-o StrictHostKeyChecking=no'

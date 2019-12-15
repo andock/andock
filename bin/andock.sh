@@ -3,13 +3,10 @@
 ANSIBLE_VERSION="2.9.2"
 ANDOCK_VERSION=1.1.0
 
-
-#REQUIREMENTS_ANDOCK_BUILD='1.1.1'
-#REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.2'
-#REQUIREMENTS_ANDOCK_SERVER='1.1.5'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.13.0'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
+
 SSH2DOCKSAL_COMMAND=""
 DEFAULT_CONNECTION_NAME="default"
 
@@ -31,7 +28,7 @@ DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 ANDOCK_ROLES="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
 ANDOCK_INSTALL_COLLECTION=${ANDOCK_INSTALL_COLLECTION:-true}
 ANDOCK_COLLECTIONS="${ANDOCK_COLLECTIONS:-${ANDOCK_HOME}/collections}"
-ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_ROLES}/andock.server/callback}"
+ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_COLLECTIONS}/callbacks}"
 ANDOCK_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-True}"
 ANDOCK_PLAYBOOK="${ANDOCK_COLLECTIONS}/ansible_collections/andock/andock/playbooks"
 
@@ -264,13 +261,7 @@ install_configuration ()
       ansible-galaxy collection build --force
       ansible-galaxy collection install andock-andock-${ANDOCK_VERSION}.tar.gz --force
     fi
-
-    #ansible-galaxy install andock.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
-    #ansible-galaxy install andock.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
-    #ansible-galaxy install andock.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
     ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
-
-
 }
 
 # Based on docksal update script
@@ -1054,7 +1045,6 @@ run_server ()
         echo
         ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "show_key" -i "${ANDOCK_INVENTORY}/${connection}" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
-        #echo-green "Andock server was updated successfully."
     fi
 }
 
@@ -1154,7 +1144,7 @@ case "$command" in
 	            run_build_push "$connection" "$@"
             ;;
              deploy)
-                shift
+              shift
 	            run_build_push "$connection" "$@"
 	            run_environment "$connection" "init,update" "$@"
             ;;
@@ -1280,9 +1270,6 @@ case "$command" in
     ;;
     -v | v)
         version --short
-    ;;
-    _collection_publish)
-      collection_publish
     ;;
     version)
 	    version
