@@ -24,13 +24,11 @@ BASHIDS_URL="https://raw.githubusercontent.com/benwilber/bashids/master/bashids"
 URL_ANDOCK="${URL_REPO}/master/bin/andock.sh"
 DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 
-
 ANDOCK_ROLES="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
 ANDOCK_INSTALL_COLLECTION=${ANDOCK_INSTALL_COLLECTION:-true}
 ANDOCK_COLLECTIONS="${ANDOCK_COLLECTIONS:-${ANDOCK_HOME}/collections}"
-ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_COLLECTIONS}/callbacks}"
+ANDOCK_COLLECTIONS_HOME="${ANDOCK_COLLECTIONS_HOME:-${ANDOCK_COLLECTIONS}/ansible_collections/andock/andock}"
 ANDOCK_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-True}"
-ANDOCK_PLAYBOOK="${ANDOCK_COLLECTIONS}/ansible_collections/andock/andock/playbooks"
 
 # Load environment variables overrides, use to permanently override some variables
 # Source and allexport variables in the .env file
@@ -41,6 +39,10 @@ if [[ -f "$ANDOCK_CONFIG_ENV" ]]; then
 else
 	touch "$ANDOCK_CONFIG_ENV"
 fi
+
+ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_COLLECTIONS_HOME}/plugins/callback}"
+ANDOCK_PLAYBOOK="${ANDOCK_COLLECTIONS_HOME}/playbooks"
+
 
 export ANSIBLE_PYTHON_INTERPRETER=auto
 
