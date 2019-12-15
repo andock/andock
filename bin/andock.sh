@@ -235,7 +235,7 @@ install_andock()
 
     which ssh-agent || ( sudo apt-get update -y && sudo apt-get install openssh-client -y )
 
-    install_configuration $1 $path
+    install_configuration $1 $2
     echo-green ""
     echo-green "Andock was installed successfully"
 
