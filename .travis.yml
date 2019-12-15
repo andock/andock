@@ -22,8 +22,7 @@ before_install:
 - cd tests
 - "./init-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE"
 - cd ..
-- if [[ "${TRAVIS_TAG}" != "" ]]; then export ANSIBLE_GALAXY_SECRET=${TRAVIS_ANSIBLE_GALAXY_API_KEY};
-  fi
+- if [[ "${TRAVIS_TAG}" != "" ]]; then export ANSIBLE_GALAXY_SECRET=${TRAVIS_ANSIBLE_GALAXY_API_KEY};fi
 - ./bin/andock.sh _install-andock "build" "$(pwd)"
 - cd tests
 - git clone https://github.com/andock/test-project.git
