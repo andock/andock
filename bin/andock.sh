@@ -3,9 +3,9 @@
 ANSIBLE_VERSION="2.8.6"
 ANDOCK_VERSION=1.1.0
 
-REQUIREMENTS_ANDOCK_BUILD='1.1.0'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.1'
-REQUIREMENTS_ANDOCK_SERVER='1.1.3'
+REQUIREMENTS_ANDOCK_BUILD='1.1.1'
+REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.2'
+REQUIREMENTS_ANDOCK_SERVER='1.1.4'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.13.0'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -610,7 +610,7 @@ build()
         exit 1;
     fi
 }
-# Clean
+# Clean build caches.
 run_build_clean ()
 {
 
@@ -621,6 +621,19 @@ run_build_clean ()
     echo-green "Build was cleaned successfully"
 
 }
+
+# Clean artifact repository.
+run_build_clean_artifact_branch ()
+{
+
+    local branch_name && branch_name=$(get_current_branch)
+    local connection && connection=$1 && shift
+    echo-green "Remove artifact branch for <${branch_name}>..."
+    build $connection --tags "cleanup,setup,cleanup_repository" -e "{'cache_build': false}" "$@"
+    echo-green "Branch was removed successfully"
+
+}
+
 # Ansible playbook wrapper for andock.build role.
 run_build_push ()
 {
@@ -1041,6 +1054,7 @@ run_server ()
         echo-green "Installing Docksal on host"
         echo-green "This will take some minutes..."
         echo
+        # Install minimal python dependencies on host.
         ansible andock_docksal_server -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}"  -m raw -a "test -e /usr/bin/python || (apt -y update && apt install -y python-minimal) || (yum -y update && yum install -y python)"
         ansible-playbook -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_command='${SSH2DOCKSAL_COMMAND}' ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=$root_user" -i "${ANDOCK_INVENTORY}/${connection}" -e "pw='$andock_pw_enc'" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
@@ -1177,8 +1191,8 @@ case "$command" in
     ;;
     clean)
       set -e
-      run_build_clean "$connection" "$@"
-	    run_environment "$connection" "rm" "$@"
+      run_environment "$connection" "rm" "$@"
+	    run_build_clean_artifact_branch "$connection" "$@"
 	    echo $(execute_ansible "$connection" "" -m file -a 'path=\"{{ environment_home }}\" state=absent')
     ;;
     environment)
