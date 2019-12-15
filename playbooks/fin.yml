@@ -1,0 +1,5 @@
+---
+- hosts: andock_docksal_server
+  gather_facts: true
+  roles:
+    - { role: andock.andock.environment }

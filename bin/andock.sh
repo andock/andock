@@ -1,11 +1,12 @@
 #!/bin/bash
 
-ANSIBLE_VERSION="2.8.6"
-ANDOCK_VERSION=1.1.1
+ANSIBLE_VERSION="2.9.2"
+ANDOCK_VERSION=1.1.0
 
-REQUIREMENTS_ANDOCK_BUILD='1.1.1'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.2'
-REQUIREMENTS_ANDOCK_SERVER='1.1.5'
+
+#REQUIREMENTS_ANDOCK_BUILD='1.1.1'
+#REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.2'
+#REQUIREMENTS_ANDOCK_SERVER='1.1.5'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.13.0'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
@@ -18,7 +19,7 @@ ANDOCK_PATH_UPDATED="/usr/local/bin/andock.updated"
 ANDOCK_HOME="$HOME/.andock"
 ANDOCK_INVENTORY="./.andock/connections"
 ANDOCK_INVENTORY_GLOBAL="$ANDOCK_HOME/connections"
-ANDOCK_PLAYBOOK="$ANDOCK_HOME/playbooks"
+
 ANDOCK_CONFIG_ENV="$ANDOCK_HOME/andock.env"
 
 URL_REPO="https://raw.githubusercontent.com/andock/andock"
@@ -26,9 +27,13 @@ BASHIDS_URL="https://raw.githubusercontent.com/benwilber/bashids/master/bashids"
 URL_ANDOCK="${URL_REPO}/master/bin/andock.sh"
 DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 
+
 ANDOCK_ROLES="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
+ANDOCK_INSTALL_COLLECTION=${ANDOCK_INSTALL_COLLECTION:-true}
+ANDOCK_COLLECTIONS="${ANDOCK_COLLECTIONS:-${ANDOCK_HOME}/collections}"
 ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_ROLES}/andock.server/callback}"
 ANDOCK_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-True}"
+ANDOCK_PLAYBOOK="${ANDOCK_COLLECTIONS}/ansible_collections/andock/andock/playbooks"
 
 # Load environment variables overrides, use to permanently override some variables
 # Source and allexport variables in the .env file
@@ -57,6 +62,8 @@ export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=True
 
 export ANSIBLE_CONDITIONAL_BARE_VARS=True
+
+export ANSIBLE_COLLECTIONS_PATHS=${ANDOCK_COLLECTIONS}
 
 #export ANSIBLE_DEPRECATION_WARNINGS=False
 #export DISPLAY_SKIPPED_HOSTS=True
@@ -202,53 +209,6 @@ _ask_pw ()
 
 #------------------------------ SETUP --------------------------------
 
-# Generate playbook files
-generate_playbooks()
-{
-    mkdir -p ${ANDOCK_PLAYBOOK}
-    echo "---
-- hosts: andock_docksal_server
-  roles:
-    - { role: andock.build }
-" > "${ANDOCK_PLAYBOOK}/build.yml"
-
-    echo "---
-- hosts: andock_docksal_server
-  gather_facts: true
-  roles:
-    - { role: andock.environment }
-" > "${ANDOCK_PLAYBOOK}/fin.yml"
-
-    echo "---
-- hosts: andock_docksal_server
-  gather_facts: false
-  tasks:
-    - include_role:
-        name: andock.fin
-        vars_from: default.yml
-    - debug: 'X'
-
-" > "${ANDOCK_PLAYBOOK}/fin_run.yml"
-
-
-    echo "---
-- hosts: andock_docksal_server
-  roles:
-    - role: andock-ci.ansible_role_ssh_keys
-      ssh_keys_clean: False
-      ssh_keys_user:
-        andock:
-          - \"{{ ssh_key }}\"
-" > "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
-
-    echo "---
-- hosts: andock_docksal_server
-  roles:
-    - { role: andock.server }
-" > "${ANDOCK_PLAYBOOK}/server_install.yml"
-
-}
-
 # Install ansible
 # and ansible galaxy roles
 install_andock()
@@ -275,7 +235,7 @@ install_andock()
 
     which ssh-agent || ( sudo apt-get update -y && sudo apt-get install openssh-client -y )
 
-    install_configuration
+    install_configuration $1 $path
     echo-green ""
     echo-green "Andock was installed successfully"
 
@@ -284,12 +244,30 @@ install_andock()
 # Install ansible galaxy roles.
 install_configuration ()
 {
-    mkdir -p $ANDOCK_INVENTORY_GLOBAL
-    generate_playbooks
+    install_type=
+    if [[ "$1" == "${install_type}" ]]; then
+      install_type="install"
+    else
+      install_type="$1"
+    fi
+
+    mkdir -p ${ANDOCK_INVENTORY_GLOBAL}
     echo-green "Installing Roles:"
-    ansible-galaxy install andock.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
-    ansible-galaxy install andock.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
-    ansible-galaxy install andock.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
+
+    if [[ "install" == "${install_type}" ]]; then
+      ansible-galaxy collection install andock.andock:==${ANDOCK_VERSION} --force
+    fi
+    if [[ "build" == "${install_type}" ]]; then
+      cd $2
+      cp default.galaxy.yml galaxy.yml
+      echo "version: \"${ANDOCK_VERSION}\"" >> galaxy.yml
+      ansible-galaxy collection build --force
+      ansible-galaxy collection install andock-andock-${ANDOCK_VERSION}.tar.gz --force
+    fi
+
+    #ansible-galaxy install andock.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
+    #ansible-galaxy install andock.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
+    #ansible-galaxy install andock.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
     ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
 
 
@@ -1010,7 +988,6 @@ run_server_ssh_add ()
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "ansible_ssh_user='$user' ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
-
 # Run ansible role andock.server.
 run_server ()
 {
@@ -1303,6 +1280,9 @@ case "$command" in
     ;;
     -v | v)
         version --short
+    ;;
+    _collection_publish)
+      collection_publish
     ;;
     version)
 	    version

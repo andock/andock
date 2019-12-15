@@ -1,0 +1,7 @@
+- hosts: andock_docksal_server
+  roles:
+    - role: andock-ci.ansible_role_ssh_keys
+      ssh_keys_clean: False
+      ssh_keys_user:
+        andock:
+          - "{{ ssh_key }}"

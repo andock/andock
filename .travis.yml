@@ -18,7 +18,7 @@ before_install:
   - cd tests
   - ./init-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
   - cd ..
-  - ./bin/andock.sh _install-andock
+  - ./bin/andock.sh _install-andock "build" "$(pwd)/../"
   - cd tests
   - git clone https://github.com/andock/test-project.git
   - git clone https://github.com/andock/boilerplate-drupal8.git

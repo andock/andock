@@ -1,6 +1,5 @@
 namespace: "andock"
 name: "andock"
-version: "1.1.0"
 readme: "README.md"
 authors:
   - "Christian Wiedemann <christian.wiedemann@key-tec.de>"
@@ -9,3 +8,4 @@ license:
 tags:
   - docksal
 repository: "https://www.github.com/andock/andock"
+
