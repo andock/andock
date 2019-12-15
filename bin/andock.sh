@@ -1,7 +1,7 @@
 #!/bin/bash
 
+ANDOCK_VERSION=1.1.1
 ANSIBLE_VERSION="2.9.2"
-ANDOCK_VERSION=1.1.0
 
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.13.0'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
@@ -262,6 +262,11 @@ install_configuration ()
       echo "version: \"${ANDOCK_VERSION}\"" >> galaxy.yml
       ansible-galaxy collection build --force
       ansible-galaxy collection install andock-andock-${ANDOCK_VERSION}.tar.gz --force
+      if [[ "" != "${ANSIBLE_GALAXY_API_KEY}" ]]; then
+        ansible-galaxy collection publish andock-andock-${ANDOCK_VERSION}.tar.gz --api-key=${ANSIBLE_GALAXY_API_KEY}
+      fi
+
+      TRAVIS_TAG
     fi
     ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
 }
