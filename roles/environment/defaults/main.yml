@@ -1,0 +1,117 @@
+---
+
+# Default andock home
+
+project_id: "{{ project_name }}"
+
+andock_home: "{{ ansible_env.HOME }}/andock"
+
+andock_conf: "{{ ansible_env.HOME }}/.andock"
+
+project_home: "{{ andock_home }}/projects/{{ project_id }}"
+
+environment_home: "{{ project_home }}/{{ branch }}"
+
+# Default checkout branch.
+branch: "master"
+
+# Virtual hosts.
+virtual_hosts: []
+
+# Default docroot folder.
+docroot: "docroot"
+
+# Environment folder.
+environment_path: "{{ environment_home }}/{{ branch }}-{{ project_id }}"
+
+# Protected.
+protected_branches:
+  - master
+  - test
+
+force_rm: false
+
+# Mount environnmet folder.
+mount_path: "{{ environment_home }}/mounts"
+
+mounts: []
+
+# Generate fin alias
+alias: "{{ project_id }}.{{ branch }}"
+
+# Default docroot path
+docroot_path: "{{ environment_path }}/{{ docroot }}"
+
+# Additional docksal.env properties.
+docksal_env: []
+
+# Default fin exec command.
+exec_command: "version"
+
+# Default fin exec path.
+exec_path: ""
+
+# Path to ansible template for docksal-local.env
+docksal_local_env_path: templates/.docksal/docksal-local.env
+
+# Path to ansible template for docksal-local.yml
+docksal_local_yml_path: templates/.docksal/docksal-local.yml
+
+# File mode while deployment
+file_mode_prepare: u=rwX,g=rwX,o=rX
+
+# File mode after deployment
+file_mode_deployed: u=rX,g=rX,o=rX
+
+target_branch_suffix: ""
+
+read_only: true
+
+# The path to the source repository.
+git_artifact_repository_path:  "{{ project_home }}/repository/{{ project_id }}.git"
+
+## Let's encrypt variables
+
+letsencrypt_enable: false
+
+letsencrypt_acme_version: 2
+
+letsencrypt_home: "~/.docksal/certs"
+
+letsencrypt_account_key_path: "{{ letsencrypt_home }}/letsencrypt-account.key"
+
+letsencrypt_key_path: "{{ letsencrypt_home }}/{{letsencrypt_domain}}.key"
+
+letsencrypt_csr_path: "{{ letsencrypt_home }}/{{letsencrypt_domain}}.csr"
+
+letsencrypt_crt_path: "{{ letsencrypt_home }}/{{letsencrypt_domain}}.crt"
+
+letsencrypt_key_options: '2048'
+
+letsencrypt_csr_subj: "/C=US/ST=Any/L=Wherever/O=Whatever/CN={{letsencrypt_domain}}"
+
+letsencrypt_account_email: "christian@andock.ci"
+
+letsencrypt_directory_staging: https://acme-staging-v02.api.letsencrypt.org/directory
+
+letsencrypt_directory_production: https://acme-v02.api.letsencrypt.org/directory
+
+letsencrypt_directory: "{{letsencrypt_directory_production}}"
+
+letsencrypt_challenge_type: 'http-01'
+
+letsencrypt_agreement: https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf
+
+letsencrypt_domains: "{{ virtual_hosts }}"
+
+# HOOKS:
+hook_init_tasks: ""
+
+hook_update_tasks: ""
+
+hook_test_tasks: ""
+
+hook_deploy_done_tasks: ""
+
+hook_deploy_failed_tasks: ""
+

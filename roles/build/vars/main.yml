@@ -1,0 +1,4 @@
+---
+# vars file for andock-build
+ANDOCK_MIN_SERVER_VERSIOM: "1.0"
+

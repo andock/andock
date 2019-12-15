@@ -1,0 +1,328 @@
+---
+- name: "Check Andock Server Version"
+  slurp:
+    src: "{{ andock_conf }}/version"
+  register: andock_server_version
+  tags: ['init','up','update','test','stop','rm','exec','letsencrypt', 'version']
+
+- name: "Andock Server Version:"
+  debug:
+    msg: "{{ andock_server_version['content']|b64decode }}"
+  tags: ['print_action','init','up','update','test','stop','rm','exec','letsencrypt', 'version']
+
+- name: "Andock Server is not up to date"
+  fail:
+    msg: "Minimum required Andock Server Version: {{ ANDOCK_MIN_SERVER_VERSIOM }}. Installed: {{ andock_server_version['content']|b64decode }}. Run 'andock server update'"
+  tags: ['print_action','init','up','update','test','stop','rm','exec','letsencrypt', 'version']
+  when:
+    - andock_server_version['content']|b64decode is version(ANDOCK_MIN_SERVER_VERSIOM, '<')
+
+- name: "Check if the environment is protected"
+  fail:
+    msg: "Environment is protected"
+  tags: ['rm']
+  when:
+    - 'branch in protected_branches'
+    - not force_rm
+
+- block:
+  - name: "Check if the environment already exists"
+    stat:
+      path: "{{ environment_path }}"
+    register: existing_environment_path_before
+    tags: ['init','up','update','test','stop','rm','exec','letsencrypt']
+
+  - name: "Set fact \"environment_exists_before\""
+    set_fact: environment_exists_before="{{ existing_environment_path_before.stat.exists }}"
+    tags: ['init','up','update','test','stop','rm','exec','letsencrypt']
+
+  - name: "Create environment"
+    file:
+      state: directory
+      path: "{{ environment_path }}"
+    tags:
+      - init
+      - print_action
+    when:
+      - not environment_exists_before
+
+  - name: "Check if the environment exists or has been created"
+    stat:
+      path: "{{ environment_path }}"
+    register: existing_environment_path
+    tags: ['init','up','update','test','stop','rm','exec']
+
+  - name: "Set fact \"environment_exists\""
+    set_fact: environment_exists="{{ existing_environment_path.stat.exists }}"
+    tags: ['init','up','update','test','stop','rm','exec','letsencrypt']
+
+  - name: "Create mounts"
+    file:
+      state: directory
+      path: "{{ mount_path }}/{{ item.key }}"
+    with_dict: "{{ mounts }}"
+    when:
+      - environment_exists
+    tags:
+      - init
+      - update
+      - print_action
+
+  - name: "Prepare filesystem"
+    file: dest="{{ environment_path }}" mode={{ file_mode_prepare }} recurse=yes follow=no
+    tags: ['init', 'update', 'rm','up','letsencrypt']
+    when: environment_exists
+
+  - name: "Update codebase"
+    git:
+      repo: "{{ git_artifact_repository_path }}"
+      dest: "{{ environment_path }}"
+      version: "{{ branch }}{{ target_branch_suffix }}"
+      accept_hostkey: true
+      force: yes
+    tags:
+      - init
+      - update
+      - print_action
+    when:
+      - environment_exists
+
+  - name: "Create symlinks"
+    file:
+      src: "{{ mount_path }}/{{ item.key }}"
+      dest: "{{ environment_path }}/{{ item.value.path }}"
+      state: link
+    with_dict: "{{ mounts }}"
+    tags:
+      - init
+      - up
+      - update
+    when: environment_exists
+
+  - name: "Create docksal-local.env"
+    template:
+      src: "{{ docksal_local_env_path }}"
+      dest: "{{ environment_path }}/.docksal/docksal-local.env"
+    tags: ['init', 'up', 'rm']
+    when: environment_exists
+
+  - name: "Create docksal-local.yml"
+    template:
+      src: "{{ docksal_local_yml_path }}"
+      dest: "{{ environment_path }}/.docksal/docksal-local.yml"
+    tags: ['init', 'up', 'rm']
+    when: environment_exists
+
+  - name: "Run \"fin ({{ exec_command }})\""
+    command: "fin {{ exec_command }}"
+    args:
+      warn: false
+      chdir: "{{ environment_path }}/{{ exec_path }}"
+    tags:
+      - exec
+    when: environment_exists
+    register: exec_result
+
+  - name: "Fin {{ exec_command }} output"
+    debug:
+      var:  exec_result.stdout
+    tags:
+      - exec
+      - print_action
+    when: environment_exists
+
+  - name: "Start services (fin up)"
+    command: fin up
+    args:
+      warn: false
+      chdir: "{{ environment_path }}"
+    tags:
+      - init
+      - up
+      - print_action
+    when: environment_exists
+
+  - block:
+    - name: "Let's Encrypt - Create Certificates"
+      with_dict: "{{ letsencrypt_domains }}"
+      include_tasks: "letsencrypt.yml"
+      vars:
+        letsencrypt_domain: "{{ item.value.virtual_host }}"
+      when: item.value.letsencrypt_enable|default(letsencrypt_enable)
+    tags:
+      - init
+      - update
+      - letsencrypt
+    when:
+      - letsencrypt_enable
+      - environment_exists
+
+  - name: "Set codebase to {{ file_mode_deployed }}"
+    file: dest="{{ environment_path }}" mode={{ file_mode_deployed }} recurse=yes follow=no
+    tags:
+      - init
+      - update
+      - letsencrypt
+      - up
+    when:
+      - environment_exists
+      - read_only
+
+  - block:
+    - name: "Run init tasks"
+      include_tasks: "{{ hook_init_tasks }}"
+    tags:
+      - init
+      - print_action
+    when:
+      - environment_exists
+      - not environment_exists_before
+      - hook_init_tasks != ""
+
+  - name: "Add environment alias (fin alias {{ alias }})"
+    command: "fin alias {{ environment_path }} {{ alias }}"
+    args:
+      warn: false
+      chdir: "{{ environment_path }}"
+    tags: ['init']
+    when:
+      - environment_exists
+      - not environment_exists_before
+
+  - block:
+    - name: "Run update tasks"
+      include_tasks: "{{ hook_update_tasks }}"
+    tags:
+      - update
+      - print_action
+    when:
+      - environment_exists
+      - environment_exists_before
+      - hook_update_tasks != ""
+
+  - block:
+    - name: "Run test tasks."
+      include_tasks: "{{ hook_test_tasks }}"
+    tags:
+      - test
+      - print_action
+    when:
+      - environment_exists
+      - hook_test_tasks != ""
+
+  - name: "Stop environment (fin stop)"
+    command: fin stop
+    args:
+      warn: false
+      chdir: "{{ environment_path }}"
+    tags:
+      - stop
+      - rm
+      - print_action
+    ignore_errors: yes
+    when: environment_exists
+
+  - name: "Remove alias {{ alias }}"
+    command: "fin alias remove {{ alias }}"
+    args:
+      warn: false
+      chdir: "{{ environment_path }}"
+    tags: ['rm']
+    ignore_errors: yes
+    when: environment_exists
+
+  - block:
+    - name: Cleanup certificates
+      with_dict:
+        - "{{ letsencrypt_domains }}"
+      include_tasks: "letsencrypt_rm.yml"
+      vars:
+        letsencrypt_domain: "{{ item.value.virtual_host }}"
+    tags:
+      - rm
+      - print_action
+    when: letsencrypt_enable
+
+  - name: "Remove services (fin rm)"
+    command: "fin rm -f"
+    args:
+      warn: false
+      chdir: "{{ environment_path }}"
+    tags:
+      - rm
+    when: environment_exists
+
+  - name: "Remove environment"
+    file:
+      state: absent
+      path: "{{ environment_home }}"
+    tags:
+      - rm
+      - print_action
+    when: environment_exists
+
+  - block:
+    - name: "Run deploy done tasks."
+      include_tasks: "{{ hook_deploy_done_tasks }}"
+    tags:
+      - init
+      - update
+      - print_action
+    when:
+      - environment_exists
+      - hook_deploy_done_tasks != ""
+
+  - name: "Restart environment"
+    command: "fin restart"
+    args:
+      warn: false
+      chdir: "{{ environment_path }}"
+    tags:
+      - update
+      - print_action
+    when: environment_exists
+
+  rescue:
+  - name: "Inconsistent environment - Remove services (fin rm)"
+    command: "fin rm -f"
+    args:
+      warn: false
+      chdir: "{{ environment_path }}"
+    tags:
+      - init
+    when:
+    - environment_exists
+    - not environment_exists_before
+
+  - name: "Inconsistent environment - Prepare codebase for deletion"
+    file: dest="{{ environment_path }}" mode={{ file_mode_prepare }} recurse=yes follow=no
+    tags: ['init']
+    when:
+    - environment_exists
+    - not environment_exists_before
+
+  - name: "Inconsistent environment - Remove environment"
+    file:
+      state: absent
+      path: "{{ environment_path }}"
+    tags:
+      - init
+      - print_action
+    when:
+    - environment_exists
+    - not environment_exists_before
+
+  - block:
+    - name: "Run deploy failed tasks"
+      include_tasks: "{{ hook_deploy_failed_tasks }}"
+    tags:
+      - init
+      - update
+      - print_action
+    when:
+      - hook_deploy_failed_tasks != ""
+
+  - name: "Fail"
+    fail:
+      msg: "Environment build failed"
+    tags: ['init','up','update','test','stop','rm','exec','letsencrypt']

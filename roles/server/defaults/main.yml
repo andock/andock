@@ -1,0 +1,31 @@
+---
+# default andock password.
+pw: "andock"
+
+# default andock ssh key.
+ssh_key: ""
+
+# default andock home folder.
+andock_user_home: "~"
+
+# Set GRUB_CMDLINE_LINUX=="cgroup_enable=memory swapaccount=1" in grub"
+enable_swap_limit: true
+
+# Path to ansible template for docksal.env
+docksal_env_template_path: templates/docksal.env
+
+# Install docksal as root. To install it via --local use use_become: false.
+sudo_nopasswd: false
+
+# docksal version.
+docksal_version: "v1.11.1"
+
+# ssh2docksal.
+ssh2docksal_version: "1.0-rc.2"
+
+ssh2docksal_command: ""
+
+# andock user name
+andock_user: "andock"
+
+inactivity_time_out: "4h"

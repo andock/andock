@@ -1,0 +1,70 @@
+- name: "Let's Encrypt: Create cert folder"
+  file:
+    state: directory
+    path: "{{ letsencrypt_folder }}"
+  loop:
+    - "{{ letsencrypt_home }}"
+  loop_control:
+    loop_var: letsencrypt_folder
+
+- name: "Let's Encrypt: Generate account key (if needed)"
+  command: openssl genrsa -out {{ letsencrypt_account_key_path|quote }} {{ letsencrypt_key_options }}
+  args:
+    creates: '{{ letsencrypt_account_key_path }}'
+
+- name: "Let's Encrypt: Generate private key (if needed)"
+  command: openssl genrsa -out {{ letsencrypt_key_path|quote }} {{ letsencrypt_key_options }}
+  args:
+    creates: '{{ letsencrypt_key_path }}'
+
+- name: "Let's Encrypt: Generate csr (f needed)"
+  command: openssl req -out {{ letsencrypt_csr_path|quote }} -key {{ letsencrypt_key_path|quote }}  -subj {{ letsencrypt_csr_subj|quote }} -new
+  args:
+    creates: '{{ letsencrypt_csr_path }}'
+
+- name: "Let's Encrypt: {{ letsencrypt_domain }}"
+  acme_certificate:
+    account_key: '{{ letsencrypt_account_key_path }}'
+    csr: '{{ letsencrypt_csr_path }}'
+    dest: '{{ letsencrypt_crt_path }}'
+    challenge: '{{ letsencrypt_challenge_type }}'
+    acme_version: '{{ letsencrypt_acme_version }}'
+    account_email: '{{ letsencrypt_account_email|default(omit,true) }}'
+    terms_agreed: yes
+    acme_directory: '{{ letsencrypt_directory|default(omit,true) }}'
+    agreement: '{{ letsencrypt_agreement|default(omit,true) }}'
+  register: letsencrypt_challenge
+  tags:
+    - print_action
+
+- name: "Let's Encrypt: Create directories to fulfill letsencrypt challenge"
+  file:
+    path: '{{ docroot_path }}/{{ letsencrypt_challenge["challenge_data"][letsencrypt_domain][letsencrypt_challenge_type]["resource"]|dirname }}'
+    state: directory
+  when: letsencrypt_challenge is changed
+
+- name: "Let's Encrypt: Create file to fulfill challenge"
+  copy:
+    content: '{{ letsencrypt_challenge["challenge_data"][letsencrypt_domain][letsencrypt_challenge_type]["resource_value"] }}'
+    dest: '{{ docroot_path }}/{{ letsencrypt_challenge["challenge_data"][letsencrypt_domain][letsencrypt_challenge_type]["resource"] }}'
+  when: letsencrypt_challenge is changed
+
+- name: "Let's Encrypt: Update certificate"
+  acme_certificate:
+    account_key: '{{ letsencrypt_account_key_path }}'
+    csr: '{{ letsencrypt_csr_path }}'
+    dest: '{{ letsencrypt_crt_path }}'
+    challenge: '{{ letsencrypt_challenge_type }}'
+    acme_version: '{{ letsencrypt_acme_version }}'
+    terms_agreed: yes
+    account_email: '{{ letsencrypt_account_email|default(omit,true) }}'
+    acme_directory: '{{ letsencrypt_directory|default(omit,true) }}'
+    agreement: '{{ letsencrypt_agreement|default(omit,true) }}'
+    data: '{{ letsencrypt_challenge }}'
+  when: letsencrypt_challenge is changed
+
+- name: "Let's Encrypt: Restart vhost proxy"
+  command: fin system reset vhost-proxy
+  when: letsencrypt_challenge is changed
+  tags:
+    - print_action

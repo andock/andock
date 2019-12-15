@@ -1,0 +1,3 @@
+---
+# vars file for andock-build
+ANDOCK_SERVER_VERSION: "1.0.3"

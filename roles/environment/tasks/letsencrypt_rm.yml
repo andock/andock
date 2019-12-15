@@ -1,0 +1,10 @@
+- name: "Let's Encrypt: Remove files"
+  file:
+    state: absent
+    path: "{{ letsencrypt_file }}"
+  loop:
+    - "{{ letsencrypt_key_path }}"
+    - "{{ letsencrypt_csr_path }}"
+    - "{{ letsencrypt_crt_path }}"
+  loop_control:
+    loop_var: letsencrypt_file

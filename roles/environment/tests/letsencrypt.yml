@@ -1,0 +1,17 @@
+---
+- name: Init andock instance
+  hosts: andock-server
+  gather_facts: true
+  roles:
+    - role: environment
+      git_artifact_repository_path: https://github.com/andock/demo-project.git
+      project_name: demo-project
+      branch: "master"
+      virtual_hosts:
+        default:
+          virtual_host: "dev.andock.ci"
+          container: web
+      hook_init_tasks: "hooks/init_tasks.yml"
+      docksal_env:
+        XDEBUG_ENABLED: "0"
+      letsencrypt_enable: true

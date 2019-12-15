@@ -1,0 +1,245 @@
+---
+- name: "Check Andock Server Version"
+  slurp:
+    src: "{{ andock_conf }}/version"
+  register: andock_server_version
+
+- name: "Andock Server Version:"
+  debug:
+    msg: "{{ andock_server_version['content']|b64decode }}"
+
+- name: "Andock Server is not up to date"
+  fail:
+    msg: "Minimum required Andock Server Version: {{ ANDOCK_MIN_SERVER_VERSIOM }}. Installed: {{ andock_server_version['content']|b64decode }}. Run 'andock server update'"
+  tags: ['print_action']
+  when:
+    - andock_server_version['content']|b64decode is version(ANDOCK_MIN_SERVER_VERSIOM, '<')
+
+- block:
+  - name: "Create build directory"
+    file:
+      state: directory
+      path: "{{ build_path }}"
+    tags: setup
+
+  - name: "Update codebase"
+    git:
+      repo: "{{ git_repository_path }}"
+      dest: "{{ build_path }}"
+      version: "{{ branch }}"
+      accept_hostkey: true
+      force: yes
+    tags:
+      - checkout
+      - print_action
+      - cleanup_repository
+    when: git_repository_path is defined
+
+
+  - name: "Create local build artifact repository"
+    command: "git init --bare {{ git_artifact_repository_path }}"
+    args:
+      creates: "{{ git_artifact_repository_path }}"
+    tags:
+      - init_repo
+
+  - name: "Create docksal-local.env"
+    template:
+      src: "{{ docksal_local_env_path }}"
+      dest: "{{ build_path }}/.docksal/docksal-local.env"
+    tags: ['fin_up']
+
+  - name: "Fin up"
+    command: "fin up"
+    args:
+      chdir: "{{ build_path }}"
+    when: fin_up_during_build
+    tags:
+      - fin_up
+      - print_action
+
+  - name: "Remove docksal-local.env"
+    file:
+      state: absent
+      path: "{{ build_path }}/.docksal/docksal-local.env"
+    tags: ['fin_up']
+
+  - name: "Remove stage"
+    file:
+      state: absent
+      path: "{{ stage_path }}"
+    tags:
+      - prepare_staging
+
+  - block:
+    - name: "Run build tasks"
+      include_tasks: "{{ hook_build_tasks }}"
+      when:
+        - hook_build_tasks != ""
+    tags:
+      - print_action
+
+  - block:
+    - name: "Run build test tasks"
+      include_tasks: "{{ hook_build_test_tasks }}"
+      when:
+        - hook_build_test_tasks != ""
+        - not skip_build_test_tasks
+    tags:
+      - print_action
+      - run_build_test_tasks
+
+  - name: "Stage files"
+    command: "rsync -a {{ build_path }}/ {{ stage_path }} --exclude {{ stage_path }}"
+    when:
+      - not skip_staging
+    tags:
+      - staging
+      - cleanup_repository
+
+  - name: "Prepare commit: Register gitignores"
+    shell: "find 2>/dev/null | egrep /\\.gitignore$"
+    args:
+      chdir: "{{ stage_path }}"
+    register: gitignore_to_check
+    ignore_errors: yes
+    tags: prepare_commit
+
+  - block:
+    - name: "Prepare commit: Remove marker in gitignore \"#### BEGIN REMOVE ANDOCK ...\""
+      blockinfile:
+        path: "{{ stage_path }}/{{ item }}"
+        marker: "#### {mark} REMOVE ANDOCK ###"
+        content: ""
+      with_items: "{{ gitignore_to_check.stdout_lines }}"
+      tags: prepare_commit
+      no_log: true
+    when:
+      - not remove_gitignore_during_build
+
+  - name: "Prepare commit: Remove gitignore files"
+    shell: "find . -type f -name .gitignore -exec rm {} \\;"
+    args:
+      chdir: "{{ stage_path }}"
+    tags: prepare_commit
+    when:
+    - remove_gitignore_during_build
+
+  - name: "Prepare commit: Add git remote \"{{ git_artifact_repository_path }}\""
+    command: git remote add remote "{{ git_artifact_repository_path }}" warn=no
+    args:
+      warn: false
+      chdir: "{{ stage_path }}"
+    tags:
+      - prepare_commit
+      - cleanup_repository
+
+  - name: "Cleanup artifact branch"
+    command: "git push --delete remote {{ target_branch }}"
+    args:
+      chdir: "{{ stage_path }}"
+    when: not cache_build
+    tags:
+      - cleanup_repository
+      - print_action
+
+  - name: "Prepare commit: Remove all git folders without the root .git directory"
+    shell: "ls | xargs find 2>/dev/null | egrep /\\.git$ | xargs rm -rf"
+    args:
+      chdir: "{{ stage_path }}"
+    tags: prepare_commit
+
+  - name: "Prepare commit: git add ."
+    command: git add .
+    args:
+      chdir: "{{ stage_path }}"
+    tags:
+      - prepare_commit
+
+  - name: "Prepare commit: git config user.name"
+    shell: git config user.name $(git --no-pager show -s --format='%an' HEAD)
+    args:
+      chdir: "{{ stage_path }}"
+    tags:
+      - prepare_commit
+
+  - name: "Prepare commit: git config user.email"
+    shell: git config user.email $(git --no-pager show -s --format='%ae' HEAD)
+    args:
+      chdir: "{{ stage_path }}"
+    tags:
+      - prepare_commit
+
+  - name: "Commit files"
+    command: "git commit --allow-empty -am \"Build: {{ ansible_date_time.iso8601 }}\""
+    args:
+      chdir: "{{ stage_path }}"
+    tags:
+      - commit
+      - print_action
+
+  - name: "Push to artifact repository"
+    command: "git push --force remote {{ branch }}:{{ target_branch }}"
+    args:
+      chdir: "{{ stage_path }}"
+    tags:
+      - push
+      - print_action
+
+  - block:
+    - name: "Run build done tasks"
+      include_tasks: "{{ hook_build_done_tasks }}"
+    tags:
+      - run_build_tasks
+      - print_action
+    when: hook_build_done_tasks
+
+  rescue:
+  - block:
+    - name: "Run build failed tasks"
+      include_tasks: "{{ hook_build_failed_tasks }}"
+    tags:
+      - run_build_failed_tasks
+      - print_action
+    when:
+      - hook_build_failed_tasks
+
+  - name: "Build failed"
+    fail:
+      msg: "Build failed"
+
+  always:
+    - name: Stop services.
+      command: "fin stop"
+      args:
+        warn: false
+        chdir: "{{ build_path }}"
+      ignore_errors: yes
+      when: fin_up_during_build
+      tags:
+        - cleanup
+        - fin_stop
+        - print_action
+
+    - name: Remove services.
+      command: "fin rm -f"
+      args:
+        warn: false
+        chdir: "{{ build_path }}"
+      ignore_errors: yes
+      when: fin_up_during_build
+      tags: cleanup
+
+    - name: "Prepare clean up"
+      file: dest="{{ build_path }}" mode=0777  recurse=yes
+      when: not cache_build
+      tags: cleanup
+
+    - name: "Clean build caches"
+      file:
+        state: absent
+        path: "{{ build_path }}"
+      when: not cache_build
+      tags:
+        - cleanup
+        - print_action

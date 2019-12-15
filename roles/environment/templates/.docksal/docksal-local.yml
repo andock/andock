@@ -1,0 +1,62 @@
+# Basic LAMP stack
+version: "2.1"
+services:
+  # CLI
+  cli:
+{% for grouped, list in virtual_hosts.values()|list|groupby('container')  %}
+{% if grouped == 'cli' %}
+    labels:
+      - io.docksal.virtual-host={% for virtual_host in list %}{{ virtual_host.virtual_host }}{% if not loop.last %},{% endif %}{% endfor %}
+{% endif %}
+{% endfor %}
+
+    environment:
+      - ANDOCK=1
+      - ANDOCK_ENVIRONMENT={{ branch }}
+      - ANDOCK_ALIAS={{ alias }}
+    volumes:
+      - project_root:/var/www:ro,nocopy
+{% if mounts %}
+{% for mount in mounts %}
+      - {{ mount }}:/var/www/{{ mounts[mount].path }}:rw
+{% endfor %}
+{% endif %}
+
+  web:
+{% for grouped, list in virtual_hosts.values()|list|groupby('container') %}
+{% if grouped == 'web' %}
+    labels:
+      - io.docksal.virtual-host={% for virtual_host in list %}{{ virtual_host.virtual_host }}{% if not loop.last %},{% endif %}{% endfor %}
+{%- endif -%}
+{% endfor %}
+
+    environment:
+      - ANDOCK=1
+{% if mounts %}
+    volumes:
+{% for mount in mounts %}
+      - {{ mount }}:/var/www/{{ mounts[mount].path }}:rw
+{% endfor %}
+{% endif %}
+
+{% for grouped, list in virtual_hosts.values()|list|groupby('container')  %}
+{% if grouped != 'web' and grouped != 'cli' %}
+  {{grouped}}:
+    labels:
+      - io.docksal.virtual-host={% for virtual_host in list %}{{ virtual_host.virtual_host }}{% if not loop.last %},{% endif %}{% endfor %}
+  {% endif %}
+  {% endfor %}
+
+{% if mounts %}
+# Generate Mounts.
+volumes:
+{% for mount in mounts %}
+  {{ mount }}:  # Project root volume (bind)
+    driver: local
+    driver_opts:
+      type: none
+      device: {{ mount_path }}/{{ mount }}
+      o: bind
+{% endfor %}
+{% endif %}
+

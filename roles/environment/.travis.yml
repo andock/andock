@@ -1,0 +1,20 @@
+---
+sudo: required
+dist: trusty
+
+services:
+  - docker
+
+before_install:
+  - sudo curl -fsSL get.docksal.io | sh
+install:
+  # Install Ansible.
+  - sudo pip install ansible==2.6
+  - sudo pip install ansible-lint
+script:
+  - ansible-lint .
+  - cd tests
+  - ./run_tests.sh "localhost" "default"
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

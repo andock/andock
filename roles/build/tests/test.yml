@@ -1,0 +1,11 @@
+---
+- name: Run build.
+  hosts: localhost
+  roles:
+    - role: build
+      project_name: "demo-project-name"
+      project_id: "demo-project"
+      git_repository_path: https://github.com/andock/demo-project.git
+      branch: "master"
+      fin_up_during_build: true
+      hook_build_tasks: "hooks/build_tasks.yml"

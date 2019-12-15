@@ -1,0 +1,289 @@
+- name: Install packages
+  retries: 3
+  register: install_result
+  until: install_result is succeeded
+  package:
+    name: "{{ item }}"
+    state: present
+  become: true
+  loop:
+    - sudo
+    - git
+    - curl
+    - python3
+    - python3-pip
+
+- name: Check that /etc/default/grub exists
+  stat:
+    path: /etc/default/grub
+  register: grunb_stat_result
+
+- name: Enable cgroup_enable and swapaccount
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: "^GRUB_CMDLINE_LINUX=="
+    line: 'GRUB_CMDLINE_LINUX=="cgroup_enable=memory swapaccount=1"'
+  become: true
+  register: grubfile
+  when:
+    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - grunb_stat_result.stat.exists
+    - enable_swap_limit
+
+- name: Enable cgroup_enable and swapaccount - update grub
+  command: update-grub
+  become: true
+  when:
+    - grubfile is changed
+    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - grunb_stat_result.stat.exists
+    - enable_swap_limit
+
+- name: Reboot... grubfile has changed.
+  shell: "sleep 5 && reboot"
+  async: 1
+  poll: 0
+  when:
+    - grubfile is changed
+    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - enable_swap_limit
+    - grunb_stat_result.stat.exists
+  tags:
+    - print_action
+
+- name: Wait for the reboot to complete.
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300
+  when:
+    - grubfile is changed
+    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - enable_swap_limit
+    - grunb_stat_result.stat.exists
+  tags:
+    - print_action
+
+- name: Create docker group
+  group:
+    name: docker
+    state: present
+  become: true
+
+- name: Ensure group "docker" exists
+  group:
+    name: docker
+    state: present
+
+- name: Ensure group "sudo" exists
+  group:
+    name: sudo
+    state: present
+
+- name: "Create / update Andock user"
+  user:
+    name: "{{ andock_user }}"
+    group: docker
+    shell: /bin/bash
+    generate_ssh_key: yes
+    groups: "sudo"
+    ssh_key_bits: 4096
+    password: "{{ pw }}"
+    update_password: on_create
+  become: true
+  tags:
+    - print_action
+
+- name: "Register ANDOCK_HOME"
+  command: "pwd"
+  register: ANDOCK_HOME
+  become: true
+  become_user: "{{ andock_user }}"
+  args:
+    chdir: "{{ andock_user_home }}"
+
+- name: Install docker-py
+  pip:
+    name: docker-py
+    executable: pip3
+  become: true
+  retries: 3
+  register: py_install_result
+  until: py_install_result is succeeded
+
+- name: Allow 'sudo' group to user andock (Disable password check)
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo   ALL=(ALL:ALL) NOPASSWD: ALL'
+  become: true
+
+- name: Add /usr/local/bin to secure_path
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin'
+    line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin'
+  become: true
+
+- name: Ensures {{ andock_user_home }}/.docksal dir exists
+  file:
+    path: "{{ andock_user_home }}/.docksal"
+    state: directory
+    recurse: yes
+  become: true
+  become_user: "{{ andock_user }}"
+
+- name: Check that docksal.env exists
+  stat:
+    path: "{{ andock_user_home }}/.docksal/docksal.env"
+  register: docksal_env_stat_result
+
+- name: "Generate docksal.env"
+  template:
+    src: "{{ docksal_env_template_path }}"
+    dest: "{{ andock_user_home }}/.docksal/docksal.env"
+    owner: "{{ andock_user }}"
+    mode: "u=rw,g=rw,o=r"
+  become: true
+  become_user: "{{ andock_user }}"
+  when:
+    - not docksal_env_stat_result.stat.exists
+
+- name: "Ensure authorized_keys file exists"
+  command: "touch ~/.ssh/authorized_keys"
+  become: true
+  args:
+    creates: "~/.ssh/authorized_keys"
+
+- name: "Copy authorized_keys file"
+  command: "bash -c '{{ item }}'"
+  with_items:
+    - "cp ~/.ssh/authorized_keys {{ ANDOCK_HOME.stdout_lines | join('\n') }}/.ssh/authorized_keys.tmp"
+    - "cat {{ ANDOCK_HOME.stdout_lines | join('\n') }}/.ssh/id_rsa.pub >> {{ ANDOCK_HOME.stdout_lines | join('\n') }}/.ssh/authorized_keys.tmp"
+    - "chown andock:docker {{ ANDOCK_HOME.stdout_lines | join('\n') }}/.ssh/authorized_keys.tmp"
+    - "mv {{ ANDOCK_HOME.stdout_lines | join('\n') }}/.ssh/authorized_keys.tmp {{ ANDOCK_HOME.stdout_lines | join('\n') }}/.ssh/authorized_keys"
+  become: true
+  args:
+    creates: "{{ ANDOCK_HOME.stdout_lines | join('\n') }}/.ssh/authorized_keys"
+
+- name: Check that /usr/local/bin/fin exists
+  stat:
+    path: /usr/local/bin/fin
+  register: fin_stat_result
+
+- name: Unlock docksal updates
+  command: fin config set DOCKSAL_LOCK_UPDATES=0 --global
+  tags:
+    - print_action
+  become: true
+  become_user: "{{ andock_user }}"
+  when:
+    - fin_stat_result.stat.exists
+
+- name: "Update Docksal"
+  command: "fin update"
+  tags:
+    - print_action
+  become: true
+  become_user: "{{ andock_user }}"
+  environment:
+    - DOCKSAL_VERSION: "{{ docksal_version }}"
+  when:
+    - fin_stat_result.stat.exists
+
+- name: "Install Docksal"
+  command: "bash -c 'curl -fsSL get.docksal.io | DOCKSAL_VERSION={{ docksal_version }} bash'"
+  tags:
+    - print_action
+  become: true
+  become_user: "{{ andock_user }}"
+  args:
+    creates: "/usr/local/bin/fin"
+  when:
+    - not fin_stat_result.stat.exists
+
+- name: Lock docksal updates
+  command: fin config set DOCKSAL_LOCK_UPDATES=1 --global
+  tags:
+    - print_action
+  become: true
+  become_user: "{{ andock_user }}"
+
+- name: "Register HOST_UID"
+  command: "id -u"
+  register: HOST_UID
+  become: true
+  become_user: "{{ andock_user }}"
+
+- name: "Register HOST_GID"
+  command: "bash -c 'cut -d: -f3 < <(getent group docker)'"
+  register: HOST_GID
+  become: true
+  become_user: "{{ andock_user }}"
+
+- name: "Install andockio/ssh2docksal"
+  docker_container:
+    image: "andockio/ssh2docksal:{{ ssh2docksal_version }}"
+    state: started
+    restart_policy: always
+    name: "andock-ssh2docksal"
+    detach: yes
+    command: "{{ ssh2docksal_command }}"
+    ports:
+      - 0.0.0.0:2222:2222
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - "{{ ANDOCK_HOME.stdout_lines | join('\n') }}/.ssh/authorized_keys:/home/docker/.ssh/authorized_keys:consistent"
+    env:
+      HOST_UID: "{{ HOST_UID.stdout_lines | join('\n') }}"
+      HOST_GID: "{{ HOST_GID.stdout_lines | join('\n') }}"
+  tags:
+    - print_action
+  become: true
+  become_user: "{{ andock_user }}"
+
+- name: Enable sudo password
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo   ALL=(ALL:ALL) NOPASSWD: /usr/sbin/adduser, /usr/sbin/userdel, /sbin/ip, /sbin/ifconfig, /usr/bin/tee'
+  become: true
+  when: not sudo_nopasswd
+
+- name: "Create Andock conf folder"
+  file:
+    state: directory
+    path: "{{ andock_user_home }}/.andock"
+  become: true
+  become_user: "{{ andock_user }}"
+
+- name: "Copy version file"
+  template:
+    src: "templates/version"
+    dest: "{{ andock_user_home }}/.andock/version"
+    owner: "{{ andock_user }}"
+    mode: "u=rw,g=rw,o=rw"
+  become: true
+  become_user: "{{ andock_user }}"
+  tags: ['install', 'update']
+
+- name: "Cat key"
+  command: "cat {{ andock_user_home }}/.ssh/id_rsa.pub"
+  register: ssh_key
+  tags:
+    - show_key
+  become: true
+  become_user: "{{ andock_user }}"
+
+- name: "Please copy and paste the following SSH key to your git user if you can't use a deploy token."
+  debug: msg="{{ ssh_key.stdout_lines | join('\n') }}"
+  tags:
+    - print_action
+    - show_key
+  become: true
+  become_user: "{{ andock_user }}"
