@@ -265,8 +265,6 @@ install_configuration ()
       if [[ "" != "${ANSIBLE_GALAXY_API_KEY}" ]]; then
         ansible-galaxy collection publish andock-andock-${ANDOCK_VERSION}.tar.gz --api-key=${ANSIBLE_GALAXY_API_KEY}
       fi
-
-      TRAVIS_TAG
     fi
     ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
 }
