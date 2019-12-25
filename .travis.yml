@@ -24,9 +24,9 @@ before_install:
 - cd ..
 - echo "${TRAVIS_TAG}"
 - echo ${TRAVIS_ANSIBLE_GALAXY_API_KEY}
-- ./bin/andock.sh _install-andock "build"
-- if [[ "${TRAVIS_TAG}" != "" ]]; then export ANSIBLE_GALAXY_SECRET=${TRAVIS_ANSIBLE_GALAXY_API_KEY}; ./bin/andock.sh _install-andock "deploy"; fi
-- cd tests
+- cd bin;./andock.sh _install-andock "build"
+- if [[ "${TRAVIS_TAG}" != "" ]]; then export ANSIBLE_GALAXY_SECRET=${TRAVIS_ANSIBLE_GALAXY_API_KEY}; ./andock.sh _install-andock "deploy"; fi
+- cd ../tests
 - git clone https://github.com/andock/test-project.git
 - git clone https://github.com/andock/boilerplate-drupal8.git
 - sudo curl -fsSL get.docksal.io | sh
