@@ -9,10 +9,10 @@ env:
     ANDOCK_USER=travis ANDOCK_CONNECTION=local
   - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
     ANDOCK_USER=andock ANDOCK_CONNECTION=default
-  - ANDOCK_TEST_IMAGE='centos-7-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
-    ANDOCK_USER=andock ANDOCK_CONNECTION=default
-  - ANDOCK_TEST_IMAGE='debian-9-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
-    ANDOCK_USER=andock ANDOCK_CONNECTION=default
+#  - ANDOCK_TEST_IMAGE='centos-7-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
+#    ANDOCK_USER=andock ANDOCK_CONNECTION=default
+#  - ANDOCK_TEST_IMAGE='debian-9-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
+#    ANDOCK_USER=andock ANDOCK_CONNECTION=default
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
@@ -25,7 +25,8 @@ before_install:
 - echo "${TRAVIS_TAG}"
 - echo ${TRAVIS_ANSIBLE_GALAXY_API_KEY}
 - cd bin;./andock.sh _install-andock "build"
-- if [[ "${TRAVIS_TAG}" != "" ]]; then export ANSIBLE_GALAXY_SECRET=${TRAVIS_ANSIBLE_GALAXY_API_KEY}; ./andock.sh _install-andock "deploy"; fi
+# Disabled for now. Docker run andock cup build
+# - if [[ "${TRAVIS_TAG}" != "" ]]; then export ANSIBLE_GALAXY_SECRET=${TRAVIS_ANSIBLE_GALAXY_API_KEY}; ./andock.sh _install-andock "deploy"; fi
 - cd ../tests
 - git clone https://github.com/andock/test-project.git
 - git clone https://github.com/andock/boilerplate-drupal8.git

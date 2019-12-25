@@ -256,12 +256,15 @@ install_ansible_collection ()
 
     mkdir -p ${ANDOCK_INVENTORY_GLOBAL}
 
+    # For local development andock is a symlink.
     if [[ -L "$0" ]]; then
-          folder="$(dirname $(readlink -f $0))/../"
-          cd $folder
-        else
-          cd "$org_path/../"
+        folder="$(dirname $(readlink -f $0))/../"
+        echo $folder
+        cd $folder
+    else
+        cd "$org_path/../"
     fi
+
     if [[ "${install_type}" == "install" ]]; then
       echo-green "Installing Collection:"
       ansible-galaxy collection install andock.andock:==${ANDOCK_VERSION} --force

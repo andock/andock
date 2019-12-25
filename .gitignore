@@ -10,5 +10,5 @@ tests/andock_key
 tests/vagrant/ubuntu-xenial-16.04-cloudimg-console.log
 tests/andock-vagrant-test
 tests/test-project
-
+andock-andock-*
 galaxy.yml

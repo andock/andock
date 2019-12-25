@@ -86,11 +86,12 @@ RUN mkdir -p /usr/local/bin
 COPY bin/andock.sh /usr/local/bin/andock
 
 RUN chmod +x /usr/local/bin/andock
-RUN andock _install-andock
+RUN cd bin
+RUN ./andock _install-andock
 USER docker
 
 # Update andock configurations as docker user.
-RUN andock cup
+RUN ./andock cup build
 
 USER root
 # Starter script
