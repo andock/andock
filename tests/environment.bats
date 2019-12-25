@@ -33,6 +33,11 @@ load setup_helper
     [[ $status == 0 ]]
 }
 
+@test "status" {
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment status -e "branch=master"
+    [[ $status == 0 ]]
+}
+
 @test "up" {
     run ../../bin/andock.sh @${ANDOCK_CONNECTION} environment up -e "branch=master"
     [[ $status == 0 ]]

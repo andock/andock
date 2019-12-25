@@ -37,6 +37,7 @@ if [[ -f "$ANDOCK_CONFIG_ENV" ]]; then
 	source "$ANDOCK_CONFIG_ENV"
 	set +a
 else
+  mkdir -p $ANDOCK_HOME
 	touch "$ANDOCK_CONFIG_ENV"
 fi
 
@@ -62,17 +63,11 @@ export ANSIBLE_STDOUT_CALLBACK="${ANDOCK_STDOUT_CALLBACK:-andock_stdout}"
 
 export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
 
-export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=True
-export ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3
+export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=silently
 
 export ANSIBLE_CONDITIONAL_BARE_VARS=True
 
 export ANSIBLE_COLLECTIONS_PATHS=${ANDOCK_COLLECTIONS}
-
-#export ANSIBLE_DEPRECATION_WARNINGS=False
-#export DISPLAY_SKIPPED_HOSTS=True
-
-#export ANSIBLE_ACTION_WARNINGS=False
 
 export ANSIBLE_SYSTEM_WARNINGS=False
 
@@ -231,7 +226,7 @@ install_andock()
     # Install bashids
     sudo curl -fsSL ${BASHIDS_URL} -o /usr/local/bin/bashids &&
     sudo chmod +x /usr/local/bin/bashids
-
+    sudo pip3 install -U setuptools
     sudo pip3 install ansible=="${ANSIBLE_VERSION}"
     # Don't install own pip inside travis.
 
@@ -376,6 +371,7 @@ show_help ()
     printh "environment stop" "Stop services."
     printh "environment rm [--force]" "Remove environment."
     printh "environment letsencrypt" "Update Let's Encrypt certificate."
+    printh "environment status" "Shows the status of the environment."
 
     printh "environment url" "Print environment urls."
     printh "environment ssh [--container] <command>" "SSH into environment. Specify a different container than cli with --container <SERVICE>"
@@ -659,6 +655,10 @@ run_build ()
 run_fin ()
 {
 
+    fin_sub_path=""
+    if [[ "$org_path" != "$root_path" ]]; then
+        fin_sub_path=$(echo ${org_path#${root_path}"/"})
+    fi
     # Check if connection exists
     check_settings_path
 
@@ -672,7 +672,7 @@ run_fin ()
 
     # Set parameters.
     local connection=$1 && shift
-    local exec_path=$1 && shift
+    local exec_path=$fin_sub_path
     local exec_command=$*
 
     echo-green "Run fin for <${branch_name}>..."
@@ -697,13 +697,67 @@ run_environment_url ()
     echo $url
 }
 
+# Checks if the environment exists
+# @param $1 Connection
+get_environment_status ()
+{
+  connection=$1 && shift
+  output=$(run_fin "$connection" "exec" "pwd")
+  if [[ "$output" =~ result.stdout\:[[:space:]]/var/www ]]; then
+    echo 1
+    return
+  fi
+
+  if [[ "$output" =~ is[[:space:]]not[[:space:]]running ]]; then
+    echo 0
+    return
+  fi
+
+  echo -1
+  return
+
+}
+show_environment_status_messages () {
+  # Get the current branch name.
+  local status && status=$1
+  local branch_name
+  branch_name=$(get_current_branch)
+  echo ""
+  if [[ $status == 1 ]]; then
+    echo-green "Environment <${branch_name}> exists and is running. Run 'andock environment init' to initialize."
+  fi
+
+  if [[ $status == 0 ]]; then
+    echo-red "Environment <${branch_name}> exists but is not running. Run 'andock environment up' to start the environment."
+  fi
+
+  if [[ $status == -1 ]]; then
+    echo-red "Environment <${branch_name}> not exists."
+  fi
+
+  echo ""
+
+}
+run_environment_status () {
+  connection=$1 && shift
+  local status && status=$(get_environment_status "$connection")
+  show_environment_status_messages $status
+}
+
 # SSH connection to environment
 # @param $1 Connection
 run_environment_ssh ()
 {
     local connection && connection=$1
     shift
+    local status && status=$(get_environment_status "$connection")
+    if [[ $status != 1 ]]; then
+      show_environment_status_messages $status
+      exit 1
+    fi
+
     local prefix && prefix=""
+
     if [[ "$1" = "--container" ]]; then
         shift
         prefix="---$1"
@@ -1220,6 +1274,10 @@ case "$command" in
                 shift
                 run_environment "$connection" "up,letsencrypt" "$@"
             ;;
+            status)
+                shift
+                run_environment_status "$connection" "$@"
+            ;;
             url)
                 shift
                 run_environment_url "$connection"
@@ -1236,11 +1294,12 @@ case "$command" in
         esac
         ;;
     fin)
-        fin_sub_path=""
-        if [[ "$org_path" != "$root_path" ]]; then
-            fin_sub_path=$(echo ${org_path#${root_path}"/"})
+        status=$(get_environment_status "$connection")
+        if [[ $status != 1 ]]; then
+            show_environment_status_messages $status
+            exit 1
         fi
-	    run_fin "$connection" "$fin_sub_path" "$*"
+	      run_fin "$connection" "$*"
     ;;
     drush)
         case "$1" in

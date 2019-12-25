@@ -1,4 +1,4 @@
-FROM golang:1.8.3 as mhbuild
+FROM golang:1.13.3 as mhbuild
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
@@ -83,17 +83,19 @@ WORKDIR /var/www
 
 # Install andock
 RUN mkdir -p /usr/local/bin
+COPY . /var/www/andock
+RUN chmod -R 777 /var/www/andock
 COPY bin/andock.sh /usr/local/bin/andock
 
 RUN chmod +x /usr/local/bin/andock
-RUN cd bin
-RUN ./andock _install-andock
+WORKDIR /var/www/andock/bin
 USER docker
+RUN ./andock.sh _install-andock build
 
 # Update andock configurations as docker user.
-RUN ./andock cup build
-
+#RUN andock cup build
 USER root
+RUN rm -R /var/www/andock
 # Starter script
 ENTRYPOINT ["/opt/startup.sh"]
 
