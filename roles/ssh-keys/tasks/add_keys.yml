@@ -1,0 +1,9 @@
+---
+# tasks file for ansible-role-ssh-keys
+- name: Set authorized keys from items
+  authorized_key:
+    user: '{{ outer_item.key }}'
+    key: '{{ item }}'
+    state: present
+    exclusive: '{{ ssh_keys_clean }}'
+  with_items: '{{ outer_item.value }}'

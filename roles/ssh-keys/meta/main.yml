@@ -1,0 +1,16 @@
+galaxy_info:
+  author: j0lly
+  description: very simple role to manage ssh pulic keys
+
+  license: BSD
+
+  min_ansible_version: 2.2
+
+  platforms:
+  - name: EL
+    versions:
+    - 7
+
+  galaxy_tags: ['ssh', 'infrastructure', 'base']
+
+dependencies: []

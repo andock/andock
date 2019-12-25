@@ -40,6 +40,10 @@ else
 	touch "$ANDOCK_CONFIG_ENV"
 fi
 
+if [[ "ANSIBLE_GALAXY_API_KEY" != "" ]]; then
+  export export ANSIBLE_GALAXY_API_KEY=$ANSIBLE_GALAXY_API_KEY
+fi
+
 ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_COLLECTIONS_HOME}/plugins/callback}"
 ANDOCK_PLAYBOOK="${ANDOCK_COLLECTIONS_HOME}/playbooks"
 
@@ -59,6 +63,7 @@ export ANSIBLE_STDOUT_CALLBACK="${ANDOCK_STDOUT_CALLBACK:-andock_stdout}"
 export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
 
 export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=True
+export ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3
 
 export ANSIBLE_CONDITIONAL_BARE_VARS=True
 
@@ -234,39 +239,50 @@ install_andock()
 
     which ssh-agent || ( sudo apt-get update -y && sudo apt-get install openssh-client -y )
 
-    install_configuration $1 $2
+    install_ansible_collection $1 $2
     echo-green ""
     echo-green "Andock was installed successfully"
 
 }
 
 # Install ansible galaxy roles.
-install_configuration ()
+install_ansible_collection ()
 {
-    install_type=
-    if [[ "$1" == "${install_type}" ]]; then
+    if [[ "$1" == "" ]]; then
       install_type="install"
     else
       install_type="$1"
     fi
 
     mkdir -p ${ANDOCK_INVENTORY_GLOBAL}
-    echo-green "Installing Roles:"
 
-    if [[ "install" == "${install_type}" ]]; then
+    if [[ -L "$0" ]]; then
+          folder="$(dirname $(readlink -f $0))/../"
+          cd $folder
+        else
+          cd "$org_path/../"
+    fi
+    if [[ "${install_type}" == "install" ]]; then
+      echo-green "Installing Collection:"
       ansible-galaxy collection install andock.andock:==${ANDOCK_VERSION} --force
     fi
-    if [[ "build" == "${install_type}" ]]; then
-      cd $2
-      cp default.galaxy.yml galaxy.yml
-      echo "version: \"${ANDOCK_VERSION}\"" >> galaxy.yml
-      ansible-galaxy collection build --force
-      ansible-galaxy collection install andock-andock-${ANDOCK_VERSION}.tar.gz --force
-      if [[ "" != "${ANSIBLE_GALAXY_API_KEY}" ]]; then
-        ansible-galaxy collection publish andock-andock-${ANDOCK_VERSION}.tar.gz --api-key=${ANSIBLE_GALAXY_API_KEY}
-      fi
+
+    if [[ "${install_type}" == "build" ]]; then
+        echo-green "Build Collection:"
+        cp default.galaxy.yml galaxy.yml
+        echo "version: \"${ANDOCK_VERSION}\"" >> galaxy.yml
+        ansible-galaxy collection build --force
+        ansible-galaxy collection install andock-andock-${ANDOCK_VERSION}.tar.gz --force
     fi
-    ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
+
+    if [[ "${install_type}" == "deploy" ]]; then
+        if [[ "" == "${ANSIBLE_GALAXY_API_KEY}" ]]; then
+          echo-error "Ansible galaxy api key is empty. Add your galaxy api key to .andock/andock.env"
+          exit 1;
+        fi
+        ansible-galaxy collection publish andock-andock-${ANDOCK_VERSION}.tar.gz --api-key=${ANSIBLE_GALAXY_API_KEY}
+    fi
+
 }
 
 # Based on docksal update script
@@ -283,7 +299,7 @@ self_update()
     new_version=$(echo "$new_andock" | grep "^ANDOCK_VERSION=" | cut -f 2 -d "=")
     if [[ "$new_version" != "$ANDOCK_VERSION" ]]; then
         local current_major_version
-        current_major_version=$(echo "$ANDOCK_VERSION" |install_configuration cut -d "." -f 1)
+        current_major_version=$(echo "$ANDOCK_VERSION" |install_ansible_collection cut -d "." -f 1)
         local new_major_version
         new_major_version=$(echo "$new_version" | cut -d "." -f 1)
         if [[ "$current_major_version" != "$new_major_version" ]]; then
@@ -1105,10 +1121,10 @@ case "$command" in
         install_andock "$@"
     ;;
     _update-andock)
-        install_configuration "$@"
+        install_ansible_collection "$@"
     ;;
     cup)
-        install_configuration "$@"
+        install_ansible_collection "$@"
     ;;
     ping)
         ping "$connection"

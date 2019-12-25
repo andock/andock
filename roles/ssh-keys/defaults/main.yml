@@ -1,0 +1,10 @@
+---
+# defaults file for ansible-role-ssh-keys
+# define if extenally set keys need to be erased
+ssh_keys_clean: False
+
+# based on user, define sources of keys
+# see http://docs.ansible.com/ansible/authorized_key_module.html for item types
+ssh_keys_user:
+  root:
+    - "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
