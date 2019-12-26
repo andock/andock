@@ -6,7 +6,7 @@ load setup_helper
 
 
 @test "deploy" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master deploy
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master deploy
     [[ $status == 0 ]]
 }
 
@@ -24,37 +24,37 @@ load setup_helper
 }
 
 @test "url: Show url" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master  environment url
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master  environment url
     [[ $status == 0 ]]
 }
 
 @test "fin: Execute fin version" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master fin "version"
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master fin "version"
     [[ $status == 0 ]]
 }
 
 @test "status" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master  environment status
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master  environment status
     [[ $status == 0 ]]
 }
 
 @test "up" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master environment up
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master environment up
     [[ $status == 0 ]]
 }
 
 @test "test" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master  environment test
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master  environment test
     [[ $status == 0 ]]
 }
 
 @test "rm" {
-  run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master environment rm
+  run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master environment rm
   [[ $status == 1 ]]
 }
 
 @test "rm --force" {
-  run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master  environment rm --force
+  run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master  environment rm --force
   [[ $status == 0 ]]
 }
 
@@ -65,7 +65,7 @@ load setup_helper
 }
 
 @test "build deploy" {
-    run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master  build deploy
+    run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master  build deploy
     [[ $status == 0 ]]
     run curl -sL http://master.demo-project.dev.andock.ci
     echo $output | grep "Hello Andock"
@@ -74,7 +74,7 @@ load setup_helper
 
 
 @test "rm" {
-  run ../../bin/andock.sh @${ANDOCK_CONNECTION}:master environment rm --force
+  run ../../bin/andock.sh @${ANDOCK_CONNECTION} :master environment rm --force
   [[ $status == 0 ]]
   fin rm -f
   [[ $status == 0 ]]
