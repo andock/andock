@@ -27,5 +27,3 @@ ssh2docksal_command: ""
 
 # andock user name
 andock_user: "andock"
-
-inactivity_time_out: "4h"

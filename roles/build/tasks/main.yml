@@ -139,6 +139,7 @@
     args:
       chdir: "{{ stage_path }}"
     when: not cache_build
+    ignore_errors: yes
     tags:
       - cleanup_repository
       - print_action

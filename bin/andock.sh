@@ -399,10 +399,6 @@ version ()
 	else
 		echo-green "Andock client: $ANDOCK_VERSION"
 		echo ""
-		echo-green "Roles:"
-		echo "andock.build: $REQUIREMENTS_ANDOCK_BUILD"
-		echo "andock.environment: $REQUIREMENTS_ANDOCK_ENVIRONMENT"
-		echo "andock.server: $REQUIREMENTS_ANDOCK_SERVER"
 	fi
 
 }
@@ -1252,7 +1248,7 @@ case "$command" in
             ;;
             update)
                 shift
-	              run_environment "$connection" "update" "$@"
+	              run_environment "$connection" "up,update" "$@"
             ;;
             rm)
                 shift
