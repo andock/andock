@@ -96,6 +96,9 @@ RUN ./andock.sh _install-andock build
 #RUN andock cup build
 USER root
 RUN rm -R /var/www/andock
+
+USER docker
+WORKDIR /var/www
 # Starter script
 ENTRYPOINT ["/opt/startup.sh"]
 
