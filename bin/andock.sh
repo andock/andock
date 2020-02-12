@@ -807,13 +807,16 @@ run_environment ()
     # Validate tag name. Show help if needed.
     case $tag in
         "init,update")
-            echo-green "Deploy branch <${branch_name}>..."
+            echo-green "Deploy branch: <${branch_name}>..."
+        ;;
+        "up,update")
+            echo-green "Update branch: <${branch_name}>..."
         ;;
         "version")
             echo-green ""
         ;;
         init|up|update|test|stop|rm|exec|"up,letsencrypt")
-            echo-green "Environment $tag branch <${branch_name}>..."
+            echo-green "Environment $tag branch: <${branch_name}>..."
         ;;
         *)
             echo-yellow "Unknown tag '$tag'. See 'andock help' for list of available commands" && \
