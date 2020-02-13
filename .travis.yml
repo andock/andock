@@ -9,10 +9,10 @@ env:
     ANDOCK_USER=travis ANDOCK_CONNECTION=local
   - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
     ANDOCK_USER=andock ANDOCK_CONNECTION=default
-#  - ANDOCK_TEST_IMAGE='centos-7-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
-#    ANDOCK_USER=andock ANDOCK_CONNECTION=default
-#  - ANDOCK_TEST_IMAGE='debian-9-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
-#    ANDOCK_USER=andock ANDOCK_CONNECTION=default
+  - ANDOCK_TEST_IMAGE='centos-7-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
+    ANDOCK_USER=andock ANDOCK_CONNECTION=default
+  - ANDOCK_TEST_IMAGE='debian-9-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
+    ANDOCK_USER=andock ANDOCK_CONNECTION=default
   global:
   - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
   - ENCRYPTION_LABEL: fe3d37fe6546
