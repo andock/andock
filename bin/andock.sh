@@ -586,7 +586,7 @@ build()
     local settings_path
     settings_path=$(get_settings_path)
 
-    local branch_nameno
+    local branch_name
     branch_name=$(get_current_branch)
 
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
