@@ -105,7 +105,7 @@
 
 - name: Install docker-py
   pip:
-    name: python-docker
+    name: docker-py
     executable: pip3
   become: true
   retries: 3
