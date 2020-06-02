@@ -1,0 +1,4 @@
+---
+- hosts: andock_docksal_server
+  roles:
+    - { role: server }

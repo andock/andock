@@ -1,0 +1,5 @@
+.molecule
+__pycache__
+*.pyc
+pytestdebug.log
+.cache

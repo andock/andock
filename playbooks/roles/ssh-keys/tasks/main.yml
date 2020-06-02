@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-role-ssh-keys
+- include: add_keys.yml
+  with_dict: '{{ssh_keys_user}}'
+  loop_control:
+    loop_var: outer_item

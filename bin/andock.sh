@@ -1,14 +1,12 @@
 #!/bin/bash
 
-ANSIBLE_VERSION="2.8.6"
 ANDOCK_VERSION=1.1.1
+ANSIBLE_VERSION="2.9.2"
 
-REQUIREMENTS_ANDOCK_BUILD='1.1.1'
-REQUIREMENTS_ANDOCK_ENVIRONMENT='1.1.2'
-REQUIREMENTS_ANDOCK_SERVER='1.1.5'
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.13.0'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
+
 SSH2DOCKSAL_COMMAND=""
 DEFAULT_CONNECTION_NAME="default"
 
@@ -18,7 +16,7 @@ ANDOCK_PATH_UPDATED="/usr/local/bin/andock.updated"
 ANDOCK_HOME="$HOME/.andock"
 ANDOCK_INVENTORY="./.andock/connections"
 ANDOCK_INVENTORY_GLOBAL="$ANDOCK_HOME/connections"
-ANDOCK_PLAYBOOK="$ANDOCK_HOME/playbooks"
+
 ANDOCK_CONFIG_ENV="$ANDOCK_HOME/andock.env"
 
 URL_REPO="https://raw.githubusercontent.com/andock/andock"
@@ -27,7 +25,9 @@ URL_ANDOCK="${URL_REPO}/master/bin/andock.sh"
 DEFAULT_ERROR_MESSAGE="Oops. There is probably something wrong. Check the logs."
 
 ANDOCK_ROLES="${ANDOCK_ROLES:-${ANDOCK_HOME}/roles}"
-ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_ROLES}/andock.server/callback}"
+ANDOCK_INSTALL_COLLECTION=${ANDOCK_INSTALL_COLLECTION:-true}
+ANDOCK_COLLECTIONS="${ANDOCK_COLLECTIONS:-${ANDOCK_HOME}/collections}"
+ANDOCK_COLLECTIONS_HOME="${ANDOCK_COLLECTIONS_HOME:-${ANDOCK_COLLECTIONS}/ansible_collections/andock/andock}"
 ANDOCK_HOST_KEY_CHECKING="${ANDOCK_HOST_KEY_CHECKING:-True}"
 
 # Load environment variables overrides, use to permanently override some variables
@@ -37,8 +37,17 @@ if [[ -f "$ANDOCK_CONFIG_ENV" ]]; then
 	source "$ANDOCK_CONFIG_ENV"
 	set +a
 else
+  mkdir -p $ANDOCK_HOME
 	touch "$ANDOCK_CONFIG_ENV"
 fi
+
+if [[ "ANSIBLE_GALAXY_API_KEY" != "" ]]; then
+  export export ANSIBLE_GALAXY_API_KEY=$ANSIBLE_GALAXY_API_KEY
+fi
+
+ANDOCK_CALLBACK_PLUGINS="${ANDOCK_CALLBACK_PLUGINS:-${ANDOCK_COLLECTIONS_HOME}/plugins/callback}"
+ANDOCK_PLAYBOOK="${ANDOCK_COLLECTIONS_HOME}/playbooks"
+
 
 export ANSIBLE_PYTHON_INTERPRETER=auto
 
@@ -54,14 +63,11 @@ export ANSIBLE_STDOUT_CALLBACK="${ANDOCK_STDOUT_CALLBACK:-andock_stdout}"
 
 export ANSIBLE_DEBUG="${ANDOCK_DEBUG:-False}"
 
-export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=True
+export ANSIBLE_TRANSFORM_INVALID_GROUP_CHARS=silently
 
 export ANSIBLE_CONDITIONAL_BARE_VARS=True
 
-#export ANSIBLE_DEPRECATION_WARNINGS=False
-#export DISPLAY_SKIPPED_HOSTS=True
-
-#export ANSIBLE_ACTION_WARNINGS=False
+export ANSIBLE_COLLECTIONS_PATHS=${ANDOCK_COLLECTIONS}
 
 export ANSIBLE_SYSTEM_WARNINGS=False
 
@@ -202,53 +208,6 @@ _ask_pw ()
 
 #------------------------------ SETUP --------------------------------
 
-# Generate playbook files
-generate_playbooks()
-{
-    mkdir -p ${ANDOCK_PLAYBOOK}
-    echo "---
-- hosts: andock_docksal_server
-  roles:
-    - { role: andock.build }
-" > "${ANDOCK_PLAYBOOK}/build.yml"
-
-    echo "---
-- hosts: andock_docksal_server
-  gather_facts: true
-  roles:
-    - { role: andock.environment }
-" > "${ANDOCK_PLAYBOOK}/fin.yml"
-
-    echo "---
-- hosts: andock_docksal_server
-  gather_facts: false
-  tasks:
-    - include_role:
-        name: andock.fin
-        vars_from: default.yml
-    - debug: 'X'
-
-" > "${ANDOCK_PLAYBOOK}/fin_run.yml"
-
-
-    echo "---
-- hosts: andock_docksal_server
-  roles:
-    - role: andock-ci.ansible_role_ssh_keys
-      ssh_keys_clean: False
-      ssh_keys_user:
-        andock:
-          - \"{{ ssh_key }}\"
-" > "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
-
-    echo "---
-- hosts: andock_docksal_server
-  roles:
-    - { role: andock.server }
-" > "${ANDOCK_PLAYBOOK}/server_install.yml"
-
-}
-
 # Install ansible
 # and ansible galaxy roles
 install_andock()
@@ -267,7 +226,7 @@ install_andock()
     # Install bashids
     sudo curl -fsSL ${BASHIDS_URL} -o /usr/local/bin/bashids &&
     sudo chmod +x /usr/local/bin/bashids
-
+    sudo pip3 install -U setuptools
     sudo pip3 install ansible=="${ANSIBLE_VERSION}"
     # Don't install own pip inside travis.
 
@@ -275,23 +234,52 @@ install_andock()
 
     which ssh-agent || ( sudo apt-get update -y && sudo apt-get install openssh-client -y )
 
-    install_configuration
+    install_ansible_collection $1 $2
     echo-green ""
     echo-green "Andock was installed successfully"
 
 }
 
 # Install ansible galaxy roles.
-install_configuration ()
+install_ansible_collection ()
 {
-    mkdir -p $ANDOCK_INVENTORY_GLOBAL
-    generate_playbooks
-    echo-green "Installing Roles:"
-    ansible-galaxy install andock.server,v${REQUIREMENTS_ANDOCK_SERVER} --force
-    ansible-galaxy install andock.build,v${REQUIREMENTS_ANDOCK_BUILD} --force
-    ansible-galaxy install andock.environment,v${REQUIREMENTS_ANDOCK_ENVIRONMENT} --force
-    ansible-galaxy install andock-ci.ansible_role_ssh_keys,v${REQUIREMENTS_SSH_KEYS} --force
+    if [[ "$1" == "" ]]; then
+      install_type="install"
+    else
+      install_type="$1"
+    fi
 
+    mkdir -p ${ANDOCK_INVENTORY_GLOBAL}
+
+    # For local development andock is a symlink.
+    if [[ -L "$0" ]]; then
+        folder="$(dirname $(readlink -f $0))/../"
+        echo $folder
+        cd $folder
+    else
+        cd "$org_path/../"
+    fi
+
+    if [[ "${install_type}" == "install" ]]; then
+      echo-green "Installing Collection:"
+      ansible-galaxy collection install andock.andock:==${ANDOCK_VERSION} --force
+    fi
+
+    if [[ "${install_type}" == "build" ]]; then
+        echo-green "Build Collection:"
+        cp default.galaxy.yml galaxy.yml
+        echo "version: \"${ANDOCK_VERSION}\"" >> galaxy.yml
+        ansible-galaxy collection build --force
+        ansible-galaxy collection install andock-andock-${ANDOCK_VERSION}.tar.gz --force
+    fi
+
+    if [[ "${install_type}" == "deploy" ]]; then
+        if [[ "" == "${ANSIBLE_GALAXY_API_KEY}" ]]; then
+          echo-error "Ansible galaxy api key is empty. Add your galaxy api key to .andock/andock.env"
+          exit 1;
+        fi
+        ansible-galaxy collection publish andock-andock-${ANDOCK_VERSION}.tar.gz --api-key=${ANSIBLE_GALAXY_API_KEY}
+    fi
 
 }
 
@@ -309,7 +297,7 @@ self_update()
     new_version=$(echo "$new_andock" | grep "^ANDOCK_VERSION=" | cut -f 2 -d "=")
     if [[ "$new_version" != "$ANDOCK_VERSION" ]]; then
         local current_major_version
-        current_major_version=$(echo "$ANDOCK_VERSION" |install_configuration cut -d "." -f 1)
+        current_major_version=$(echo "$ANDOCK_VERSION" |install_ansible_collection cut -d "." -f 1)
         local new_major_version
         new_major_version=$(echo "$new_version" | cut -d "." -f 1)
         if [[ "$current_major_version" != "$new_major_version" ]]; then
@@ -383,6 +371,7 @@ show_help ()
     printh "environment stop" "Stop services."
     printh "environment rm [--force]" "Remove environment."
     printh "environment letsencrypt" "Update Let's Encrypt certificate."
+    printh "environment status" "Shows the status of the environment."
 
     printh "environment url" "Print environment urls."
     printh "environment ssh [--container] <command>" "SSH into environment. Specify a different container than cli with --container <SERVICE>"
@@ -410,10 +399,6 @@ version ()
 	else
 		echo-green "Andock client: $ANDOCK_VERSION"
 		echo ""
-		echo-green "Roles:"
-		echo "andock.build: $REQUIREMENTS_ANDOCK_BUILD"
-		echo "andock.environment: $REQUIREMENTS_ANDOCK_ENVIRONMENT"
-		echo "andock.server: $REQUIREMENTS_ANDOCK_SERVER"
 	fi
 
 }
@@ -601,7 +586,7 @@ build()
     local settings_path
     settings_path=$(get_settings_path)
 
-    local branch_nameno
+    local branch_name
     branch_name=$(get_current_branch)
 
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "@${settings_path}" -e "project_path=$PWD branch=$branch_name" "$@" ${ANDOCK_PLAYBOOK}/build.yml
@@ -666,6 +651,10 @@ run_build ()
 run_fin ()
 {
 
+    fin_sub_path=""
+    if [[ "$org_path" != "$root_path" ]]; then
+        fin_sub_path=$(echo ${org_path#${root_path}"/"})
+    fi
     # Check if connection exists
     check_settings_path
 
@@ -679,7 +668,7 @@ run_fin ()
 
     # Set parameters.
     local connection=$1 && shift
-    local exec_path=$1 && shift
+    local exec_path=$fin_sub_path
     local exec_command=$*
 
     echo-green "Run fin for <${branch_name}>..."
@@ -704,13 +693,68 @@ run_environment_url ()
     echo $url
 }
 
+# Checks if the environment exists
+# @param $1 Connection
+get_environment_status ()
+{
+  connection=$1 && shift
+  output=$(run_fin "$connection" "exec" "pwd")
+  if [[ "$output" =~ result.stdout\:[[:space:]]/var/www ]]; then
+    echo 1
+    return
+  fi
+
+  if [[ "$output" =~ is[[:space:]]not[[:space:]]running ]]; then
+    echo 0
+    return
+  fi
+
+  echo -1
+  return
+
+}
+
+show_environment_status_messages () {
+  # Get the current branch name.
+  local status && status=$1
+  local branch_name
+  branch_name=$(get_current_branch)
+  echo ""
+  if [[ $status == 1 ]]; then
+    echo-green "Environment <${branch_name}> exists and is running. Run 'andock environment init' to initialize."
+  fi
+
+  if [[ $status == 0 ]]; then
+    echo-red "Environment <${branch_name}> exists but is not running. Run 'andock environment up' to start the environment."
+  fi
+
+  if [[ $status == -1 ]]; then
+    echo-red "Environment <${branch_name}> not exists."
+  fi
+
+  echo ""
+
+}
+run_environment_status () {
+  connection=$1 && shift
+  local status && status=$(get_environment_status "$connection")
+  show_environment_status_messages $status
+}
+
 # SSH connection to environment
 # @param $1 Connection
 run_environment_ssh ()
 {
     local connection && connection=$1
     shift
+    local status && status=$(get_environment_status "$connection")
+    if [[ $status != 1 ]]; then
+      show_environment_status_messages $status
+      exit 1
+    fi
+
     local prefix && prefix=""
+
     if [[ "$1" = "--container" ]]; then
         shift
         prefix="---$1"
@@ -764,13 +808,16 @@ run_environment ()
     # Validate tag name. Show help if needed.
     case $tag in
         "init,update")
-            echo-green "Deploy branch <${branch_name}>..."
+            echo-green "Deploy branch: <${branch_name}>..."
+        ;;
+        "up,update")
+            echo-green "Update branch: <${branch_name}>..."
         ;;
         "version")
             echo-green ""
         ;;
         init|up|update|test|stop|rm|exec|"up,letsencrypt")
-            echo-green "Environment $tag branch <${branch_name}>..."
+            echo-green "Environment $tag branch: <${branch_name}>..."
         ;;
         *)
             echo-yellow "Unknown tag '$tag'. See 'andock help' for list of available commands" && \
@@ -1010,7 +1057,6 @@ run_server_ssh_add ()
     ansible-playbook -i "${ANDOCK_INVENTORY}/${connection}" -e "ansible_ssh_user='$user' ssh_key='$key'" "${ANDOCK_PLAYBOOK}/server_ssh_add.yml"
     echo-green "SSH key was added."
 }
-
 # Run ansible role andock.server.
 run_server ()
 {
@@ -1077,10 +1123,8 @@ run_server ()
         echo
         ansible-playbook -e "${andock_pw_option}" -e "docksal_version=${REQUIREMENTS_ANDOCK_SERVER_DOCKSAL} ssh2docksal_version=${REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL} ansible_ssh_user=${root_user}" --tags "show_key" -i "${ANDOCK_INVENTORY}/${connection}" "$@" "${ANDOCK_PLAYBOOK}/server_install.yml"
         echo
-        #echo-green "Andock server was updated successfully."
     fi
 }
-
 #----------------------------------- MAIN -------------------------------------
 
 
@@ -1133,10 +1177,10 @@ case "$command" in
         install_andock "$@"
     ;;
     _update-andock)
-        install_configuration "$@"
+        install_ansible_collection "$@"
     ;;
     cup)
-        install_configuration "$@"
+        install_ansible_collection "$@"
     ;;
     ping)
         ping "$connection"
@@ -1177,7 +1221,7 @@ case "$command" in
 	            run_build_push "$connection" "$@"
             ;;
              deploy)
-                shift
+              shift
 	            run_build_push "$connection" "$@"
 	            run_environment "$connection" "init,update" "$@"
             ;;
@@ -1207,7 +1251,7 @@ case "$command" in
             ;;
             update)
                 shift
-	              run_environment "$connection" "update" "$@"
+	              run_environment "$connection" "up,update" "$@"
             ;;
             rm)
                 shift
@@ -1229,6 +1273,10 @@ case "$command" in
                 shift
                 run_environment "$connection" "up,letsencrypt" "$@"
             ;;
+            status)
+                shift
+                run_environment_status "$connection" "$@"
+            ;;
             url)
                 shift
                 run_environment_url "$connection"
@@ -1245,11 +1293,12 @@ case "$command" in
         esac
         ;;
     fin)
-        fin_sub_path=""
-        if [[ "$org_path" != "$root_path" ]]; then
-            fin_sub_path=$(echo ${org_path#${root_path}"/"})
+        status=$(get_environment_status "$connection")
+        if [[ $status != 1 ]]; then
+            show_environment_status_messages $status
+            exit 1
         fi
-	    run_fin "$connection" "$fin_sub_path" "$*"
+	      run_fin "$connection" "$*"
     ;;
     drush)
         case "$1" in
@@ -1275,6 +1324,10 @@ case "$command" in
         ;;
     server)
         case "$1" in
+            sizes)
+                shift
+                run_server_info "$connection"
+            ;;
             install)
                 shift
                 run_server "$connection" "install" "$@"

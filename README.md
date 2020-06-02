@@ -15,21 +15,23 @@ The Andock command line tool is the heart of Andock.
 * [Drupal boilerplate project](https://github.com/andock/boilerplate-drupal8)
 
 ## Installation
-Docksal addon (prefered):
-```
-    fin addon install andock
-```
-Standalone: 
-```
-    curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock | sh
-```
+
 Andock inside Docksal:
 
-Thin command line tool which install Andock and execute Andock inside the CLI container.  
+Thin command line tool which runs andock with `fin run-cli` (prefered)
 ```
     curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock-docksal | sh
 ```
 
+Docksal addon:
+```
+    fin addon install andock
+```
+
+Standalone (not recommend): 
+```
+    curl -sS https://raw.githubusercontent.com/andock/andock/master/install-andock | sh
+```
 
 ## Updates
 Update with this command:

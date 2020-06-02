@@ -2,36 +2,41 @@ sudo: required
 dist: xenial
 language: generic
 services:
-  - docker
+- docker
 env:
   matrix:
-    - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis ANDOCK_USER=travis ANDOCK_CONNECTION=local
-    - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_USER=andock ANDOCK_CONNECTION=default
-    - ANDOCK_TEST_IMAGE='centos-7-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_USER=andock ANDOCK_CONNECTION=default
-    - ANDOCK_TEST_IMAGE='debian-9-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root ANDOCK_USER=andock ANDOCK_CONNECTION=default
-  # - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='travisssh' ANDOCK_ROOT_USER=travis ANDOCK_CONNECTION=travisssh
+  - ANDOCK_TEST_IMAGE='NO_IMAGE' ANDOCK_TEST_TYPE='travis' ANDOCK_ROOT_USER=travis
+    ANDOCK_USER=travis ANDOCK_CONNECTION=local
+  - ANDOCK_TEST_IMAGE='ubuntu-18-04-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
+    ANDOCK_USER=andock ANDOCK_CONNECTION=default
+#  - ANDOCK_TEST_IMAGE='centos-7-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
+#    ANDOCK_USER=andock ANDOCK_CONNECTION=default
+#  - ANDOCK_TEST_IMAGE='debian-9-x64' ANDOCK_TEST_TYPE='digitalocean' ANDOCK_ROOT_USER=root
+#    ANDOCK_USER=andock ANDOCK_CONNECTION=default
   global:
-    - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
-    - ENCRYPTION_LABEL: fe3d37fe6546
-
+  - COMMIT_AUTHOR_EMAIL: christian.wiedemann@key-tec.de
+  - ENCRYPTION_LABEL: fe3d37fe6546
+  - secure: CQ4wLpNneo9mUhO0lWrJX0RHCa8gIM1vIWd4+xjpe7nZB4AXyC/xn8HbhCV5G0IRvHAb+HZwv5DDWGmeMlv5eHJ7KYniHGqTp1vyjUA7PuoDRW8HmCq94NmQVOn6+vDYhYVeANkM1AOH8ivbFkPMstR3k+jGdGjpDn8kh/JlG2gAdWdno/7Hu7Xp2XHZsD/DL+uZx9/wOaKK99hht/RcXMR404NS+vEnlXEKXpURI/hFJYCwjmegIHfBUrCkMZuUYZK5F2FxyZJ3gqEL3a9b8Advn5EV9wJ12WVa9PPZGU7VSv6LLL5MllGYY7gh2GidrBL/HJTttdSFtLFcy8fK3M+ICo+m3vyY5wL6wOThf9OjBnpCprffj0UkycR/8v/+tk9yMuibfS7Bdukplz8oA6hIcJX1gkOya00CMqv8G1wjftgMx5vM9bmriizkzmeBsbsVneox/sD3YTub50UhoqfdMGNaOIxBGgcRoYXVxXGPK25yasO+IRiTJrbfXuEfFPaSH2S/D1SZSBZcML0DGij07GMUlIY4gRARasSCwdbhBvtCkrQp7g+v/p/HTH178yYc+YtHIOoDz9iGs/JQTQSOpLeMS7vMw2BOLvhyorNSW88OVV4q/LRf8rgiGrGEnHkyuS02J2nDb3BHrsYQYV+TLLeBDPm/0Do84oWcjkA=
 before_install:
-  - cd tests
-  - ./init-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
-  - cd ..
-  - ./bin/andock.sh _install-andock
-  - cd tests
-  - git clone https://github.com/andock/test-project.git
-  - git clone https://github.com/andock/boilerplate-drupal8.git
-  - sudo curl -fsSL get.docksal.io | sh
-  - fin config set DOCKSAL_SSH_AGENT_USE_HOST=0 --global
-
+- set -e
+- cd tests
+- "./init-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE"
+- cd ..
+- echo "${TRAVIS_TAG}"
+- echo ${TRAVIS_ANSIBLE_GALAXY_API_KEY}
+- cd bin;./andock.sh _install-andock "build"
+# Disabled for now. Docker run andock cup build
+# - if [[ "${TRAVIS_TAG}" != "" ]]; then export ANSIBLE_GALAXY_SECRET=${TRAVIS_ANSIBLE_GALAXY_API_KEY}; ./andock.sh _install-andock "deploy"; fi
+- cd ../tests
+- git clone https://github.com/andock/test-project.git
+- git clone https://github.com/andock/boilerplate-drupal8.git
+- sudo curl -fsSL get.docksal.io | sh
+- fin config set DOCKSAL_SSH_AGENT_USE_HOST=0 --global
 script:
-  - bats server.bats
-  - bats build.bats
-  - bats environment.bats
-
-  # Install demo drupal.
-  - if [ "${ANDOCK_TEST_TYPE}" = "digitalocean" ]; then cd boilerplate-drupal8; fin init; cd ..; bats drupal.bats; fi
-#- curl -sL -I -k "https://www.master.demo-drupal.dev.andock.ci"
+- bats server.bats
+- bats build.bats
+- bats environment.bats
+- if [ "${ANDOCK_TEST_TYPE}" = "digitalocean" ]; then cd boilerplate-drupal8; fin
+  init; cd ..; bats drupal.bats; fi
 after_script:
-  - ./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE
+- "./cleanup-travis.sh $ANDOCK_TEST_TYPE $ANDOCK_TEST_IMAGE"

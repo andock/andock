@@ -1,0 +1,62 @@
+Command line:
+"travis"
+
+
+   ________                                 __
+  /        |                               /  |
+  ########/ ______    ______    __     __  ##/    _______
+     ## |  /      \  /      \  /  \   /  | /  |  /       |
+     ## | /######  | ######  | ##  \ /##/  ## | /#######/
+     ## | ## |  ##/  /    ## |  ##  /##/   ## | ##      \
+     ## | ## |      /####### |   ## ##/    ## |  ######  |
+     ## | ## |      ##    ## |    ###/     ## | /     ##/
+     ##/  ##/        #######/      #/      ##/  #######/
+
+     TRajectory Analyzer and VISualizer  -  Open-source freeware under GNU GPL v3
+
+     Copyright (c) Martin Brehm      (2009-2019), University of Halle (Saale)
+                   Martin Thomas     (2012-2019)
+                   Sascha Gehrke     (2016-2019), University of Bonn
+                   Barbara Kirchner  (2009-2019), University of Bonn
+
+     http://www.travis-analyzer.de
+
+     Please cite: M. Brehm, B. Kirchner: J. Chem. Inf. Model. 2011, 51 (8), pp 2007-2023.
+
+     There is absolutely no warranty on any results obtained from TRAVIS.
+
+  #  Running on cw-XPS-15-7590 at Sun Dec 15 23:37:11 2019 (PID 16997)
+  #  Running in /home/cw/projects/andock/andock/tests/digitalocean
+  #  Code version: Jan 01 2019,  Compiled at Feb 12 2019, 01:11:32,  Compiler "8.2.0", GCC 8.2.0
+  #  Target platform: Linux,  Compile flags: DEBUG_ARRAYS 
+  #  Machine: int=4b, long=8b, addr=8b, 0xA0B0C0D0=D0,C0,B0,A0.
+  #  Home: /home/cw,  Executable: /usr/bin/travis
+  #  Input from terminal,  Output to terminal
+
+ >>> Please use a color scheme with dark background or specify "-nocolor"! <<<
+
+    No configuration file found.
+    Writing default configuration to /home/cw/.travis.conf ...
+
+    No trajectory file specified.
+    Please use the "-p" flag to specify an input trajectory in the command line.
+
+    Enter the file name of the trajectory file to open: [Quit] 
+
+*** SIGINT caught: Hard interrupt by user ***
+Stopping execution.
+Decoding line numbers... ("addr2line <addr> -f -i -C -e /usr/bin/travis")
+ # 13 - [0x5629bd0e2db4] - ?? - ??:0 
+ # 12 - [0x5629bd0e3449] - ?? - ??:0 
+ # 11 - [0x5629bd0e3514] - ?? - ??:0 
+ # 10 - [0x7f831bfd2470] - ?? - ??:0 
+ #  9 - [0x7f831c09d270] - ?? - ??:0 
+ #  8 - [0x7f831c01fd0f] - ?? - ??:0 
+ #  7 - [0x7f831c0210f6] - ?? - ??:0 
+ #  6 - [0x7f831c01293c] - ?? - ??:0 
+ #  5 - [0x7f831c01179a] - ?? - ??:0 
+ #  4 - [0x5629bd0a9054] - ?? - ??:0 
+ #  3 - [0x5629bd02e3ac] - ?? - ??:0 
+ #  2 - [0x7f831bfb31e3] - ?? - ??:0 
+ #  1 - [0x5629bd05a9fa] - ?? - ??:0 
+Delivering control to operating system.
