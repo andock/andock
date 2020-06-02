@@ -713,6 +713,7 @@ get_environment_status ()
   return
 
 }
+
 show_environment_status_messages () {
   # Get the current branch name.
   local status && status=$1
@@ -1124,7 +1125,6 @@ run_server ()
         echo
     fi
 }
-
 #----------------------------------- MAIN -------------------------------------
 
 
@@ -1324,6 +1324,10 @@ case "$command" in
         ;;
     server)
         case "$1" in
+            sizes)
+                shift
+                run_server_info "$connection"
+            ;;
             install)
                 shift
                 run_server "$connection" "install" "$@"
