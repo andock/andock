@@ -20,4 +20,4 @@ if [[ $ANDOCK_VERSION == "" ]]; then
 fi
 echo "Use Andock Image $ANDOCK_VERSION"
 
-fin rc --image=andockio/andock:$ANDOCK_VERSION andock $cmd
+fin rc --image=andockio/andock:$ANDOCK_VERSION andock $*
