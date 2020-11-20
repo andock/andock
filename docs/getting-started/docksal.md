@@ -1,6 +1,6 @@
 # 15 minutes setup instruction
 
-You have tow options to test Andock:
+You have two options to test Andock:
 
 * [Test on a Cloud box - AWS, digital ocean etc.](cloud.md) 
  
