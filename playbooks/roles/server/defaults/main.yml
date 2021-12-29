@@ -18,7 +18,7 @@ docksal_env_template_path: templates/docksal.env
 sudo_nopasswd: false
 
 # docksal version.
-docksal_version: "v1.11.1"
+docksal_version: "v1.107.1"
 
 # ssh2docksal.
 ssh2docksal_version: "1.0-rc.2"
