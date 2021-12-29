@@ -175,7 +175,7 @@
   register: fin_stat_result
 
 - name: Unlock docksal updates
-  command: fin config set DOCKSAL_LOCK_UPDATES=0 --global
+  command: fin config remove DOCKSAL_LOCK_UPDATES --global
   tags:
     - print_action
   become: true
