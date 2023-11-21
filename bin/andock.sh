@@ -1,9 +1,9 @@
 #!/bin/bash
 
-ANDOCK_VERSION=1.1.1
+ANDOCK_VERSION=1.2.1
 ANSIBLE_VERSION="2.9.2"
 
-REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.13.0'
+REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.18.2'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
 REQUIREMENTS_SSH_KEYS='0.3'
 
@@ -699,6 +699,7 @@ get_environment_status ()
 {
   connection=$1 && shift
   output=$(run_fin "$connection" "exec" "pwd")
+
   if [[ "$output" =~ result.stdout\:[[:space:]]/var/www ]]; then
     echo 1
     return

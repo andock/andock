@@ -12,6 +12,10 @@ project_home: "{{ andock_home }}/projects/{{ project_id }}"
 
 environment_home: "{{ project_home }}/{{ branch }}"
 
+# Run git gc after checkout
+environment_git_gc: true
+environment_git_gc_options: "--aggressive --prune=now"
+
 # Default checkout branch.
 branch: "master"
 

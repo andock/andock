@@ -87,6 +87,15 @@
     when:
       - environment_exists
 
+  - name: "Run \"git gc {{ environment_git_gc_options }}"
+    command: "git gc {{ environment_git_gc_options }}"
+    tags:
+      - init
+      - update
+    when:
+      - environment_exists
+      - environment_git_gc != ''
+
   - name: "Create symlinks"
     file:
       src: "{{ mount_path }}/{{ item.key }}"
