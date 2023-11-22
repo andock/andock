@@ -92,6 +92,8 @@
     tags:
       - init
       - update
+    args:
+      chdir: "{{ environment_path }}"
     when:
       - environment_exists
       - environment_git_gc != ''

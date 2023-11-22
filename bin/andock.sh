@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ANDOCK_VERSION=1.2.1
-ANSIBLE_VERSION="2.9.2"
+ANSIBLE_VERSION="2.10.6"
 
 REQUIREMENTS_ANDOCK_SERVER_DOCKSAL='v1.18.2'
 REQUIREMENTS_ANDOCK_SERVER_SSH2DOCKSAL='1.0-rc.3'
@@ -228,6 +228,8 @@ install_andock()
     sudo chmod +x /usr/local/bin/bashids
     sudo pip3 install -U setuptools
     sudo pip3 install ansible=="${ANSIBLE_VERSION}"
+    sudo pip3 install --upgrade pip
+
     # Don't install own pip inside travis.
 
     sudo pip3 install urllib3 pyOpenSSL ndg-httpsclient pyasn1 jmespath
@@ -243,6 +245,7 @@ install_andock()
 # Install ansible galaxy roles.
 install_ansible_collection ()
 {
+    echo $install_type
     if [[ "$1" == "" ]]; then
       install_type="install"
     else

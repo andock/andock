@@ -108,6 +108,13 @@ Andock inside docksal:
 
 ```
 
+Manual Docker Build
+------------------
+
+docker login
+docker build -t andockio/andock:VERSION .
+docker push andockio/andock:VERSION
+
 
 ## Contributing to andock
 Check the [Contributing docs](CONTRIBUTING.md) on how to get involved or run tests on your local maschine.
